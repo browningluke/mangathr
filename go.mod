@@ -1,3 +1,3 @@
-module mangathr-v2
+module mangathrV2
 
 go 1.17
