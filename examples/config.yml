@@ -1,0 +1,21 @@
+---
+database:
+  driver: "sqlite"
+  uri: "./examples/database.sqlite"
+metadata:
+  agent: "comicinfo"
+  location: "internal"
+downloader:
+  simultaneousPages: 5
+  pageRetries: 5
+  delay:
+    page: 100
+    chapter: 200
+    updateChapter: 2000
+  output:
+    path: ''
+    updatePath: ''
+    zip: true
+sources:
+  mangadex:
+    syncDeletions: false
