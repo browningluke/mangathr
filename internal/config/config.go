@@ -4,7 +4,6 @@ import (
 	"errors"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"log"
 	"mangathrV2/internal/sources/connections/mangadex"
 	"strings"
 )
@@ -42,13 +41,11 @@ func (c* Config) Load(path string) error {
 
 	yamlFile, err := ioutil.ReadFile(path)
 	if err != nil {
-		log.Printf("yamlFile.Get err   #%v ", err)
+		return err
 	}
-	err = yaml.Unmarshal(yamlFile, c)
-	if err != nil {
-		log.Fatalf("Unmarshal: %v", err)
+	if err = yaml.Unmarshal(yamlFile, c); err != nil {
+		return err
 	}
-
 	if err = c.validate(); err != nil {
 		return err
 	}
