@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"mangathrV2/internal/config"
-	"syscall"
+	"mangathrV2/internal/utils"
 )
 
 func main()  {
@@ -11,10 +11,8 @@ func main()  {
 
 	// Load config object, returns Config struct
 	var c config.Config
-	err := c.Load("./examples/config.yml")
-	if err != nil {
-		fmt.Println(err)
-		syscall.Exit(1)
+	if err := c.Load("./examples/config.yml"); err != nil {
+		utils.RaiseError(err)
 	}
 	fmt.Println(c)
 
