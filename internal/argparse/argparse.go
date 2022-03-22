@@ -2,14 +2,24 @@ package argparse
 
 import (
 	"github.com/akamensky/argparse"
+	"mangathrV2/internal/commands/download"
+	"mangathrV2/internal/commands/register"
 	"os"
 )
 
 type Argparse struct {
 	Command string
-	Plugin  string
-	Query   string
-	All     bool
+
+	// Commands
+	Download download.Args
+	Register register.Args
+
+	Config struct {
+	}
+
+	// Options (overrides options in config file)
+	Options struct {
+	}
 }
 
 func (a *Argparse) Parse() error {
@@ -34,18 +44,16 @@ func (a *Argparse) Parse() error {
 
 	if downloadCmd.Happened() {
 		a.Command = "download"
-		a.Query = *downloadQuery
-		a.All = *downloadAll
+		a.Download.Plugin = *downloadPlugin
+		a.Download.Query = *downloadQuery
+		a.Download.All = *downloadAll
 
-		a.Plugin = *downloadPlugin
 	} else if registerCmd.Happened() {
 		a.Command = "register"
-		a.Query = *registerQuery
-		a.All = *registerYes
+		a.Register.Query = *registerQuery
+		a.Register.Yes = *registerYes
 
-		a.Plugin = *registerPlugin
-	} else {
-		a.Plugin = ""
+		a.Register.Plugin = *registerPlugin
 	}
 
 	return nil
