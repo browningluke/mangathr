@@ -26,13 +26,13 @@ func (a *Argparse) Parse() error {
 	parser := argparse.NewParser("mangathr", "description")
 
 	downloadCmd := parser.NewCommand("download", "")
-	downloadPlugin := downloadCmd.Selector("p", "plugin", []string{"mangadex", "webtoons"},
+	downloadPlugin := downloadCmd.Selector("p", "plugin", []string{"mangadex", "cubari"},
 		&argparse.Options{Help: "", Required: true})
 	downloadQuery := downloadCmd.String("q", "query", &argparse.Options{Help: "", Required: true})
 	downloadAll := downloadCmd.Flag("a", "all", &argparse.Options{Help: "", Required: false})
 
 	registerCmd := parser.NewCommand("register", "")
-	registerPlugin := registerCmd.Selector("p", "plugin", []string{"mangadex", "webtoons"},
+	registerPlugin := registerCmd.Selector("p", "plugin", []string{"mangadex", "cubari"},
 		&argparse.Options{Help: "", Required: true})
 	registerQuery := registerCmd.String("q", "query", &argparse.Options{Help: "", Required: true})
 	registerYes := registerCmd.Flag("y", "yes", &argparse.Options{Help: "", Required: false})

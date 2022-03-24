@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"mangathrV2/internal/argparse"
+	"mangathrV2/internal/commands/download"
 	"mangathrV2/internal/config"
 	"mangathrV2/internal/utils"
 )
@@ -27,6 +28,7 @@ func main() {
 	switch a.Command {
 	case "download":
 		fmt.Println("Downloading", a.Download)
+		download.Run(&a.Download, &c)
 		break
 	case "register":
 		fmt.Println("Registering", a.Register)

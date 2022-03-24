@@ -1,4 +1,4 @@
-package mangadex
+package cubari
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ type Scraper struct {
 }
 
 func NewScraper() *Scraper {
-	fmt.Println("Created a mangadex scraper")
+	fmt.Println("Created a cubari scraper")
 	return &Scraper{}
 }
 
