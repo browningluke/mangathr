@@ -7,6 +7,22 @@ import (
 
 type Scraper struct {
 	name string
+
+	searchResults []searchResult
+	allChapters   []chapter
+
+	manga            searchResult
+	selectedChapters []chapter
+}
+
+type searchResult struct {
+	name string
+	url  string
+}
+
+type chapter struct {
+	name string
+	num  string // doing this will make it easier
 }
 
 func NewScraper() *Scraper {
@@ -14,38 +30,91 @@ func NewScraper() *Scraper {
 	return &Scraper{}
 }
 
-func (m *Scraper) Search(query string) interface{} {
-	//TODO implement me
-	panic("implement me")
+// Search for a Manga, will fill searchResults with 0 or more results
+func (m *Scraper) Search(query string) []string {
+	m.searchResults = []searchResult{
+		{name: "Komi-san", url: "https://komi"},
+		{name: "Komi-other", url: "https://komi-other"},
+	}
 
+	var names []string
+
+	for _, item := range m.searchResults {
+		names = append(names, item.name)
+	}
+
+	return names
 }
 
+// SelectManga from searchResults list
+func (m *Scraper) SelectManga(name string) {
+
+	found := false
+	for _, item := range m.searchResults {
+		if item.name == name {
+			m.manga = item
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		panic("Selected manga not is search result list")
+	}
+
+	// Once manga has been selected, clear all search results
+	m.searchResults = []searchResult{}
+}
+
+// SearchByID for a Manga, will fill searchResults with ONLY 1 result (first result)
 func (m *Scraper) SearchByID(id string) interface{} {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (m *Scraper) ListChapters() interface{} {
-	fmt.Println("List chapters")
-	m.name = "test"
-	fmt.Println(m.name)
+func (m *Scraper) ListChapters() []string {
+	m.allChapters = []chapter{
+		{name: "Chapter 100 - something", num: "100"},
+		{name: "Chapter 101 - something else", num: "101"},
+		{name: "Chapter 101.5 - something extra", num: "101.5"},
+	}
 
-	//TODO implement me
-	//panic("implement me")
-	return nil
+	var names []string
+
+	for _, item := range m.allChapters {
+		names = append(names, item.name)
+	}
+
+	return names // do formatting on names here
 }
 
-func (m *Scraper) SelectChapters() interface{} {
-	fmt.Println("Select chapters")
-	m.name = "test"
-	fmt.Println(m.name)
+func (m *Scraper) SelectChapters(titles []string) {
+	var chapters []chapter
 
-	//TODO implement me
-	//panic("implement me")
-	return nil
+	for _, chapter := range m.allChapters {
+		for _, title := range titles {
+			if chapter.name == title {
+				chapters = append(chapters, chapter)
+			}
+		}
+	}
+	m.selectedChapters = chapters
+
+	// Once chapters have been selected, clear all chapters
+	m.allChapters = []chapter{}
+
+	fmt.Println("Selected chapters: ", m.selectedChapters)
 }
 
 func (m *Scraper) Download(downloader *downloader.Downloader) {
 	//TODO implement me
 	panic("implement me")
+}
+
+func (m *Scraper) GetChapterTitle() string {
+	return m.manga.name
+}
+
+func (m *Scraper) GetScraperName() string {
+	return "Mangadex"
 }

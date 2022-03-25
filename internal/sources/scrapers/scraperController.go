@@ -2,25 +2,29 @@ package scrapers
 
 import (
 	"mangathrV2/internal/downloader"
-	"mangathrV2/internal/sources/scrapers/cubari"
 	"mangathrV2/internal/sources/scrapers/mangadex"
 )
 
 type Scraper interface {
-	Search(query string) interface{}
+	Search(query string) []string
 	SearchByID(id string) interface{}
-	ListChapters() interface{}
+
+	SelectManga(name string)
+	ListChapters() []string
 
 	//SelectNewChapters() interface{}
-	SelectChapters() interface{}
+	SelectChapters(titles []string)
 
 	Download(downloader *downloader.Downloader)
+
+	GetChapterTitle() string
+	GetScraperName() string
 }
 
 func NewScraper(name string) Scraper {
 	m := map[string]func() Scraper{
 		"mangadex": func() Scraper { return mangadex.NewScraper() },
-		"cubari":   func() Scraper { return cubari.NewScraper() },
+		//"cubari":   func() Scraper { return cubari.NewScraper() },
 	}
 
 	scraper, ok := m[name]
