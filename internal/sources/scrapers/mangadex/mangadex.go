@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"mangathrV2/internal/downloader"
 	"mangathrV2/internal/rester"
+	"math"
 	"net/url"
 	"strconv"
 )
@@ -98,44 +99,72 @@ func (m *Scraper) SearchByID(id string) interface{} {
 
 func (m *Scraper) ListChapters() []string {
 
-	jsonString := rester.New().Get(
-		fmt.Sprintf("https://api.mangadex.org/manga/%s/feed"+
-			"?limit=10&translatedLanguage[]=en&order[chapter]=desc", m.manga.id),
-		map[string]string{})
+	getMangaFeedResp := func(offset int) mangaFeedResponse {
+		jsonString := rester.New().Get(
+			fmt.Sprintf("https://api.mangadex.org/manga/%s/feed"+
+				"?limit=500&translatedLanguage[]=en&order[chapter]=desc&offset=%d", m.manga.id, offset),
+			map[string]string{})
 
-	var mangaFeedResp mangaFeedResponse
+		var mangaFeedResp mangaFeedResponse
 
-	err := json.Unmarshal([]byte(jsonString), &mangaFeedResp)
-	if err != nil {
-		panic(err)
+		err := json.Unmarshal([]byte(jsonString), &mangaFeedResp)
+		if err != nil {
+			panic(err)
+		}
+
+		return mangaFeedResp
+	}
+
+	var mangaFeedRespList []mangaFeedResponse
+
+	initial := getMangaFeedResp(0)
+	mangaFeedRespList = append(mangaFeedRespList, initial)
+	for i := 1; i <= int(math.Ceil(float64(initial.Total/500))); i++ {
+		mangaFeedRespList = append(mangaFeedRespList, getMangaFeedResp(500*i))
 	}
 
 	var searchResults []chapterResult
 	var names []string
 
-	for _, item := range mangaFeedResp.Data {
-		var titlePadding string
-		if item.Attributes.Title == "" {
-			titlePadding = ""
-		} else {
-			titlePadding = fmt.Sprintf(" - %s", item.Attributes.Title)
-		}
+	for _, mangaFeedResp := range mangaFeedRespList {
+		for _, item := range mangaFeedResp.Data {
+			var f float64
 
-		prettyTitle := fmt.Sprintf("Chapter %s%s",
-			item.Attributes.Chapter, titlePadding)
-		f, err := strconv.ParseFloat(item.Attributes.Chapter, 64)
-		if err != nil {
-			panic(err)
-		}
+			if item.Attributes.Chapter == "" {
+				f = 0
+			} else {
+				parsedFloat, err := strconv.ParseFloat(item.Attributes.Chapter, 64)
+				f = parsedFloat
+				if err != nil {
+					fmt.Println("Error: ", item)
+					panic(err)
+				}
+			}
 
-		searchResults = append(searchResults,
-			chapterResult{
-				prettyTitle: prettyTitle,
-				title:       item.Attributes.Title,
-				num:         item.Attributes.Chapter,
-				sortNum:     f,
-				id:          item.Id,
-			})
+			num := item.Attributes.Chapter
+			if item.Attributes.Chapter == "" {
+				num = "0"
+			}
+
+			var titlePadding string
+			if item.Attributes.Title == "" {
+				titlePadding = ""
+			} else {
+				titlePadding = fmt.Sprintf(" - %s", item.Attributes.Title)
+			}
+
+			prettyTitle := fmt.Sprintf("Chapter %s%s",
+				num, titlePadding)
+
+			searchResults = append(searchResults,
+				chapterResult{
+					prettyTitle: prettyTitle,
+					title:       item.Attributes.Title,
+					num:         num,
+					sortNum:     f,
+					id:          item.Id,
+				})
+		}
 	}
 	//	ceil(1831/500)
 	//fmt.Println(mangaResp)
