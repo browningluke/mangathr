@@ -81,7 +81,7 @@ func SelectChapters(titles []string, mangaTitle string, sourceName string) []str
 }
 
 func Run(args *Args, config *config.Config) {
-	scraper := sources.NewScraper(args.Plugin)
+	scraper := sources.NewScraper(args.Plugin, config)
 
 	titles := scraper.Search(args.Query)
 	//fmt.Println(titles)

@@ -11,7 +11,8 @@ import (
 )
 
 type Scraper struct {
-	name string
+	name   string
+	config *Config
 
 	searchResults []searchResult
 	allChapters   []chapterResult
@@ -41,12 +42,17 @@ func (n chapterResultByNum) Swap(i, j int)      { n[i], n[j] = n[j], n[i] }
 
 type reader struct {
 	chapterResult chapterResult
-	pageURLs      []string
+	pages         []page
 }
 
-func NewScraper() *Scraper {
+type page struct {
+	url      string
+	filename string
+}
+
+func NewScraper(config *Config) *Scraper {
 	fmt.Println("Created a mangadex scraper")
-	return &Scraper{}
+	return &Scraper{config: config}
 }
 
 // Search for a Manga, will fill searchResults with 0 or more results
@@ -191,7 +197,7 @@ func (m *Scraper) SelectChapters(titles []string) {
 			if chapter.prettyTitle == prettyTitle {
 				chapters = append(chapters, reader{
 					chapterResult: chapter,
-					pageURLs:      getChapterURLs(chapter.id),
+					pages:         m.getChapterPages(chapter.id),
 				})
 			}
 		}
@@ -204,8 +210,44 @@ func (m *Scraper) SelectChapters(titles []string) {
 	fmt.Println("Selected chapters: ", m.selectedChapters)
 }
 
-func getChapterURLs(id string) []string {
-	return nil
+func (m *Scraper) getChapterPages(id string) []page {
+	fmt.Println(id)
+	jsonString := rester.New().Get(
+		fmt.Sprintf("https://api.mangadex.org/at-home/server/%s", id),
+		map[string]string{})
+
+	var chapterResp chapterResponse
+
+	err := json.Unmarshal([]byte(jsonString), &chapterResp)
+	if err != nil {
+		panic(err)
+	}
+
+	var pages []page
+
+	//length := len(chapterResp.Chapter.Data)
+
+	if m.config.DataSaver {
+		for i, chapter := range chapterResp.Chapter.DataSaver {
+			pages = append(pages, page{
+				url: fmt.Sprintf("%s/data-saver/%s/%s",
+					chapterResp.BaseUrl, chapterResp.Chapter.Hash, chapter),
+				filename: fmt.Sprintf("%d%s", i+1, chapter[len(chapter)-4:]),
+			})
+		}
+	} else {
+		for i, chapter := range chapterResp.Chapter.Data {
+			pages = append(pages, page{
+				url: fmt.Sprintf("%s/data/%s/%s",
+					chapterResp.BaseUrl, chapterResp.Chapter.Hash, chapter),
+				filename: fmt.Sprintf("%d%s", i+1, chapter[len(chapter)-4:]),
+			})
+		}
+	}
+
+	fmt.Println(pages)
+
+	return pages
 }
 
 func (m *Scraper) Download(downloader *downloader.Downloader) {

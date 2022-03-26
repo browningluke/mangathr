@@ -1,6 +1,7 @@
 package sources
 
 import (
+	"mangathrV2/internal/config"
 	"mangathrV2/internal/downloader"
 	"mangathrV2/internal/sources/mangadex"
 )
@@ -21,9 +22,9 @@ type Scraper interface {
 	GetScraperName() string
 }
 
-func NewScraper(name string) Scraper {
+func NewScraper(name string, config *config.Config) Scraper {
 	m := map[string]func() Scraper{
-		"mangadex": func() Scraper { return mangadex.NewScraper() },
+		"mangadex": func() Scraper { return mangadex.NewScraper(&config.Sources.Mangadex) },
 		//"cubari":   func() Scraper { return cubari.NewScraper() },
 	}
 

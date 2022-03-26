@@ -37,3 +37,13 @@ type mangaFeedResponse struct {
 	Offset int `json:"offset"`
 	Total  int `json:"total"`
 }
+
+type chapterResponse struct {
+	Result  string `json:"result"`
+	BaseUrl string `json:"baseUrl"`
+	Chapter struct {
+		Hash      string   `json:"hash"`
+		Data      []string `json:"data"`
+		DataSaver []string `json:"dataSaver"`
+	} `json:"chapter"`
+}
