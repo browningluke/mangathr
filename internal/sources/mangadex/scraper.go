@@ -7,7 +7,6 @@ import (
 	"mangathrV2/internal/rester"
 	"mangathrV2/internal/utils"
 	"math"
-	"net/url"
 	"strconv"
 )
 
@@ -59,8 +58,13 @@ func NewScraper(config *Config) *Scraper {
 // Search for a Manga, will fill searchResults with 0 or more results
 func (m *Scraper) Search(query string) []string {
 	jsonString := rester.New().Get(
-		"https://api.mangadex.org/manga?limit=10&order[relevance]=desc&title="+url.QueryEscape(query),
-		map[string]string{})
+		"https://api.mangadex.org/manga",
+		map[string]string{},
+		[]utils.Tuple{
+			{A: "limit", B: "10", C: true},
+			{A: "order[relevance]", B: "desc", C: true},
+			{A: "title", B: query, C: true},
+		})
 
 	var mangaResp mangaResponse
 
@@ -113,9 +117,14 @@ func (m *Scraper) ListChapters() []string {
 
 	getMangaFeedResp := func(offset int) mangaFeedResponse {
 		jsonString := rester.New().Get(
-			fmt.Sprintf("https://api.mangadex.org/manga/%s/feed"+
-				"?limit=500&translatedLanguage[]=en&order[chapter]=desc&offset=%d", m.manga.id, offset),
-			map[string]string{})
+			fmt.Sprintf("https://api.mangadex.org/manga/%s/feed", m.manga.id),
+			map[string]string{},
+			[]utils.Tuple{
+				{A: "limit", B: "500", C: true},
+				{A: "translatedLanguage[]", B: "en", C: true},
+				{A: "order[chapter]", B: "desc", C: true},
+				{A: "offset", B: strconv.Itoa(offset), C: true},
+			})
 
 		var mangaFeedResp mangaFeedResponse
 
@@ -215,7 +224,8 @@ func (m *Scraper) getChapterPages(id string) []page {
 	fmt.Println(id)
 	jsonString := rester.New().Get(
 		fmt.Sprintf("https://api.mangadex.org/at-home/server/%s", id),
-		map[string]string{})
+		map[string]string{},
+		[]utils.Tuple{})
 
 	var chapterResp chapterResponse
 

@@ -1,9 +1,12 @@
 package rester
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
+	"mangathrV2/internal/utils"
 	"net/http"
+	"net/url"
 )
 
 type RESTer struct {
@@ -17,8 +20,25 @@ func New() *RESTer {
 }
 
 // Get a URL, returns a json string. DOES NOT UNMARSHAL
-func (r RESTer) Get(url string, headers map[string]string) string {
-	req, err := http.NewRequest("GET", url, nil)
+func (r RESTer) Get(urlString string, headers map[string]string, params []utils.Tuple) string {
+
+	if len(params) > 0 {
+		urlString += "?"
+	}
+
+	for _, param := range params {
+		key := param.A.(string)
+		val := param.B.(string)
+
+		if param.C.(bool) {
+			val = url.QueryEscape(val)
+		}
+		urlString += fmt.Sprintf("%s=%s&", key, val)
+	}
+
+	fmt.Println(urlString)
+
+	req, err := http.NewRequest("GET", urlString, nil)
 	if err != nil {
 		panic(err)
 	}

@@ -34,3 +34,7 @@ func PadString(s string, length int) string {
 	}
 	return strings.Repeat("0", length-utf8.RuneCountInString(s)) + s
 }
+
+type Tuple struct {
+	A, B, C interface{}
+}
