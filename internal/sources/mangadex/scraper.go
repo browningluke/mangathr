@@ -22,17 +22,13 @@ type Scraper struct {
 }
 
 type searchResult struct {
-	title string
-	id    string
+	title, id string
 }
 
 type chapterResult struct {
-	title       string
-	prettyTitle string
-	num         string // doing this will make it easier
-	sortNum     float64
-	id          string
-	language    string
+	id, title, prettyTitle,
+	num, language string
+	sortNum float64
 }
 
 type chapterResultByNum []chapterResult
@@ -47,8 +43,7 @@ type reader struct {
 }
 
 type page struct {
-	url      string
-	filename string
+	url, filename string
 }
 
 func NewScraper(config *Config) *Scraper {
@@ -59,13 +54,13 @@ func NewScraper(config *Config) *Scraper {
 // Search for a Manga, will fill searchResults with 0 or more results
 func (m *Scraper) Search(query string) []string {
 	// Build query params
-	queryParams := []utils.Tuple{
-		{A: "order[relevance]", B: "desc", C: true},
-		{A: "title", B: query, C: true},
+	queryParams := []rester.QueryParam{
+		{Key: "order[relevance]", Value: "desc", Encode: true},
+		{Key: "title", Value: query, Encode: true},
 	}
 
 	for _, rating := range m.config.RatingFilter {
-		queryParams = append(queryParams, utils.Tuple{A: "contentRating[]", B: rating, C: true})
+		queryParams = append(queryParams, rester.QueryParam{Key: "contentRating[]", Value: rating, Encode: true})
 	}
 
 	jsonString := rester.New().Get(
@@ -122,20 +117,20 @@ func (m *Scraper) SearchByID(id string) interface{} {
 
 func (m *Scraper) ListChapters() []string {
 	// Build query params
-	queryParams := []utils.Tuple{
-		{A: "limit", B: "500", C: true},
-		{A: "order[chapter]", B: "desc", C: true},
+	queryParams := []rester.QueryParam{
+		{Key: "limit", Value: "500", Encode: true},
+		{Key: "order[chapter]", Value: "desc", Encode: true},
 	}
 
 	for _, language := range m.config.LanguageFilter {
-		queryParams = append(queryParams, utils.Tuple{A: "translatedLanguage[]", B: language, C: true})
+		queryParams = append(queryParams, rester.QueryParam{Key: "translatedLanguage[]", Value: language, Encode: true})
 	}
 
 	getMangaFeedResp := func(offset int) mangaFeedResponse {
 		jsonString := rester.New().Get(
 			fmt.Sprintf("https://api.mangadex.org/manga/%s/feed", m.manga.id),
 			map[string]string{},
-			append(queryParams, utils.Tuple{A: "offset", B: strconv.Itoa(offset), C: true}),
+			append(queryParams, rester.QueryParam{Key: "offset", Value: strconv.Itoa(offset), Encode: true}),
 		)
 
 		var mangaFeedResp mangaFeedResponse
@@ -241,7 +236,7 @@ func (m *Scraper) getChapterPages(id string) []page {
 	jsonString := rester.New().Get(
 		fmt.Sprintf("https://api.mangadex.org/at-home/server/%s", id),
 		map[string]string{},
-		[]utils.Tuple{})
+		[]rester.QueryParam{})
 
 	var chapterResp chapterResponse
 

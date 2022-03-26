@@ -4,13 +4,17 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"mangathrV2/internal/utils"
 	"net/http"
 	"net/url"
 )
 
 type RESTer struct {
 	client http.Client
+}
+
+type QueryParam struct {
+	Key, Value string
+	Encode     bool
 }
 
 func New() *RESTer {
@@ -20,20 +24,19 @@ func New() *RESTer {
 }
 
 // Get a URL, returns a json string. DOES NOT UNMARSHAL
-func (r RESTer) Get(urlString string, headers map[string]string, params []utils.Tuple) string {
+func (r RESTer) Get(urlString string, headers map[string]string, params []QueryParam) string {
 
 	if len(params) > 0 {
 		urlString += "?"
 	}
 
 	for _, param := range params {
-		key := param.A.(string)
-		val := param.B.(string)
+		val := param.Value
 
-		if param.C.(bool) {
+		if param.Encode {
 			val = url.QueryEscape(val)
 		}
-		urlString += fmt.Sprintf("%s=%s&", key, val)
+		urlString += fmt.Sprintf("%s=%s&", param.Key, val)
 	}
 
 	fmt.Println(urlString)

@@ -39,7 +39,3 @@ func PadString(s string, length int) string {
 func GetImageExtension(filename string) string {
 	return "." + regexp.MustCompile(`.*\.(jpg|jpeg|webp|png)$`).FindAllStringSubmatch(filename, -1)[0][1]
 }
-
-type Tuple struct {
-	A, B, C interface{}
-}
