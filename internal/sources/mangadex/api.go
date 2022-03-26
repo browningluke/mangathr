@@ -28,8 +28,9 @@ type mangaFeedResponse struct {
 		Type string `json:"type"`
 
 		Attributes struct {
-			Title   string `json:"title"`
-			Chapter string `json:"chapter"`
+			Title              string `json:"title"`
+			Chapter            string `json:"chapter"`
+			TranslatedLanguage string `json:"translatedLanguage"`
 		} `json:"attributes"`
 	} `json:"data"`
 

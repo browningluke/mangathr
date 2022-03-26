@@ -32,6 +32,7 @@ type chapterResult struct {
 	num         string // doing this will make it easier
 	sortNum     float64
 	id          string
+	language    string
 }
 
 type chapterResultByNum []chapterResult
@@ -57,14 +58,20 @@ func NewScraper(config *Config) *Scraper {
 
 // Search for a Manga, will fill searchResults with 0 or more results
 func (m *Scraper) Search(query string) []string {
+	// Build query params
+	queryParams := []utils.Tuple{
+		{A: "order[relevance]", B: "desc", C: true},
+		{A: "title", B: query, C: true},
+	}
+
+	for _, rating := range m.config.RatingFilter {
+		queryParams = append(queryParams, utils.Tuple{A: "contentRating[]", B: rating, C: true})
+	}
+
 	jsonString := rester.New().Get(
 		"https://api.mangadex.org/manga",
 		map[string]string{},
-		[]utils.Tuple{
-			{A: "limit", B: "10", C: true},
-			{A: "order[relevance]", B: "desc", C: true},
-			{A: "title", B: query, C: true},
-		})
+		queryParams)
 
 	var mangaResp mangaResponse
 
@@ -114,17 +121,22 @@ func (m *Scraper) SearchByID(id string) interface{} {
 }
 
 func (m *Scraper) ListChapters() []string {
+	// Build query params
+	queryParams := []utils.Tuple{
+		{A: "limit", B: "500", C: true},
+		{A: "order[chapter]", B: "desc", C: true},
+	}
+
+	for _, language := range m.config.LanguageFilter {
+		queryParams = append(queryParams, utils.Tuple{A: "translatedLanguage[]", B: language, C: true})
+	}
 
 	getMangaFeedResp := func(offset int) mangaFeedResponse {
 		jsonString := rester.New().Get(
 			fmt.Sprintf("https://api.mangadex.org/manga/%s/feed", m.manga.id),
 			map[string]string{},
-			[]utils.Tuple{
-				{A: "limit", B: "500", C: true},
-				{A: "translatedLanguage[]", B: "en", C: true},
-				{A: "order[chapter]", B: "desc", C: true},
-				{A: "offset", B: strconv.Itoa(offset), C: true},
-			})
+			append(queryParams, utils.Tuple{A: "offset", B: strconv.Itoa(offset), C: true}),
+		)
 
 		var mangaFeedResp mangaFeedResponse
 
@@ -167,11 +179,17 @@ func (m *Scraper) ListChapters() []string {
 				num = "0"
 			}
 
-			var titlePadding string
+			// Generate title padding
+			titlePadding := ""
+
+			if len(m.config.LanguageFilter) > 1 {
+				titlePadding += fmt.Sprintf(" - %s", item.Attributes.TranslatedLanguage)
+			}
+
 			if item.Attributes.Title == "" {
-				titlePadding = ""
+				titlePadding += ""
 			} else {
-				titlePadding = fmt.Sprintf(" - %s", item.Attributes.Title)
+				titlePadding += fmt.Sprintf(" - %s", item.Attributes.Title)
 			}
 
 			prettyTitle := fmt.Sprintf("Chapter %s%s",
@@ -184,12 +202,10 @@ func (m *Scraper) ListChapters() []string {
 					num:         num,
 					sortNum:     f,
 					id:          item.Id,
+					language:    item.Attributes.TranslatedLanguage,
 				})
 		}
 	}
-	//	ceil(1831/500)
-	//fmt.Println(mangaResp)
-	//sort.Sort(chapterResultByNum(searchResults))
 	m.allChapters = searchResults
 
 	for _, item := range searchResults {

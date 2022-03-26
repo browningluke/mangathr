@@ -2,7 +2,10 @@ package mangadex
 
 type Config struct {
 	// Scraper
-	DataSaver bool `yaml:"dataSaver"`
+	FilenameTemplate string   `yaml:"filenameTemplate"`
+	RatingFilter     []string `yaml:"ratingFilter"`
+	LanguageFilter   []string `yaml:"languageFilter"`
+	DataSaver        bool     `yaml:"dataSaver"`
 
 	// Connection
 	SyncDeletions bool `yaml:"syncDeletions"`

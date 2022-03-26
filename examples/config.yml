@@ -25,5 +25,6 @@ sources:
   mangadex:
     syncDeletions: false
     filenameTemplate: "{num:3} - Chapter {num}{? - {title}}" # Set specific for source (overrides global)
-    ratingFitler: ["safe", "suggestive", "erotica"]
+    ratingFilter: ["safe", "suggestive", "erotica"]
+    languageFilter: ["en", "fr"]
     dataSaver: false
