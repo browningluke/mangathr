@@ -1,8 +1,11 @@
 package mangadex
 
 import (
+	"encoding/json"
 	"fmt"
 	"mangathrV2/internal/downloader"
+	"mangathrV2/internal/rester"
+	"net/url"
 )
 
 type Scraper struct {
@@ -17,7 +20,7 @@ type Scraper struct {
 
 type searchResult struct {
 	name string
-	url  string
+	id   string
 }
 
 type chapter struct {
@@ -32,16 +35,27 @@ func NewScraper() *Scraper {
 
 // Search for a Manga, will fill searchResults with 0 or more results
 func (m *Scraper) Search(query string) []string {
-	m.searchResults = []searchResult{
-		{name: "Komi-san", url: "https://komi"},
-		{name: "Komi-other", url: "https://komi-other"},
+	jsonString := rester.New().Get(
+		"https://api.mangadex.org/manga?limit=10&title="+url.QueryEscape(query),
+		map[string]string{})
+
+	var mangaResp mangaResponse
+
+	err := json.Unmarshal([]byte(jsonString), &mangaResp)
+	if err != nil {
+		panic(err)
 	}
 
+	var searchResults []searchResult
 	var names []string
 
-	for _, item := range m.searchResults {
-		names = append(names, item.name)
+	for _, item := range mangaResp.Data {
+		searchResults = append(searchResults, searchResult{name: item.Attributes.Title["en"], id: item.Id})
+		names = append(names, item.Attributes.Title["en"])
 	}
+
+	//fmt.Println(mangaResp)
+	m.searchResults = searchResults
 
 	return names
 }
