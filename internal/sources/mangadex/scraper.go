@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"mangathrV2/internal/downloader"
 	"mangathrV2/internal/rester"
+	"mangathrV2/internal/utils"
 	"math"
 	"net/url"
 	"strconv"
@@ -225,14 +226,17 @@ func (m *Scraper) getChapterPages(id string) []page {
 
 	var pages []page
 
-	//length := len(chapterResp.Chapter.Data)
+	length := len(chapterResp.Chapter.Data)
+	digits := int(math.Floor(math.Log10(float64(length))) + 1)
 
 	if m.config.DataSaver {
 		for i, chapter := range chapterResp.Chapter.DataSaver {
 			pages = append(pages, page{
 				url: fmt.Sprintf("%s/data-saver/%s/%s",
 					chapterResp.BaseUrl, chapterResp.Chapter.Hash, chapter),
-				filename: fmt.Sprintf("%d%s", i+1, chapter[len(chapter)-4:]),
+				filename: fmt.Sprintf("%s%s",
+					utils.PadString(fmt.Sprintf("%d", i+1), digits),
+					chapter[len(chapter)-4:]),
 			})
 		}
 	} else {
@@ -240,7 +244,9 @@ func (m *Scraper) getChapterPages(id string) []page {
 			pages = append(pages, page{
 				url: fmt.Sprintf("%s/data/%s/%s",
 					chapterResp.BaseUrl, chapterResp.Chapter.Hash, chapter),
-				filename: fmt.Sprintf("%d%s", i+1, chapter[len(chapter)-4:]),
+				filename: fmt.Sprintf("%s%s",
+					utils.PadString(fmt.Sprintf("%d", i+1), digits),
+					chapter[len(chapter)-4:]),
 			})
 		}
 	}

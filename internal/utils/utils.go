@@ -3,7 +3,9 @@ package utils
 import (
 	"fmt"
 	"mangathrV2/internal/utils/ui"
+	"strings"
 	"syscall"
+	"unicode/utf8"
 )
 
 func RaiseError(err error) {
@@ -24,4 +26,11 @@ func FindInSlice(list interface{}, match interface{}) (interface{}, bool) {
 		fmt.Println("unknown")
 	}
 	return nil, false
+}
+
+func PadString(s string, length int) string {
+	if utf8.RuneCountInString(s) >= length {
+		return s
+	}
+	return strings.Repeat("0", length-utf8.RuneCountInString(s)) + s
 }
