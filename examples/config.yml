@@ -26,3 +26,4 @@ sources:
     syncDeletions: false
     filenameTemplate: "{num:3} - Chapter {num}{? - {title}}" # Set specific for source (overrides global)
     ratingFitler: ["safe", "suggestive", "erotica"]
+    dataSaver: false
