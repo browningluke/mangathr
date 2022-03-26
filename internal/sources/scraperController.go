@@ -1,8 +1,8 @@
-package scrapers
+package sources
 
 import (
 	"mangathrV2/internal/downloader"
-	"mangathrV2/internal/sources/scrapers/mangadex"
+	"mangathrV2/internal/sources/mangadex"
 )
 
 type Scraper interface {

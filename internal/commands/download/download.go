@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
 	"mangathrV2/internal/config"
-	"mangathrV2/internal/sources/scrapers"
+	"mangathrV2/internal/sources"
 )
 
 func SingleCheckboxes(label string, opts []string) string {
@@ -81,7 +81,7 @@ func SelectChapters(titles []string, mangaTitle string, sourceName string) []str
 }
 
 func Run(args *Args, config *config.Config) {
-	scraper := scrapers.NewScraper(args.Plugin)
+	scraper := sources.NewScraper(args.Plugin)
 
 	titles := scraper.Search(args.Query)
 	//fmt.Println(titles)

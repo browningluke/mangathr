@@ -17,7 +17,7 @@ type Scraper struct {
 	allChapters   []chapterResult
 
 	manga            searchResult
-	selectedChapters []chapterResult
+	selectedChapters []reader
 }
 
 type searchResult struct {
@@ -38,6 +38,11 @@ type chapterResultByNum []chapterResult
 func (n chapterResultByNum) Len() int           { return len(n) }
 func (n chapterResultByNum) Less(i, j int) bool { return n[i].sortNum < n[j].sortNum }
 func (n chapterResultByNum) Swap(i, j int)      { n[i], n[j] = n[j], n[i] }
+
+type reader struct {
+	chapterResult chapterResult
+	pageURLs      []string
+}
 
 func NewScraper() *Scraper {
 	fmt.Println("Created a mangadex scraper")
@@ -179,12 +184,15 @@ func (m *Scraper) ListChapters() []string {
 }
 
 func (m *Scraper) SelectChapters(titles []string) {
-	var chapters []chapterResult
+	var chapters []reader
 
 	for _, chapter := range m.allChapters {
 		for _, prettyTitle := range titles {
 			if chapter.prettyTitle == prettyTitle {
-				chapters = append(chapters, chapter)
+				chapters = append(chapters, reader{
+					chapterResult: chapter,
+					pageURLs:      getChapterURLs(chapter.id),
+				})
 			}
 		}
 	}
@@ -194,6 +202,10 @@ func (m *Scraper) SelectChapters(titles []string) {
 	m.allChapters = []chapterResult{}
 
 	fmt.Println("Selected chapters: ", m.selectedChapters)
+}
+
+func getChapterURLs(id string) []string {
+	return nil
 }
 
 func (m *Scraper) Download(downloader *downloader.Downloader) {

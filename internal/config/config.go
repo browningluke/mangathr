@@ -4,40 +4,39 @@ import (
 	"errors"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"mangathrV2/internal/sources/connections/mangadex"
+	"mangathrV2/internal/sources/mangadex"
 	"strings"
 )
 
 type Config struct {
 	Database struct {
-		Driver   string
-		Uri      string
+		Driver string
+		Uri    string
 	}
 	Metadata struct {
-		Agent             string
-		Location          string
+		Agent    string
+		Location string
 	}
 	Downloader struct {
 		SimultaneousPages int `yaml:"simultaneousPages"`
 		PageRetries       int `yaml:"pageRetries"`
-		Delay struct {
+		Delay             struct {
 			Page          int
 			Chapter       int
 			UpdateChapter int `yaml:"updateChapter"`
 		}
 		Output struct {
-			Path          string
-			UpdatePath    string `yaml:"updatePath"`
-			Zip           bool
+			Path       string
+			UpdatePath string `yaml:"updatePath"`
+			Zip        bool
 		}
 	}
 	Sources struct {
 		Mangadex mangadex.Config
 	}
-
 }
 
-func (c* Config) Load(path string) error {
+func (c *Config) Load(path string) error {
 
 	yamlFile, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -53,7 +52,7 @@ func (c* Config) Load(path string) error {
 	return nil
 }
 
-func (c* Config) validate() error {
+func (c *Config) validate() error {
 	if !validateDatabaseDriver(c.Database.Driver) {
 		return errors.New("InvalidDatabaseError: " + c.Database.Driver + " is not a valid database.")
 	}
@@ -66,7 +65,6 @@ func (c* Config) validate() error {
 	return nil
 }
 
-
 func validateDatabaseDriver(driver string) bool {
 	return isInSlice(driver, []string{"sqlite"})
 }
@@ -78,7 +76,6 @@ func validateMetadataAgent(agent string) bool {
 func validateMetadataLocation(location string) bool {
 	return isInSlice(location, []string{"internal", "external", "both"})
 }
-
 
 func isInSlice(s string, slice []string) bool {
 	for _, v := range slice {
