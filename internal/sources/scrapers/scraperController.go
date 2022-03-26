@@ -17,7 +17,7 @@ type Scraper interface {
 
 	Download(downloader *downloader.Downloader)
 
-	GetChapterTitle() string
+	GetMangaTitle() string
 	GetScraperName() string
 }
 

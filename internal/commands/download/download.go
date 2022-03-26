@@ -89,9 +89,11 @@ func Run(args *Args, config *config.Config) {
 	selection := SelectManga(titles)
 	scraper.SelectManga(selection)
 
-	_ = scraper.ListChapters()
-	//chapterTitle := scraper.GetChapterTitle()
-	//sourceName := scraper.GetScraperName()
-	//chapterSelections := SelectChapters(chapters, chapterTitle, sourceName)
-	//scraper.SelectChapters(chapterSelections)
+	chapters := scraper.ListChapters()
+	//fmt.Println(chapters)
+	chapterTitle := scraper.GetMangaTitle()
+	sourceName := scraper.GetScraperName()
+	chapterSelections := SelectChapters(chapters, chapterTitle, sourceName)
+	//fmt.Println(chapterSelections)
+	scraper.SelectChapters(chapterSelections)
 }
