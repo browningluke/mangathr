@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"mangathrV2/internal/utils/ui"
+	"regexp"
 	"strings"
 	"syscall"
 	"unicode/utf8"
@@ -33,6 +34,10 @@ func PadString(s string, length int) string {
 		return s
 	}
 	return strings.Repeat("0", length-utf8.RuneCountInString(s)) + s
+}
+
+func GetImageExtension(filename string) string {
+	return "." + regexp.MustCompile(`.*\.(jpg|jpeg|webp|png)$`).FindAllStringSubmatch(filename, -1)[0][1]
 }
 
 type Tuple struct {

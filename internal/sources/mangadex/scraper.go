@@ -262,7 +262,7 @@ func (m *Scraper) getChapterPages(id string) []page {
 					chapterResp.BaseUrl, chapterResp.Chapter.Hash, chapter),
 				filename: fmt.Sprintf("%s%s",
 					utils.PadString(fmt.Sprintf("%d", i+1), digits),
-					chapter[len(chapter)-4:]),
+					utils.GetImageExtension(chapter)),
 			})
 		}
 	} else {
@@ -272,7 +272,7 @@ func (m *Scraper) getChapterPages(id string) []page {
 					chapterResp.BaseUrl, chapterResp.Chapter.Hash, chapter),
 				filename: fmt.Sprintf("%s%s",
 					utils.PadString(fmt.Sprintf("%d", i+1), digits),
-					chapter[len(chapter)-4:]),
+					utils.GetImageExtension(chapter)),
 			})
 		}
 	}
