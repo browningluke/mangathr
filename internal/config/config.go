@@ -4,6 +4,7 @@ import (
 	"errors"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"mangathrV2/internal/downloader"
 	"mangathrV2/internal/sources/mangadex"
 	"strings"
 )
@@ -17,21 +18,8 @@ type Config struct {
 		Agent    string
 		Location string
 	}
-	Downloader struct {
-		SimultaneousPages int `yaml:"simultaneousPages"`
-		PageRetries       int `yaml:"pageRetries"`
-		Delay             struct {
-			Page          int
-			Chapter       int
-			UpdateChapter int `yaml:"updateChapter"`
-		}
-		Output struct {
-			Path       string
-			UpdatePath string `yaml:"updatePath"`
-			Zip        bool
-		}
-	}
-	Sources struct {
+	Downloader downloader.Config
+	Sources    struct {
 		Mangadex mangadex.Config
 	}
 }
