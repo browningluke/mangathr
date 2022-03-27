@@ -2,16 +2,16 @@ package downloader
 
 import (
 	"archive/zip"
+	"bytes"
 	"errors"
 	"fmt"
 	"github.com/gammazero/workerpool"
 	"io"
 	"log"
+	"mangathrV2/internal/rester"
 	"mangathrV2/internal/utils"
-	"net/http"
 	"os"
 	"path/filepath"
-	"strconv"
 	"sync"
 )
 
@@ -125,7 +125,7 @@ func (d *Downloader) Download(path, chapterFilename string, pages []Page) {
 			wp.Submit(func() {
 				//mu.Lock()
 				//defer mu.Unlock()
-				if err := downloadImage(image.Url, image.Filename, zipWriter, &mu); err != nil {
+				if err := d.downloadImage(image.Url, image.Filename, zipWriter, &mu); err != nil {
 					log.Fatalln(err)
 				}
 			})
@@ -151,23 +151,12 @@ func (d *Downloader) Download(path, chapterFilename string, pages []Page) {
 	}
 }
 
-func downloadImage(url, filename string, zipWriter *zip.Writer, mu *sync.Mutex) error {
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			panic(err)
-		}
-	}(resp.Body)
+func (d *Downloader) downloadImage(url, filename string, zipWriter *zip.Writer, mu *sync.Mutex) error {
+	imageBytes := rester.New().GetBytes(url,
+		map[string]string{},
+		[]rester.QueryParam{}).Do(d.config.PageRetries).([]byte)
 
-	if resp.StatusCode != 200 {
-		return errors.New("Received code: " + strconv.Itoa(resp.StatusCode))
-	}
-
-	fmt.Println("Downloading image: ", filename, " Status Code: ", resp.StatusCode)
+	fmt.Println("Downloading image: ", filename)
 
 	mu.Lock()
 	defer mu.Unlock()
@@ -176,7 +165,7 @@ func downloadImage(url, filename string, zipWriter *zip.Writer, mu *sync.Mutex) 
 		return err
 	}
 
-	_, err = io.Copy(image, resp.Body)
+	_, err = io.Copy(image, bytes.NewReader(imageBytes))
 	if err != nil {
 		return err
 	}

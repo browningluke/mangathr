@@ -62,7 +62,7 @@ func (m *Scraper) Search(query string) []string {
 	jsonString := rester.New().Get(
 		"https://api.mangadex.org/manga",
 		map[string]string{},
-		queryParams)
+		queryParams).Do(1).(string)
 
 	var mangaResp mangaResponse
 
@@ -127,7 +127,7 @@ func (m *Scraper) ListChapters() []string {
 			fmt.Sprintf("https://api.mangadex.org/manga/%s/feed", m.manga.id),
 			map[string]string{},
 			append(queryParams, rester.QueryParam{Key: "offset", Value: strconv.Itoa(offset), Encode: true}),
-		)
+		).Do(1).(string)
 
 		var mangaFeedResp mangaFeedResponse
 
@@ -230,7 +230,7 @@ func (m *Scraper) getChapterPages(id string) []downloader.Page {
 	jsonString := rester.New().Get(
 		fmt.Sprintf("https://api.mangadex.org/at-home/server/%s", id),
 		map[string]string{},
-		[]rester.QueryParam{})
+		[]rester.QueryParam{}).Do(1).(string)
 
 	var chapterResp chapterResponse
 
