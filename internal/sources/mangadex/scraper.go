@@ -277,9 +277,9 @@ func (m *Scraper) getChapterPages(id string) []page {
 	return pages
 }
 
-func (m *Scraper) Download(downloader *downloader.Downloader) {
-	//TODO implement me
-	panic("implement me")
+func (m *Scraper) Download(downloader *downloader.Downloader, downloadType string) {
+	// downloadType is one of ["download", "update"]
+	downloader.CreateDirectory(m.manga.title, downloadType)
 }
 
 func (m *Scraper) GetMangaTitle() string {

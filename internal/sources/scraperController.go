@@ -16,7 +16,7 @@ type Scraper interface {
 	//SelectNewChapters() interface{}
 	SelectChapters(titles []string)
 
-	Download(downloader *downloader.Downloader)
+	Download(downloader *downloader.Downloader, downloadType string)
 
 	GetMangaTitle() string
 	GetScraperName() string

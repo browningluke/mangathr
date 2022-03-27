@@ -13,7 +13,7 @@ downloader:
     chapter: 200
     updateChapter: 2000
   output:
-    path: ''
+    path: './downloads'
     updatePath: ''
     zip: true
     filenameTemplate: "{num:3} - Chapter {num}{? - {title}}" # Set a global template

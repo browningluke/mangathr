@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
 	"mangathrV2/internal/config"
+	"mangathrV2/internal/downloader"
 	"mangathrV2/internal/sources"
 )
 
@@ -96,4 +97,7 @@ func Run(args *Args, config *config.Config) {
 	chapterSelections := SelectChapters(chapters, chapterTitle, sourceName)
 	//fmt.Println(chapterSelections)
 	scraper.SelectChapters(chapterSelections)
+
+	scraper.Download(downloader.NewDownloader(&config.Downloader), "download")
+
 }
