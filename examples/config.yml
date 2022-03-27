@@ -16,7 +16,7 @@ downloader:
     path: './downloads'
     updatePath: ''
     zip: true
-    filenameTemplate: "{num:3} - Chapter {num}{? - {title}}" # Set a global template
+    filenameTemplate: "{num:3} - Chapter {num}{? - {lang}}{? - {title}}" # Set a global template
     # syntax is in format:
     # {num:3} = number padded to 3 digits (e.g. 001, 010, 100, 1000)
     # {num}   = number with no padding (e.g. 1, 10, 100, 1000)
@@ -24,7 +24,7 @@ downloader:
 sources:
   mangadex:
     syncDeletions: false
-    filenameTemplate: "{num:3} - Chapter {num}{? - {title}}" # Set specific for source (overrides global)
+    filenameTemplate: "{num:3} - Chapter {num}{? - {lang}}{? - {title}}" # Set specific for source (overrides global)
     ratingFilter: ["safe", "suggestive", "erotica"]
     languageFilter: ["en", "fr"]
     dataSaver: false

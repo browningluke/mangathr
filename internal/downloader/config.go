@@ -9,8 +9,9 @@ type Config struct {
 		UpdateChapter int `yaml:"updateChapter"`
 	}
 	Output struct {
-		Path       string
-		UpdatePath string `yaml:"updatePath"`
-		Zip        bool
+		Path             string
+		UpdatePath       string `yaml:"updatePath"`
+		Zip              bool
+		FilenameTemplate string `yaml:"filenameTemplate"`
 	}
 }

@@ -39,11 +39,7 @@ func (n chapterResultByNum) Swap(i, j int)      { n[i], n[j] = n[j], n[i] }
 
 type reader struct {
 	chapterResult chapterResult
-	pages         []page
-}
-
-type page struct {
-	url, filename string
+	pages         []downloader.Page
 }
 
 func NewScraper(config *Config) *Scraper {
@@ -227,11 +223,9 @@ func (m *Scraper) SelectChapters(titles []string) {
 
 	// Once chapters have been selected, clear all chapters
 	m.allChapters = []chapterResult{}
-
-	fmt.Println("Selected chapters: ", m.selectedChapters)
 }
 
-func (m *Scraper) getChapterPages(id string) []page {
+func (m *Scraper) getChapterPages(id string) []downloader.Page {
 	fmt.Println(id)
 	jsonString := rester.New().Get(
 		fmt.Sprintf("https://api.mangadex.org/at-home/server/%s", id),
@@ -248,13 +242,13 @@ func (m *Scraper) getChapterPages(id string) []page {
 	length := len(chapterResp.Chapter.Data)
 	digits := int(math.Floor(math.Log10(float64(length))) + 1)
 
-	getPages := func(slice []string, key string) []page {
-		var pages []page
+	getPages := func(slice []string, key string) []downloader.Page {
+		var pages []downloader.Page
 		for i, chapter := range slice {
-			pages = append(pages, page{
-				url: fmt.Sprintf("%s/%s/%s/%s",
+			pages = append(pages, downloader.Page{
+				Url: fmt.Sprintf("%s/%s/%s/%s",
 					chapterResp.BaseUrl, key, chapterResp.Chapter.Hash, chapter),
-				filename: fmt.Sprintf("%s%s",
+				Filename: fmt.Sprintf("%s%s",
 					utils.PadString(fmt.Sprintf("%d", i+1), digits),
 					utils.GetImageExtension(chapter)),
 			})
@@ -262,7 +256,7 @@ func (m *Scraper) getChapterPages(id string) []page {
 		return pages
 	}
 
-	var pages []page
+	var pages []downloader.Page
 
 	if m.config.DataSaver {
 		pages = getPages(chapterResp.Chapter.DataSaver, "data-saver")
@@ -270,14 +264,22 @@ func (m *Scraper) getChapterPages(id string) []page {
 		pages = getPages(chapterResp.Chapter.Data, "data")
 	}
 
-	fmt.Println(pages)
-
 	return pages
 }
 
 func (m *Scraper) Download(downloader *downloader.Downloader, downloadType string) {
 	// downloadType is one of ["download", "update"]
-	downloader.CreateDirectory(m.manga.title, downloadType)
+	_ = downloader.CreateDirectory(m.manga.title, downloadType)
+	for _, chapter := range m.selectedChapters {
+		language := ""
+		if len(m.config.LanguageFilter) > 1 {
+			language = fmt.Sprintf("%s", chapter.chapterResult.language)
+		}
+
+		_ = downloader.GetNameFromTemplate(m.config.FilenameTemplate,
+			chapter.chapterResult.num, chapter.chapterResult.title, language)
+
+	}
 }
 
 func (m *Scraper) GetMangaTitle() string {
