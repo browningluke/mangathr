@@ -245,31 +245,29 @@ func (m *Scraper) getChapterPages(id string) []page {
 		panic(err)
 	}
 
-	var pages []page
-
 	length := len(chapterResp.Chapter.Data)
 	digits := int(math.Floor(math.Log10(float64(length))) + 1)
 
+	getPages := func(slice []string, key string) []page {
+		var pages []page
+		for i, chapter := range slice {
+			pages = append(pages, page{
+				url: fmt.Sprintf("%s/%s/%s/%s",
+					chapterResp.BaseUrl, key, chapterResp.Chapter.Hash, chapter),
+				filename: fmt.Sprintf("%s%s",
+					utils.PadString(fmt.Sprintf("%d", i+1), digits),
+					utils.GetImageExtension(chapter)),
+			})
+		}
+		return pages
+	}
+
+	var pages []page
+
 	if m.config.DataSaver {
-		for i, chapter := range chapterResp.Chapter.DataSaver {
-			pages = append(pages, page{
-				url: fmt.Sprintf("%s/data-saver/%s/%s",
-					chapterResp.BaseUrl, chapterResp.Chapter.Hash, chapter),
-				filename: fmt.Sprintf("%s%s",
-					utils.PadString(fmt.Sprintf("%d", i+1), digits),
-					utils.GetImageExtension(chapter)),
-			})
-		}
+		pages = getPages(chapterResp.Chapter.DataSaver, "data-saver")
 	} else {
-		for i, chapter := range chapterResp.Chapter.Data {
-			pages = append(pages, page{
-				url: fmt.Sprintf("%s/data/%s/%s",
-					chapterResp.BaseUrl, chapterResp.Chapter.Hash, chapter),
-				filename: fmt.Sprintf("%s%s",
-					utils.PadString(fmt.Sprintf("%d", i+1), digits),
-					utils.GetImageExtension(chapter)),
-			})
-		}
+		pages = getPages(chapterResp.Chapter.Data, "data")
 	}
 
 	fmt.Println(pages)
