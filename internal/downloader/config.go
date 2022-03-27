@@ -14,4 +14,8 @@ type Config struct {
 		Zip              bool
 		FilenameTemplate string `yaml:"filenameTemplate"`
 	}
+	Metadata struct {
+		Agent    string
+		Location string
+	}
 }

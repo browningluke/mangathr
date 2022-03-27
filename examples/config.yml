@@ -2,9 +2,6 @@
 database:
   driver: "sqlite"
   uri: "./examples/database.sqlite"
-metadata:
-  agent: "comicinfo"
-  location: "internal"
 downloader:
   simultaneousPages: 2
   pageRetries: 5
@@ -21,6 +18,9 @@ downloader:
     # {num:3} = number padded to 3 digits (e.g. 001, 010, 100, 1000)
     # {num}   = number with no padding (e.g. 1, 10, 100, 1000)
     # {?xx - {title} - xx}  = if title is not "", replace with xx-title-xx, else use ""
+  metadata:
+    agent: "comicinfo"
+    location: "internal"
 sources:
   mangadex:
     syncDeletions: false

@@ -14,10 +14,6 @@ type Config struct {
 		Driver string
 		Uri    string
 	}
-	Metadata struct {
-		Agent    string
-		Location string
-	}
 	Downloader downloader.Config
 	Sources    struct {
 		Mangadex mangadex.Config
@@ -44,11 +40,11 @@ func (c *Config) validate() error {
 	if !validateDatabaseDriver(c.Database.Driver) {
 		return errors.New("InvalidDatabaseError: " + c.Database.Driver + " is not a valid database.")
 	}
-	if !validateMetadataAgent(c.Metadata.Agent) {
-		return errors.New("InvalidMetadataAgentError: " + c.Metadata.Agent + " is not a valid agent.")
+	if !validateMetadataAgent(c.Downloader.Metadata.Agent) {
+		return errors.New("InvalidMetadataAgentError: " + c.Downloader.Metadata.Agent + " is not a valid agent.")
 	}
-	if !validateMetadataLocation(c.Metadata.Location) {
-		return errors.New("InvalidMetadataLocationError: " + c.Metadata.Location + " is not a valid location.")
+	if !validateMetadataLocation(c.Downloader.Metadata.Location) {
+		return errors.New("InvalidMetadataLocationError: " + c.Downloader.Metadata.Location + " is not a valid location.")
 	}
 	return nil
 }
