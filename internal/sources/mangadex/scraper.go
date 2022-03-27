@@ -278,6 +278,7 @@ func (m *Scraper) Download(downloader *downloader.Downloader, downloadType strin
 
 		chapterTitle := downloader.GetNameFromTemplate(m.config.FilenameTemplate,
 			chapter.chapterResult.num, chapter.chapterResult.title, language)
+		downloader.SetMetadataAgent(chapterTitle, chapter.chapterResult.num)
 		downloader.Download(path, chapterTitle, chapter.pages)
 	}
 }

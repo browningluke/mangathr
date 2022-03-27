@@ -8,15 +8,18 @@ import (
 	"github.com/gammazero/workerpool"
 	"io"
 	"log"
+	"mangathrV2/internal/metadata"
 	"mangathrV2/internal/rester"
 	"mangathrV2/internal/utils"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 )
 
 type Downloader struct {
 	config *Config
+	agent  metadata.Agent
 }
 
 type Page struct {
@@ -25,6 +28,10 @@ type Page struct {
 
 func NewDownloader(config *Config) *Downloader {
 	return &Downloader{config: config}
+}
+
+func (d *Downloader) SetMetadataAgent(title, num string) {
+	d.agent = metadata.NewAgent(d.config.Metadata.Agent, title, num)
 }
 
 func (d *Downloader) CreateDirectory(title, downloadType string) string {
@@ -83,13 +90,13 @@ func (d *Downloader) GetNameFromTemplate(pluginTemplate, num, title, language st
 	if title != "" {
 		conditionalTitle = fmt.Sprintf(" - %s", title)
 	}
-	return fmt.Sprintf("%s - Chapter %s%s%s.cbz", paddedNum, num, conditionalLanguage, conditionalTitle)
+	return fmt.Sprintf("%s - Chapter %s%s%s", paddedNum, num, conditionalLanguage, conditionalTitle)
 }
 
 func (d *Downloader) Download(path, chapterFilename string, pages []Page) {
 	fmt.Println(chapterFilename)
 
-	chapterPath := filepath.Join(path, chapterFilename)
+	chapterPath := filepath.Join(path, fmt.Sprintf("%s.cbz", chapterFilename))
 
 	if _, err := os.Stat(chapterPath); err == nil {
 		fmt.Println("Chapter already exists.")
@@ -133,18 +140,19 @@ func (d *Downloader) Download(path, chapterFilename string, pages []Page) {
 		}
 		wp.StopWait()
 
-		// TODO: add this (v) code for ComicInfo metadata agent
-		//fmt.Println("Saving ComicInfo")
-		//comicInfo, err := zipWriter.Create("ComicInfo.xml")
-		//if err != nil {
-		//	panic(err)
-		//}
-		//
-		//reader := strings.NewReader("<COMIC_INFO_SYNTAX_HERE>")
-		//_, err = io.Copy(comicInfo, reader)
-		//if err != nil {
-		//	panic(err)
-		//}
+		fmt.Println("Saving metadata")
+		filename, body := d.agent.GenerateMetadataFile()
+
+		comicInfo, err := zipWriter.Create(filename)
+		if err != nil {
+			panic(err)
+		}
+
+		reader := strings.NewReader(body)
+		_, err = io.Copy(comicInfo, reader)
+		if err != nil {
+			panic(err)
+		}
 
 	} else {
 		panic(err)
