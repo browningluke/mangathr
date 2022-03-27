@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="MacOS arm64" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="mangathrV2" />
+    <working_directory value="$PROJECT_DIR$" />
+    <go_parameters value="-o $ProjectFileDir$/build/$ModuleName$_mac_arm64" />
+    <envs>
+      <env name="GOOS" value="darwin" />
+      <env name="GOARCH" value="arm64" />
+    </envs>
+    <kind value="FILE" />
+    <package value="mangathrV2" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$/cmd/mangathr/mangathr.go" />
+    <output_directory value="$ProjectFileDir$/build" />
+    <option name="run" value="false" />
+    <method v="2" />
+  </configuration>
+</component>
