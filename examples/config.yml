@@ -6,7 +6,7 @@ metadata:
   agent: "comicinfo"
   location: "internal"
 downloader:
-  simultaneousPages: 5
+  simultaneousPages: 2
   pageRetries: 5
   delay:
     page: 100
@@ -26,5 +26,5 @@ sources:
     syncDeletions: false
     filenameTemplate: "{num:3} - Chapter {num}{? - {lang}}{? - {title}}" # Set specific for source (overrides global)
     ratingFilter: ["safe", "suggestive", "erotica"]
-    languageFilter: ["en", "fr"]
+    languageFilter: ["en"] # , "fr"
     dataSaver: false

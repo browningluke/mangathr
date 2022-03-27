@@ -269,16 +269,16 @@ func (m *Scraper) getChapterPages(id string) []downloader.Page {
 
 func (m *Scraper) Download(downloader *downloader.Downloader, downloadType string) {
 	// downloadType is one of ["download", "update"]
-	_ = downloader.CreateDirectory(m.manga.title, downloadType)
+	path := downloader.CreateDirectory(m.manga.title, downloadType)
 	for _, chapter := range m.selectedChapters {
 		language := ""
 		if len(m.config.LanguageFilter) > 1 {
 			language = fmt.Sprintf("%s", chapter.chapterResult.language)
 		}
 
-		_ = downloader.GetNameFromTemplate(m.config.FilenameTemplate,
+		chapterTitle := downloader.GetNameFromTemplate(m.config.FilenameTemplate,
 			chapter.chapterResult.num, chapter.chapterResult.title, language)
-
+		downloader.Download(path, chapterTitle, chapter.pages)
 	}
 }
 
