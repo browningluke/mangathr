@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gammazero/workerpool"
+	"github.com/vbauerster/mpb/v7"
 	"io"
 	"log"
 	"mangathrV2/internal/metadata"
@@ -24,6 +25,12 @@ type Downloader struct {
 
 type Page struct {
 	Url, Filename string
+}
+
+type Job struct {
+	Title, Num string
+	Pages      []Page
+	Bar        *mpb.Bar
 }
 
 func NewDownloader(config *Config) *Downloader {
@@ -93,13 +100,14 @@ func (d *Downloader) GetNameFromTemplate(pluginTemplate, num, title, language st
 	return fmt.Sprintf("%s - Chapter %s%s%s", paddedNum, num, conditionalLanguage, conditionalTitle)
 }
 
-func (d *Downloader) Download(path, chapterFilename string, pages []Page) {
-	fmt.Println(chapterFilename)
+func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *mpb.Bar) {
+	//fmt.Println(chapterFilename)
 
 	chapterPath := filepath.Join(path, fmt.Sprintf("%s.cbz", chapterFilename))
 
 	if _, err := os.Stat(chapterPath); err == nil {
 		fmt.Println("Chapter already exists.")
+		bar.Abort(true)
 		return
 	} else if errors.Is(err, os.ErrNotExist) {
 		// Create empty file
@@ -135,12 +143,13 @@ func (d *Downloader) Download(path, chapterFilename string, pages []Page) {
 				if err := d.downloadImage(image.Url, image.Filename, zipWriter, &mu); err != nil {
 					log.Fatalln(err)
 				}
+				bar.Increment()
 			})
 
 		}
 		wp.StopWait()
 
-		fmt.Println("Saving metadata")
+		//fmt.Println("Saving metadata")
 		filename, body := d.agent.GenerateMetadataFile()
 
 		comicInfo, err := zipWriter.Create(filename)
@@ -164,7 +173,7 @@ func (d *Downloader) downloadImage(url, filename string, zipWriter *zip.Writer, 
 		map[string]string{},
 		[]rester.QueryParam{}).Do(d.config.PageRetries).([]byte)
 
-	fmt.Println("Downloading image: ", filename)
+	//fmt.Println("Downloading image: ", filename)
 
 	mu.Lock()
 	defer mu.Unlock()

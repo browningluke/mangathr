@@ -7,7 +7,6 @@ type Agent struct {
 }
 
 func NewAgent(title, num string) *Agent {
-	fmt.Println("Created a comicinfo agent")
 	return &Agent{title: title, num: num}
 }
 

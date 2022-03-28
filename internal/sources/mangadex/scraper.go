@@ -6,6 +6,7 @@ import (
 	"mangathrV2/internal/downloader"
 	"mangathrV2/internal/rester"
 	"mangathrV2/internal/utils"
+	"mangathrV2/internal/utils/ui"
 	"math"
 	"strconv"
 )
@@ -267,20 +268,39 @@ func (m *Scraper) getChapterPages(id string) []downloader.Page {
 	return pages
 }
 
-func (m *Scraper) Download(downloader *downloader.Downloader, downloadType string) {
+func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 	// downloadType is one of ["download", "update"]
-	path := downloader.CreateDirectory(m.manga.title, downloadType)
-	for _, chapter := range m.selectedChapters {
+	path := dl.CreateDirectory(m.manga.title, downloadType)
+	progress := ui.CreateProgress()
+
+	downloadQueue := make([]downloader.Job, len(m.selectedChapters))
+
+	for i, chapter := range m.selectedChapters {
+		bar := ui.AddBar(progress, int64(len(chapter.pages)),
+			fmt.Sprintf("Chapter %s", chapter.chapterResult.num))
+
 		language := ""
 		if len(m.config.LanguageFilter) > 1 {
 			language = fmt.Sprintf("%s", chapter.chapterResult.language)
 		}
-
-		chapterTitle := downloader.GetNameFromTemplate(m.config.FilenameTemplate,
+		chapterTitle := dl.GetNameFromTemplate(m.config.FilenameTemplate,
 			chapter.chapterResult.num, chapter.chapterResult.title, language)
-		downloader.SetMetadataAgent(chapterTitle, chapter.chapterResult.num)
-		downloader.Download(path, chapterTitle, chapter.pages)
+
+		downloadQueue[i] = downloader.Job{Title: chapterTitle, Num: chapter.chapterResult.num,
+			Pages: chapter.pages, Bar: bar}
 	}
+
+	runJob := func(job downloader.Job) {
+		dl.SetMetadataAgent(job.Title, job.Num)
+		dl.Download(path, job.Title, job.Pages, job.Bar)
+	}
+
+	// Execute download queue, potential to add workerpool here later
+	for _, job := range downloadQueue {
+		runJob(job)
+	}
+
+	progress.Wait()
 }
 
 func (m *Scraper) GetMangaTitle() string {

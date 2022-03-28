@@ -72,7 +72,7 @@ func (r RESTer) get(urlString string, headers map[string]string, params []QueryP
 		urlString += fmt.Sprintf("%s=%s&", param.Key, val)
 	}
 
-	fmt.Println(urlString)
+	//fmt.Println(urlString)
 
 	req, err := http.NewRequest("GET", urlString, nil)
 	if err != nil {
