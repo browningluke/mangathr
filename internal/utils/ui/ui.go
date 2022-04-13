@@ -83,3 +83,18 @@ func SingleCheckboxes(label string, opts []string) string {
 
 	return res
 }
+
+func ConfirmPrompt(label string) bool {
+	var res bool
+
+	prompt := &survey.Confirm{
+		Message: label,
+	}
+
+	err := survey.AskOne(prompt, &res)
+	if err != nil {
+		panic(err)
+	}
+
+	return res
+}
