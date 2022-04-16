@@ -6,7 +6,7 @@ import (
 	"mangathrV2/ent"
 )
 
-func (d *Driver) CreateManga(mangaID, title, source, mapping string) (*ent.Manga, error) {
+func (d *Driver) createManga(mangaID, title, source, mapping string) (*ent.Manga, error) {
 	u, err := d.client.Manga.
 		Create().
 		SetMangaID(mangaID).
@@ -19,6 +19,14 @@ func (d *Driver) CreateManga(mangaID, title, source, mapping string) (*ent.Manga
 	}
 	log.Println("user was created: ", u)
 	return u, nil
+}
+
+func (d *Driver) CreateManga(mangaID, title, source, mapping string) (*ent.Manga, error) {
+	manga, err := d.QueryManga(mangaID)
+	if err != nil {
+		return d.createManga(mangaID, title, source, mapping)
+	}
+	return manga, nil
 }
 
 func (d *Driver) CreateChapter(chapterID, num string, manga *ent.Manga) error {

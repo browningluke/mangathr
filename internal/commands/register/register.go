@@ -93,6 +93,12 @@ func promptMainMenu(args *Args, config *config.Config, driver *database.Driver) 
 		scraper:       &scraper,
 	}
 
+	if _, err := driver.QueryManga(scraper.MangaID()); err == nil {
+		fmt.Printf("Title: %s\nSource: %s\n", mangaTitle, sourceName)
+		ui.PrintlnColor(fmt.Sprint("Manga is already registered. Exiting..."), ui.Red)
+		return
+	}
+
 	for true {
 		option := ui.SingleCheckboxes(generateString(&opts, "Select an option"),
 			[]string{"Register", "Customize"})
