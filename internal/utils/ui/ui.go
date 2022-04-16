@@ -98,3 +98,16 @@ func ConfirmPrompt(label string) bool {
 
 	return res
 }
+
+func InputPrompt(label string) string {
+	res := ""
+	prompt := &survey.Input{
+		Message: label,
+	}
+	err := survey.AskOne(prompt, &res)
+	if err != nil {
+		panic(err)
+	}
+
+	return res
+}
