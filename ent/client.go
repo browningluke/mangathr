@@ -215,7 +215,7 @@ func (c *ChapterClient) GetX(ctx context.Context, id int) *Chapter {
 	return obj
 }
 
-// QueryManga queries the manga edge of a Chapter.
+// QueryManga queries the Manga edge of a Chapter.
 func (c *ChapterClient) QueryManga(ch *Chapter) *MangaQuery {
 	query := &MangaQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
@@ -321,7 +321,7 @@ func (c *MangaClient) GetX(ctx context.Context, id int) *Manga {
 	return obj
 }
 
-// QueryChapters queries the chapters edge of a Manga.
+// QueryChapters queries the Chapters edge of a Manga.
 func (c *MangaClient) QueryChapters(m *Manga) *ChapterQuery {
 	query := &ChapterQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {

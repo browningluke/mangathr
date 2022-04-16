@@ -36,8 +36,8 @@ type ChapterMutation struct {
 	_ChapterID    *string
 	_Num          *string
 	clearedFields map[string]struct{}
-	manga         *int
-	clearedmanga  bool
+	_Manga        *int
+	cleared_Manga bool
 	done          bool
 	oldValue      func(context.Context) (*Chapter, error)
 	predicates    []predicate.Chapter
@@ -213,43 +213,43 @@ func (m *ChapterMutation) ResetNum() {
 	m._Num = nil
 }
 
-// SetMangaID sets the "manga" edge to the Manga entity by id.
+// SetMangaID sets the "Manga" edge to the Manga entity by id.
 func (m *ChapterMutation) SetMangaID(id int) {
-	m.manga = &id
+	m._Manga = &id
 }
 
-// ClearManga clears the "manga" edge to the Manga entity.
+// ClearManga clears the "Manga" edge to the Manga entity.
 func (m *ChapterMutation) ClearManga() {
-	m.clearedmanga = true
+	m.cleared_Manga = true
 }
 
-// MangaCleared reports if the "manga" edge to the Manga entity was cleared.
+// MangaCleared reports if the "Manga" edge to the Manga entity was cleared.
 func (m *ChapterMutation) MangaCleared() bool {
-	return m.clearedmanga
+	return m.cleared_Manga
 }
 
-// MangaID returns the "manga" edge ID in the mutation.
+// MangaID returns the "Manga" edge ID in the mutation.
 func (m *ChapterMutation) MangaID() (id int, exists bool) {
-	if m.manga != nil {
-		return *m.manga, true
+	if m._Manga != nil {
+		return *m._Manga, true
 	}
 	return
 }
 
-// MangaIDs returns the "manga" edge IDs in the mutation.
+// MangaIDs returns the "Manga" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // MangaID instead. It exists only for internal usage by the builders.
 func (m *ChapterMutation) MangaIDs() (ids []int) {
-	if id := m.manga; id != nil {
+	if id := m._Manga; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetManga resets all changes to the "manga" edge.
+// ResetManga resets all changes to the "Manga" edge.
 func (m *ChapterMutation) ResetManga() {
-	m.manga = nil
-	m.clearedmanga = false
+	m._Manga = nil
+	m.cleared_Manga = false
 }
 
 // Where appends a list predicates to the ChapterMutation builder.
@@ -388,7 +388,7 @@ func (m *ChapterMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ChapterMutation) AddedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.manga != nil {
+	if m._Manga != nil {
 		edges = append(edges, chapter.EdgeManga)
 	}
 	return edges
@@ -399,7 +399,7 @@ func (m *ChapterMutation) AddedEdges() []string {
 func (m *ChapterMutation) AddedIDs(name string) []ent.Value {
 	switch name {
 	case chapter.EdgeManga:
-		if id := m.manga; id != nil {
+		if id := m._Manga; id != nil {
 			return []ent.Value{*id}
 		}
 	}
@@ -423,7 +423,7 @@ func (m *ChapterMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ChapterMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.clearedmanga {
+	if m.cleared_Manga {
 		edges = append(edges, chapter.EdgeManga)
 	}
 	return edges
@@ -434,7 +434,7 @@ func (m *ChapterMutation) ClearedEdges() []string {
 func (m *ChapterMutation) EdgeCleared(name string) bool {
 	switch name {
 	case chapter.EdgeManga:
-		return m.clearedmanga
+		return m.cleared_Manga
 	}
 	return false
 }
@@ -464,19 +464,20 @@ func (m *ChapterMutation) ResetEdge(name string) error {
 // MangaMutation represents an operation that mutates the Manga nodes in the graph.
 type MangaMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *int
-	_MangaID        *string
-	_Plugin         *string
-	_Title          *string
-	clearedFields   map[string]struct{}
-	chapters        map[int]struct{}
-	removedchapters map[int]struct{}
-	clearedchapters bool
-	done            bool
-	oldValue        func(context.Context) (*Manga, error)
-	predicates      []predicate.Manga
+	op               Op
+	typ              string
+	id               *int
+	_MangaID         *string
+	_Source          *string
+	_Title           *string
+	_Mapping         *string
+	clearedFields    map[string]struct{}
+	_Chapters        map[int]struct{}
+	removed_Chapters map[int]struct{}
+	cleared_Chapters bool
+	done             bool
+	oldValue         func(context.Context) (*Manga, error)
+	predicates       []predicate.Manga
 }
 
 var _ ent.Mutation = (*MangaMutation)(nil)
@@ -613,40 +614,40 @@ func (m *MangaMutation) ResetMangaID() {
 	m._MangaID = nil
 }
 
-// SetPlugin sets the "Plugin" field.
-func (m *MangaMutation) SetPlugin(s string) {
-	m._Plugin = &s
+// SetSource sets the "Source" field.
+func (m *MangaMutation) SetSource(s string) {
+	m._Source = &s
 }
 
-// Plugin returns the value of the "Plugin" field in the mutation.
-func (m *MangaMutation) Plugin() (r string, exists bool) {
-	v := m._Plugin
+// Source returns the value of the "Source" field in the mutation.
+func (m *MangaMutation) Source() (r string, exists bool) {
+	v := m._Source
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldPlugin returns the old "Plugin" field's value of the Manga entity.
+// OldSource returns the old "Source" field's value of the Manga entity.
 // If the Manga object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MangaMutation) OldPlugin(ctx context.Context) (v string, err error) {
+func (m *MangaMutation) OldSource(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPlugin is only allowed on UpdateOne operations")
+		return v, errors.New("OldSource is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPlugin requires an ID field in the mutation")
+		return v, errors.New("OldSource requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPlugin: %w", err)
+		return v, fmt.Errorf("querying old value for OldSource: %w", err)
 	}
-	return oldValue.Plugin, nil
+	return oldValue.Source, nil
 }
 
-// ResetPlugin resets all changes to the "Plugin" field.
-func (m *MangaMutation) ResetPlugin() {
-	m._Plugin = nil
+// ResetSource resets all changes to the "Source" field.
+func (m *MangaMutation) ResetSource() {
+	m._Source = nil
 }
 
 // SetTitle sets the "Title" field.
@@ -685,58 +686,94 @@ func (m *MangaMutation) ResetTitle() {
 	m._Title = nil
 }
 
-// AddChapterIDs adds the "chapters" edge to the Chapter entity by ids.
+// SetMapping sets the "Mapping" field.
+func (m *MangaMutation) SetMapping(s string) {
+	m._Mapping = &s
+}
+
+// Mapping returns the value of the "Mapping" field in the mutation.
+func (m *MangaMutation) Mapping() (r string, exists bool) {
+	v := m._Mapping
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMapping returns the old "Mapping" field's value of the Manga entity.
+// If the Manga object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MangaMutation) OldMapping(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMapping is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMapping requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMapping: %w", err)
+	}
+	return oldValue.Mapping, nil
+}
+
+// ResetMapping resets all changes to the "Mapping" field.
+func (m *MangaMutation) ResetMapping() {
+	m._Mapping = nil
+}
+
+// AddChapterIDs adds the "Chapters" edge to the Chapter entity by ids.
 func (m *MangaMutation) AddChapterIDs(ids ...int) {
-	if m.chapters == nil {
-		m.chapters = make(map[int]struct{})
+	if m._Chapters == nil {
+		m._Chapters = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.chapters[ids[i]] = struct{}{}
+		m._Chapters[ids[i]] = struct{}{}
 	}
 }
 
-// ClearChapters clears the "chapters" edge to the Chapter entity.
+// ClearChapters clears the "Chapters" edge to the Chapter entity.
 func (m *MangaMutation) ClearChapters() {
-	m.clearedchapters = true
+	m.cleared_Chapters = true
 }
 
-// ChaptersCleared reports if the "chapters" edge to the Chapter entity was cleared.
+// ChaptersCleared reports if the "Chapters" edge to the Chapter entity was cleared.
 func (m *MangaMutation) ChaptersCleared() bool {
-	return m.clearedchapters
+	return m.cleared_Chapters
 }
 
-// RemoveChapterIDs removes the "chapters" edge to the Chapter entity by IDs.
+// RemoveChapterIDs removes the "Chapters" edge to the Chapter entity by IDs.
 func (m *MangaMutation) RemoveChapterIDs(ids ...int) {
-	if m.removedchapters == nil {
-		m.removedchapters = make(map[int]struct{})
+	if m.removed_Chapters == nil {
+		m.removed_Chapters = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.chapters, ids[i])
-		m.removedchapters[ids[i]] = struct{}{}
+		delete(m._Chapters, ids[i])
+		m.removed_Chapters[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedChapters returns the removed IDs of the "chapters" edge to the Chapter entity.
+// RemovedChapters returns the removed IDs of the "Chapters" edge to the Chapter entity.
 func (m *MangaMutation) RemovedChaptersIDs() (ids []int) {
-	for id := range m.removedchapters {
+	for id := range m.removed_Chapters {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ChaptersIDs returns the "chapters" edge IDs in the mutation.
+// ChaptersIDs returns the "Chapters" edge IDs in the mutation.
 func (m *MangaMutation) ChaptersIDs() (ids []int) {
-	for id := range m.chapters {
+	for id := range m._Chapters {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetChapters resets all changes to the "chapters" edge.
+// ResetChapters resets all changes to the "Chapters" edge.
 func (m *MangaMutation) ResetChapters() {
-	m.chapters = nil
-	m.clearedchapters = false
-	m.removedchapters = nil
+	m._Chapters = nil
+	m.cleared_Chapters = false
+	m.removed_Chapters = nil
 }
 
 // Where appends a list predicates to the MangaMutation builder.
@@ -758,15 +795,18 @@ func (m *MangaMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MangaMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m._MangaID != nil {
 		fields = append(fields, manga.FieldMangaID)
 	}
-	if m._Plugin != nil {
-		fields = append(fields, manga.FieldPlugin)
+	if m._Source != nil {
+		fields = append(fields, manga.FieldSource)
 	}
 	if m._Title != nil {
 		fields = append(fields, manga.FieldTitle)
+	}
+	if m._Mapping != nil {
+		fields = append(fields, manga.FieldMapping)
 	}
 	return fields
 }
@@ -778,10 +818,12 @@ func (m *MangaMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case manga.FieldMangaID:
 		return m.MangaID()
-	case manga.FieldPlugin:
-		return m.Plugin()
+	case manga.FieldSource:
+		return m.Source()
 	case manga.FieldTitle:
 		return m.Title()
+	case manga.FieldMapping:
+		return m.Mapping()
 	}
 	return nil, false
 }
@@ -793,10 +835,12 @@ func (m *MangaMutation) OldField(ctx context.Context, name string) (ent.Value, e
 	switch name {
 	case manga.FieldMangaID:
 		return m.OldMangaID(ctx)
-	case manga.FieldPlugin:
-		return m.OldPlugin(ctx)
+	case manga.FieldSource:
+		return m.OldSource(ctx)
 	case manga.FieldTitle:
 		return m.OldTitle(ctx)
+	case manga.FieldMapping:
+		return m.OldMapping(ctx)
 	}
 	return nil, fmt.Errorf("unknown Manga field %s", name)
 }
@@ -813,12 +857,12 @@ func (m *MangaMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetMangaID(v)
 		return nil
-	case manga.FieldPlugin:
+	case manga.FieldSource:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetPlugin(v)
+		m.SetSource(v)
 		return nil
 	case manga.FieldTitle:
 		v, ok := value.(string)
@@ -826,6 +870,13 @@ func (m *MangaMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTitle(v)
+		return nil
+	case manga.FieldMapping:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMapping(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Manga field %s", name)
@@ -879,11 +930,14 @@ func (m *MangaMutation) ResetField(name string) error {
 	case manga.FieldMangaID:
 		m.ResetMangaID()
 		return nil
-	case manga.FieldPlugin:
-		m.ResetPlugin()
+	case manga.FieldSource:
+		m.ResetSource()
 		return nil
 	case manga.FieldTitle:
 		m.ResetTitle()
+		return nil
+	case manga.FieldMapping:
+		m.ResetMapping()
 		return nil
 	}
 	return fmt.Errorf("unknown Manga field %s", name)
@@ -892,7 +946,7 @@ func (m *MangaMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *MangaMutation) AddedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.chapters != nil {
+	if m._Chapters != nil {
 		edges = append(edges, manga.EdgeChapters)
 	}
 	return edges
@@ -903,8 +957,8 @@ func (m *MangaMutation) AddedEdges() []string {
 func (m *MangaMutation) AddedIDs(name string) []ent.Value {
 	switch name {
 	case manga.EdgeChapters:
-		ids := make([]ent.Value, 0, len(m.chapters))
-		for id := range m.chapters {
+		ids := make([]ent.Value, 0, len(m._Chapters))
+		for id := range m._Chapters {
 			ids = append(ids, id)
 		}
 		return ids
@@ -915,7 +969,7 @@ func (m *MangaMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *MangaMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.removedchapters != nil {
+	if m.removed_Chapters != nil {
 		edges = append(edges, manga.EdgeChapters)
 	}
 	return edges
@@ -926,8 +980,8 @@ func (m *MangaMutation) RemovedEdges() []string {
 func (m *MangaMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
 	case manga.EdgeChapters:
-		ids := make([]ent.Value, 0, len(m.removedchapters))
-		for id := range m.removedchapters {
+		ids := make([]ent.Value, 0, len(m.removed_Chapters))
+		for id := range m.removed_Chapters {
 			ids = append(ids, id)
 		}
 		return ids
@@ -938,7 +992,7 @@ func (m *MangaMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *MangaMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.clearedchapters {
+	if m.cleared_Chapters {
 		edges = append(edges, manga.EdgeChapters)
 	}
 	return edges
@@ -949,7 +1003,7 @@ func (m *MangaMutation) ClearedEdges() []string {
 func (m *MangaMutation) EdgeCleared(name string) bool {
 	switch name {
 	case manga.EdgeChapters:
-		return m.clearedchapters
+		return m.cleared_Chapters
 	}
 	return false
 }

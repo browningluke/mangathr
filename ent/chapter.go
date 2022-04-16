@@ -28,8 +28,8 @@ type Chapter struct {
 
 // ChapterEdges holds the relations/edges for other nodes in the graph.
 type ChapterEdges struct {
-	// Manga holds the value of the manga edge.
-	Manga *Manga `json:"manga,omitempty"`
+	// Manga holds the value of the Manga edge.
+	Manga *Manga `json:"Manga,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
@@ -40,13 +40,13 @@ type ChapterEdges struct {
 func (e ChapterEdges) MangaOrErr() (*Manga, error) {
 	if e.loadedTypes[0] {
 		if e.Manga == nil {
-			// The edge manga was loaded in eager-loading,
+			// The edge Manga was loaded in eager-loading,
 			// but was not found.
 			return nil, &NotFoundError{label: manga.Label}
 		}
 		return e.Manga, nil
 	}
-	return nil, &NotLoadedError{edge: "manga"}
+	return nil, &NotLoadedError{edge: "Manga"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -105,7 +105,7 @@ func (c *Chapter) assignValues(columns []string, values []interface{}) error {
 	return nil
 }
 
-// QueryManga queries the "manga" edge of the Chapter entity.
+// QueryManga queries the "Manga" edge of the Chapter entity.
 func (c *Chapter) QueryManga() *MangaQuery {
 	return (&ChapterClient{config: c.config}).QueryManga(c)
 }

@@ -40,13 +40,13 @@ func (cu *ChapterUpdate) SetNum(s string) *ChapterUpdate {
 	return cu
 }
 
-// SetMangaID sets the "manga" edge to the Manga entity by ID.
+// SetMangaID sets the "Manga" edge to the Manga entity by ID.
 func (cu *ChapterUpdate) SetMangaID(id int) *ChapterUpdate {
 	cu.mutation.SetMangaID(id)
 	return cu
 }
 
-// SetNillableMangaID sets the "manga" edge to the Manga entity by ID if the given value is not nil.
+// SetNillableMangaID sets the "Manga" edge to the Manga entity by ID if the given value is not nil.
 func (cu *ChapterUpdate) SetNillableMangaID(id *int) *ChapterUpdate {
 	if id != nil {
 		cu = cu.SetMangaID(*id)
@@ -54,7 +54,7 @@ func (cu *ChapterUpdate) SetNillableMangaID(id *int) *ChapterUpdate {
 	return cu
 }
 
-// SetManga sets the "manga" edge to the Manga entity.
+// SetManga sets the "Manga" edge to the Manga entity.
 func (cu *ChapterUpdate) SetManga(m *Manga) *ChapterUpdate {
 	return cu.SetMangaID(m.ID)
 }
@@ -64,7 +64,7 @@ func (cu *ChapterUpdate) Mutation() *ChapterMutation {
 	return cu.mutation
 }
 
-// ClearManga clears the "manga" edge to the Manga entity.
+// ClearManga clears the "Manga" edge to the Manga entity.
 func (cu *ChapterUpdate) ClearManga() *ChapterUpdate {
 	cu.mutation.ClearManga()
 	return cu
@@ -222,13 +222,13 @@ func (cuo *ChapterUpdateOne) SetNum(s string) *ChapterUpdateOne {
 	return cuo
 }
 
-// SetMangaID sets the "manga" edge to the Manga entity by ID.
+// SetMangaID sets the "Manga" edge to the Manga entity by ID.
 func (cuo *ChapterUpdateOne) SetMangaID(id int) *ChapterUpdateOne {
 	cuo.mutation.SetMangaID(id)
 	return cuo
 }
 
-// SetNillableMangaID sets the "manga" edge to the Manga entity by ID if the given value is not nil.
+// SetNillableMangaID sets the "Manga" edge to the Manga entity by ID if the given value is not nil.
 func (cuo *ChapterUpdateOne) SetNillableMangaID(id *int) *ChapterUpdateOne {
 	if id != nil {
 		cuo = cuo.SetMangaID(*id)
@@ -236,7 +236,7 @@ func (cuo *ChapterUpdateOne) SetNillableMangaID(id *int) *ChapterUpdateOne {
 	return cuo
 }
 
-// SetManga sets the "manga" edge to the Manga entity.
+// SetManga sets the "Manga" edge to the Manga entity.
 func (cuo *ChapterUpdateOne) SetManga(m *Manga) *ChapterUpdateOne {
 	return cuo.SetMangaID(m.ID)
 }
@@ -246,7 +246,7 @@ func (cuo *ChapterUpdateOne) Mutation() *ChapterMutation {
 	return cuo.mutation
 }
 
-// ClearManga clears the "manga" edge to the Manga entity.
+// ClearManga clears the "Manga" edge to the Manga entity.
 func (cuo *ChapterUpdateOne) ClearManga() *ChapterUpdateOne {
 	cuo.mutation.ClearManga()
 	return cuo

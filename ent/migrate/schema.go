@@ -22,7 +22,7 @@ var (
 		PrimaryKey: []*schema.Column{ChaptersColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "chapters_mangas_chapters",
+				Symbol:     "chapters_mangas_Chapters",
 				Columns:    []*schema.Column{ChaptersColumns[3]},
 				RefColumns: []*schema.Column{MangasColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -33,8 +33,9 @@ var (
 	MangasColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "manga_id", Type: field.TypeString},
-		{Name: "plugin", Type: field.TypeString},
+		{Name: "source", Type: field.TypeString},
 		{Name: "title", Type: field.TypeString},
+		{Name: "mapping", Type: field.TypeString},
 	}
 	// MangasTable holds the schema information for the "mangas" table.
 	MangasTable = &schema.Table{

@@ -12,15 +12,15 @@ const (
 	// FieldNum holds the string denoting the num field in the database.
 	FieldNum = "num"
 	// EdgeManga holds the string denoting the manga edge name in mutations.
-	EdgeManga = "manga"
+	EdgeManga = "Manga"
 	// Table holds the table name of the chapter in the database.
 	Table = "chapters"
-	// MangaTable is the table that holds the manga relation/edge.
+	// MangaTable is the table that holds the Manga relation/edge.
 	MangaTable = "chapters"
 	// MangaInverseTable is the table name for the Manga entity.
 	// It exists in this package in order to avoid circular dependency with the "manga" package.
 	MangaInverseTable = "mangas"
-	// MangaColumn is the table column denoting the manga relation/edge.
+	// MangaColumn is the table column denoting the Manga relation/edge.
 	MangaColumn = "manga_chapters"
 )
 

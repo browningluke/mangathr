@@ -32,13 +32,13 @@ func (cc *ChapterCreate) SetNum(s string) *ChapterCreate {
 	return cc
 }
 
-// SetMangaID sets the "manga" edge to the Manga entity by ID.
+// SetMangaID sets the "Manga" edge to the Manga entity by ID.
 func (cc *ChapterCreate) SetMangaID(id int) *ChapterCreate {
 	cc.mutation.SetMangaID(id)
 	return cc
 }
 
-// SetNillableMangaID sets the "manga" edge to the Manga entity by ID if the given value is not nil.
+// SetNillableMangaID sets the "Manga" edge to the Manga entity by ID if the given value is not nil.
 func (cc *ChapterCreate) SetNillableMangaID(id *int) *ChapterCreate {
 	if id != nil {
 		cc = cc.SetMangaID(*id)
@@ -46,7 +46,7 @@ func (cc *ChapterCreate) SetNillableMangaID(id *int) *ChapterCreate {
 	return cc
 }
 
-// SetManga sets the "manga" edge to the Manga entity.
+// SetManga sets the "Manga" edge to the Manga entity.
 func (cc *ChapterCreate) SetManga(m *Manga) *ChapterCreate {
 	return cc.SetMangaID(m.ID)
 }

@@ -99,10 +99,10 @@ func MangaID(v string) predicate.Manga {
 	})
 }
 
-// Plugin applies equality check predicate on the "Plugin" field. It's identical to PluginEQ.
-func Plugin(v string) predicate.Manga {
+// Source applies equality check predicate on the "Source" field. It's identical to SourceEQ.
+func Source(v string) predicate.Manga {
 	return predicate.Manga(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldPlugin), v))
+		s.Where(sql.EQ(s.C(FieldSource), v))
 	})
 }
 
@@ -110,6 +110,13 @@ func Plugin(v string) predicate.Manga {
 func Title(v string) predicate.Manga {
 	return predicate.Manga(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldTitle), v))
+	})
+}
+
+// Mapping applies equality check predicate on the "Mapping" field. It's identical to MappingEQ.
+func Mapping(v string) predicate.Manga {
+	return predicate.Manga(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldMapping), v))
 	})
 }
 
@@ -224,22 +231,22 @@ func MangaIDContainsFold(v string) predicate.Manga {
 	})
 }
 
-// PluginEQ applies the EQ predicate on the "Plugin" field.
-func PluginEQ(v string) predicate.Manga {
+// SourceEQ applies the EQ predicate on the "Source" field.
+func SourceEQ(v string) predicate.Manga {
 	return predicate.Manga(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldPlugin), v))
+		s.Where(sql.EQ(s.C(FieldSource), v))
 	})
 }
 
-// PluginNEQ applies the NEQ predicate on the "Plugin" field.
-func PluginNEQ(v string) predicate.Manga {
+// SourceNEQ applies the NEQ predicate on the "Source" field.
+func SourceNEQ(v string) predicate.Manga {
 	return predicate.Manga(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldPlugin), v))
+		s.Where(sql.NEQ(s.C(FieldSource), v))
 	})
 }
 
-// PluginIn applies the In predicate on the "Plugin" field.
-func PluginIn(vs ...string) predicate.Manga {
+// SourceIn applies the In predicate on the "Source" field.
+func SourceIn(vs ...string) predicate.Manga {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -251,12 +258,12 @@ func PluginIn(vs ...string) predicate.Manga {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldPlugin), v...))
+		s.Where(sql.In(s.C(FieldSource), v...))
 	})
 }
 
-// PluginNotIn applies the NotIn predicate on the "Plugin" field.
-func PluginNotIn(vs ...string) predicate.Manga {
+// SourceNotIn applies the NotIn predicate on the "Source" field.
+func SourceNotIn(vs ...string) predicate.Manga {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -268,70 +275,70 @@ func PluginNotIn(vs ...string) predicate.Manga {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldPlugin), v...))
+		s.Where(sql.NotIn(s.C(FieldSource), v...))
 	})
 }
 
-// PluginGT applies the GT predicate on the "Plugin" field.
-func PluginGT(v string) predicate.Manga {
+// SourceGT applies the GT predicate on the "Source" field.
+func SourceGT(v string) predicate.Manga {
 	return predicate.Manga(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldPlugin), v))
+		s.Where(sql.GT(s.C(FieldSource), v))
 	})
 }
 
-// PluginGTE applies the GTE predicate on the "Plugin" field.
-func PluginGTE(v string) predicate.Manga {
+// SourceGTE applies the GTE predicate on the "Source" field.
+func SourceGTE(v string) predicate.Manga {
 	return predicate.Manga(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldPlugin), v))
+		s.Where(sql.GTE(s.C(FieldSource), v))
 	})
 }
 
-// PluginLT applies the LT predicate on the "Plugin" field.
-func PluginLT(v string) predicate.Manga {
+// SourceLT applies the LT predicate on the "Source" field.
+func SourceLT(v string) predicate.Manga {
 	return predicate.Manga(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldPlugin), v))
+		s.Where(sql.LT(s.C(FieldSource), v))
 	})
 }
 
-// PluginLTE applies the LTE predicate on the "Plugin" field.
-func PluginLTE(v string) predicate.Manga {
+// SourceLTE applies the LTE predicate on the "Source" field.
+func SourceLTE(v string) predicate.Manga {
 	return predicate.Manga(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldPlugin), v))
+		s.Where(sql.LTE(s.C(FieldSource), v))
 	})
 }
 
-// PluginContains applies the Contains predicate on the "Plugin" field.
-func PluginContains(v string) predicate.Manga {
+// SourceContains applies the Contains predicate on the "Source" field.
+func SourceContains(v string) predicate.Manga {
 	return predicate.Manga(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldPlugin), v))
+		s.Where(sql.Contains(s.C(FieldSource), v))
 	})
 }
 
-// PluginHasPrefix applies the HasPrefix predicate on the "Plugin" field.
-func PluginHasPrefix(v string) predicate.Manga {
+// SourceHasPrefix applies the HasPrefix predicate on the "Source" field.
+func SourceHasPrefix(v string) predicate.Manga {
 	return predicate.Manga(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldPlugin), v))
+		s.Where(sql.HasPrefix(s.C(FieldSource), v))
 	})
 }
 
-// PluginHasSuffix applies the HasSuffix predicate on the "Plugin" field.
-func PluginHasSuffix(v string) predicate.Manga {
+// SourceHasSuffix applies the HasSuffix predicate on the "Source" field.
+func SourceHasSuffix(v string) predicate.Manga {
 	return predicate.Manga(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldPlugin), v))
+		s.Where(sql.HasSuffix(s.C(FieldSource), v))
 	})
 }
 
-// PluginEqualFold applies the EqualFold predicate on the "Plugin" field.
-func PluginEqualFold(v string) predicate.Manga {
+// SourceEqualFold applies the EqualFold predicate on the "Source" field.
+func SourceEqualFold(v string) predicate.Manga {
 	return predicate.Manga(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldPlugin), v))
+		s.Where(sql.EqualFold(s.C(FieldSource), v))
 	})
 }
 
-// PluginContainsFold applies the ContainsFold predicate on the "Plugin" field.
-func PluginContainsFold(v string) predicate.Manga {
+// SourceContainsFold applies the ContainsFold predicate on the "Source" field.
+func SourceContainsFold(v string) predicate.Manga {
 	return predicate.Manga(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldPlugin), v))
+		s.Where(sql.ContainsFold(s.C(FieldSource), v))
 	})
 }
 
@@ -446,7 +453,118 @@ func TitleContainsFold(v string) predicate.Manga {
 	})
 }
 
-// HasChapters applies the HasEdge predicate on the "chapters" edge.
+// MappingEQ applies the EQ predicate on the "Mapping" field.
+func MappingEQ(v string) predicate.Manga {
+	return predicate.Manga(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldMapping), v))
+	})
+}
+
+// MappingNEQ applies the NEQ predicate on the "Mapping" field.
+func MappingNEQ(v string) predicate.Manga {
+	return predicate.Manga(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldMapping), v))
+	})
+}
+
+// MappingIn applies the In predicate on the "Mapping" field.
+func MappingIn(vs ...string) predicate.Manga {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Manga(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldMapping), v...))
+	})
+}
+
+// MappingNotIn applies the NotIn predicate on the "Mapping" field.
+func MappingNotIn(vs ...string) predicate.Manga {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Manga(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldMapping), v...))
+	})
+}
+
+// MappingGT applies the GT predicate on the "Mapping" field.
+func MappingGT(v string) predicate.Manga {
+	return predicate.Manga(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldMapping), v))
+	})
+}
+
+// MappingGTE applies the GTE predicate on the "Mapping" field.
+func MappingGTE(v string) predicate.Manga {
+	return predicate.Manga(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldMapping), v))
+	})
+}
+
+// MappingLT applies the LT predicate on the "Mapping" field.
+func MappingLT(v string) predicate.Manga {
+	return predicate.Manga(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldMapping), v))
+	})
+}
+
+// MappingLTE applies the LTE predicate on the "Mapping" field.
+func MappingLTE(v string) predicate.Manga {
+	return predicate.Manga(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldMapping), v))
+	})
+}
+
+// MappingContains applies the Contains predicate on the "Mapping" field.
+func MappingContains(v string) predicate.Manga {
+	return predicate.Manga(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldMapping), v))
+	})
+}
+
+// MappingHasPrefix applies the HasPrefix predicate on the "Mapping" field.
+func MappingHasPrefix(v string) predicate.Manga {
+	return predicate.Manga(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldMapping), v))
+	})
+}
+
+// MappingHasSuffix applies the HasSuffix predicate on the "Mapping" field.
+func MappingHasSuffix(v string) predicate.Manga {
+	return predicate.Manga(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldMapping), v))
+	})
+}
+
+// MappingEqualFold applies the EqualFold predicate on the "Mapping" field.
+func MappingEqualFold(v string) predicate.Manga {
+	return predicate.Manga(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldMapping), v))
+	})
+}
+
+// MappingContainsFold applies the ContainsFold predicate on the "Mapping" field.
+func MappingContainsFold(v string) predicate.Manga {
+	return predicate.Manga(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldMapping), v))
+	})
+}
+
+// HasChapters applies the HasEdge predicate on the "Chapters" edge.
 func HasChapters() predicate.Manga {
 	return predicate.Manga(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
@@ -458,7 +576,7 @@ func HasChapters() predicate.Manga {
 	})
 }
 
-// HasChaptersWith applies the HasEdge predicate on the "chapters" edge with a given conditions (other predicates).
+// HasChaptersWith applies the HasEdge predicate on the "Chapters" edge with a given conditions (other predicates).
 func HasChaptersWith(preds ...predicate.Chapter) predicate.Manga {
 	return predicate.Manga(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(

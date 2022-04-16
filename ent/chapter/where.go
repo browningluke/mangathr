@@ -328,7 +328,7 @@ func NumContainsFold(v string) predicate.Chapter {
 	})
 }
 
-// HasManga applies the HasEdge predicate on the "manga" edge.
+// HasManga applies the HasEdge predicate on the "Manga" edge.
 func HasManga() predicate.Chapter {
 	return predicate.Chapter(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
@@ -340,7 +340,7 @@ func HasManga() predicate.Chapter {
 	})
 }
 
-// HasMangaWith applies the HasEdge predicate on the "manga" edge with a given conditions (other predicates).
+// HasMangaWith applies the HasEdge predicate on the "Manga" edge with a given conditions (other predicates).
 func HasMangaWith(preds ...predicate.Manga) predicate.Chapter {
 	return predicate.Chapter(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
