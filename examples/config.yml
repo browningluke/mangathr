@@ -6,9 +6,9 @@ downloader:
   simultaneousPages: 2
   pageRetries: 5
   delay:
-    page: 100
-    chapter: 200
-    updateChapter: 2000
+    page: "100ms"
+    chapter: "200ms"
+    updateChapter: "2s"
   output:
     path: './downloads'
     updatePath: ''

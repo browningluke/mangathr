@@ -4,9 +4,9 @@ type Config struct {
 	SimultaneousPages int `yaml:"simultaneousPages"`
 	PageRetries       int `yaml:"pageRetries"`
 	Delay             struct {
-		Page          int
-		Chapter       int
-		UpdateChapter int `yaml:"updateChapter"`
+		Page          string
+		Chapter       string
+		UpdateChapter string `yaml:"updateChapter"`
 	}
 	Output struct {
 		Path             string

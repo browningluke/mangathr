@@ -16,6 +16,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 )
 
 type Downloader struct {
@@ -28,9 +29,8 @@ type Page struct {
 }
 
 type Job struct {
-	Title, Num string
-	Pages      []Page
-	Bar        *mpb.Bar
+	Title, Num, ID string
+	Bar            *mpb.Bar
 }
 
 func NewDownloader(config *Config) *Downloader {
@@ -101,6 +101,13 @@ func (d *Downloader) GetNameFromTemplate(pluginTemplate, num, title, language st
 }
 
 func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *mpb.Bar) {
+	// TODO: differentiate between Download & Update delay
+	dur, err := time.ParseDuration(d.config.Delay.Chapter)
+	if err != nil {
+		panic(err)
+	}
+	time.Sleep(dur)
+
 	//fmt.Println(chapterFilename)
 
 	chapterPath := filepath.Join(path, fmt.Sprintf("%s.cbz", chapterFilename))
@@ -169,6 +176,12 @@ func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *m
 }
 
 func (d *Downloader) downloadImage(url, filename string, zipWriter *zip.Writer, mu *sync.Mutex) error {
+	dur, err := time.ParseDuration(d.config.Delay.Page)
+	if err != nil {
+		return err
+	}
+	time.Sleep(dur)
+
 	imageBytes := rester.New().GetBytes(url,
 		map[string]string{},
 		[]rester.QueryParam{}).Do(d.config.PageRetries).([]byte)
