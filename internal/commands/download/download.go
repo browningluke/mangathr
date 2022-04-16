@@ -8,15 +8,6 @@ import (
 	"mangathrV2/internal/utils/ui"
 )
 
-func SelectManga(titles []string) string {
-	selection := ui.SingleCheckboxes(
-		"Select Manga:",
-		titles,
-	)
-
-	return selection
-}
-
 func SelectChapters(titles []string, mangaTitle string, sourceName string) []string {
 
 	selections := ui.Checkboxes(
@@ -31,17 +22,16 @@ func SelectChapters(titles []string, mangaTitle string, sourceName string) []str
 func Run(args *Args, config *config.Config) {
 	scraper := sources.NewScraper(args.Plugin, config)
 
+	// Search and select manga
 	titles := scraper.Search(args.Query)
-	//fmt.Println(titles)
-
-	selection := SelectManga(titles)
+	selection := ui.SingleCheckboxes("Select Manga:", titles)
 	scraper.SelectManga(selection)
 
-	chapters := scraper.ListChapters()
+	chapterTitles := scraper.ChapterTitles()
 	//fmt.Println(chapters)
-	chapterTitle := scraper.GetMangaTitle()
-	sourceName := scraper.GetScraperName()
-	chapterSelections := SelectChapters(chapters, chapterTitle, sourceName)
+	chapterTitle := scraper.MangaTitle()
+	sourceName := scraper.ScraperName()
+	chapterSelections := SelectChapters(chapterTitles, chapterTitle, sourceName)
 	//fmt.Println(chapterSelections)
 	scraper.SelectChapters(chapterSelections)
 

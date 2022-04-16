@@ -64,10 +64,16 @@ func promptMainMenu(args *Args, config *config.Config) {
 	selection := ui.SingleCheckboxes("Select Manga:", titles)
 	scraper.SelectManga(selection)
 
-	chapters := scraper.ListChapters()
-	mangaTitle := scraper.GetMangaTitle()
-	sourceName := scraper.GetScraperName()
-	opts := options{title: mangaTitle, chapters: chapters, source: sourceName, mapping: mangaTitle}
+	chapterTitles := scraper.ChapterTitles()
+	mangaTitle := scraper.MangaTitle()
+	sourceName := scraper.ScraperName()
+	opts := options{
+		title:         mangaTitle,
+		chapterTitles: chapterTitles,
+		source:        sourceName,
+		mapping:       mangaTitle,
+		scraper:       &scraper,
+	}
 
 	for true {
 		option := ui.SingleCheckboxes(generateString(&opts, "Select an option"),

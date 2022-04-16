@@ -4,6 +4,7 @@ import (
 	"mangathrV2/internal/config"
 	"mangathrV2/internal/downloader"
 	"mangathrV2/internal/sources/mangadex"
+	"mangathrV2/internal/sources/structs"
 )
 
 type Scraper interface {
@@ -11,15 +12,17 @@ type Scraper interface {
 	SearchByID(id string) interface{}
 
 	SelectManga(name string)
-	ListChapters() []string
+	Chapters() []structs.Chapter
+	ChapterTitles() []string
 
 	//SelectNewChapters() interface{}
 	SelectChapters(titles []string)
 
 	Download(downloader *downloader.Downloader, downloadType string)
 
-	GetMangaTitle() string
-	GetScraperName() string
+	MangaTitle() string
+	ScraperName() string
+	MangaID() string
 }
 
 func NewScraper(name string, config *config.Config) Scraper {
