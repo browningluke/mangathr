@@ -17,10 +17,9 @@ type Scraper struct {
 	config *Config
 
 	searchResults []searchResult
-	allChapters   []chapterResult
+	manga         searchResult
 
-	manga            searchResult
-	selectedChapters []reader
+	allChapters, selectedChapters []chapterResult
 }
 
 type searchResult struct {
@@ -33,19 +32,8 @@ type chapterResult struct {
 	sortNum float64
 }
 
-type chapterResultByNum []chapterResult
-
-func (n chapterResultByNum) Len() int           { return len(n) }
-func (n chapterResultByNum) Less(i, j int) bool { return n[i].sortNum < n[j].sortNum }
-func (n chapterResultByNum) Swap(i, j int)      { n[i], n[j] = n[j], n[i] }
-
-type reader struct {
-	chapterResult chapterResult
-	pages         []downloader.Page
-}
-
 func NewScraper(config *Config) *Scraper {
-	fmt.Println("Created a mangadex scraper")
+	fmt.Println("Created a Mangadex scraper")
 	return &Scraper{config: config}
 }
 
@@ -67,7 +55,6 @@ func (m *Scraper) Search(query string) []string {
 		queryParams).Do(1).(string)
 
 	var mangaResp mangaResponse
-
 	err := json.Unmarshal([]byte(jsonString), &mangaResp)
 	if err != nil {
 		panic(err)
@@ -89,7 +76,6 @@ func (m *Scraper) Search(query string) []string {
 
 // SelectManga from searchResults list
 func (m *Scraper) SelectManga(name string) {
-
 	found := false
 	for _, item := range m.searchResults {
 		if item.title == name {
@@ -225,15 +211,12 @@ func (m *Scraper) ChapterTitles() []string {
 }
 
 func (m *Scraper) SelectChapters(titles []string) {
-	var chapters []reader
+	var chapters []chapterResult
 
 	for _, chapter := range m.allChapters {
 		for _, prettyTitle := range titles {
 			if chapter.prettyTitle == prettyTitle {
-				chapters = append(chapters, reader{
-					chapterResult: chapter,
-					pages:         m.getChapterPages(chapter.id),
-				})
+				chapters = append(chapters, chapter)
 			}
 		}
 	}
@@ -293,23 +276,25 @@ func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 	downloadQueue := make([]downloader.Job, len(m.selectedChapters))
 
 	for i, chapter := range m.selectedChapters {
-		bar := ui.AddBar(progress, int64(len(chapter.pages)),
-			fmt.Sprintf("Chapter %s", chapter.chapterResult.num))
-
 		language := ""
 		if len(m.config.LanguageFilter) > 1 {
-			language = fmt.Sprintf("%s", chapter.chapterResult.language)
+			language = fmt.Sprintf("%s", chapter.language)
 		}
 		chapterTitle := dl.GetNameFromTemplate(m.config.FilenameTemplate,
-			chapter.chapterResult.num, chapter.chapterResult.title, language)
+			chapter.num, chapter.title, language)
 
-		downloadQueue[i] = downloader.Job{Title: chapterTitle, Num: chapter.chapterResult.num,
-			Pages: chapter.pages, Bar: bar}
+		downloadQueue[i] = downloader.Job{Title: chapterTitle, Num: chapter.num,
+			ID: chapter.id}
 	}
 
 	runJob := func(job downloader.Job) {
+		pages := m.getChapterPages(job.ID)
+
+		bar := ui.AddBar(progress, int64(len(pages)),
+			fmt.Sprintf("Chapter %s", job.Num))
+
 		dl.SetMetadataAgent(job.Title, job.Num)
-		dl.Download(path, job.Title, job.Pages, job.Bar)
+		dl.Download(path, job.Title, pages, bar)
 	}
 
 	// Execute download queue, potential to add workerpool here later
