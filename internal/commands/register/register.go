@@ -2,16 +2,19 @@ package register
 
 import (
 	"fmt"
+	"log"
 	"mangathrV2/internal/config"
+	"mangathrV2/internal/database"
 	"mangathrV2/internal/sources"
 	"mangathrV2/internal/utils/ui"
 )
 
 type options struct {
-	title    string
-	chapters []string
-	source   string
-	mapping  string
+	title         string
+	chapterTitles []string
+	source        string
+	mapping       string
+	scraper       *sources.Scraper
 }
 
 func generateString(opts *options, prompt string) string {
@@ -23,15 +26,30 @@ func generateString(opts *options, prompt string) string {
 			"\nFirst  Chapter: %s"+
 			"\nMapped to: ./%s"+
 			"\n%s",
-		opts.title, opts.source, len(opts.chapters), opts.chapters[0],
-		opts.chapters[len(opts.chapters)-1], opts.mapping, prompt)
+		opts.title, opts.source, len(opts.chapterTitles), opts.chapterTitles[0],
+		opts.chapterTitles[len(opts.chapterTitles)-1], opts.mapping, prompt)
 }
 
-func handleRegisterMenu(opts *options) bool {
+func handleRegisterMenu(opts *options, driver *database.Driver) bool {
 	confirm := ui.ConfirmPrompt("Register this manga?")
 	if confirm {
 		// Start the registration process
 		fmt.Println("confirmed")
+
+		mangaID := (*opts.scraper).MangaID()
+
+		manga, err := driver.CreateManga(mangaID, opts.title, opts.source, opts.mapping)
+		if err != nil {
+			panic(err)
+		}
+
+		for _, c := range (*opts.scraper).Chapters() {
+			err := driver.CreateChapter(c.ID, c.Num, manga)
+			if err != nil {
+				panic(err)
+			}
+		}
+
 	} else {
 		// return
 		fmt.Println("cancelled")
@@ -57,7 +75,7 @@ func handleCustomizeMenu(opts *options) bool {
 	return false
 }
 
-func promptMainMenu(args *Args, config *config.Config) {
+func promptMainMenu(args *Args, config *config.Config, driver *database.Driver) {
 	// Do manga scraping
 	scraper := sources.NewScraper(args.Plugin, config)
 	titles := scraper.Search(args.Query)
@@ -80,7 +98,7 @@ func promptMainMenu(args *Args, config *config.Config) {
 			[]string{"Register", "Customize"})
 
 		if option == "Register" {
-			if loop := handleRegisterMenu(&opts); !loop {
+			if loop := handleRegisterMenu(&opts, driver); !loop {
 				break
 			}
 		} else if option == "Customize" {
@@ -93,8 +111,18 @@ func promptMainMenu(args *Args, config *config.Config) {
 
 func Run(args *Args, config *config.Config) {
 	// Open database
+	driver, err := database.GetDriver(database.SQLITE)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer func(driver *database.Driver) {
+		err := driver.Close()
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}(driver)
 
-	promptMainMenu(args, config)
+	promptMainMenu(args, config, driver)
 
 	// Close database
 }
