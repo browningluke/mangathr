@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"mangathrV2/internal/argparse"
 	"mangathrV2/internal/commands/download"
@@ -17,14 +16,12 @@ func main() {
 	if err := c.Load("./examples/config.yml"); err != nil {
 		utils.RaiseError(err)
 	}
-	fmt.Println(c)
 
 	// Load argparse object, returns ArgParse struct
 	var a argparse.Argparse
 	if err := a.Parse(); err != nil {
 		utils.RaiseError(err)
 	}
-	fmt.Println(a)
 
 	// Init logging
 	logging.Init()
@@ -62,13 +59,16 @@ func main() {
 	}
 	logging.SetLoggingLevel(loggingLevel)
 
+	logging.Debugln(c)
+	logging.Debugln(a)
+
 	switch a.Command {
 	case "download":
-		fmt.Println("Downloading", a.Download)
+		logging.Infoln("Downloading", a.Download)
 		download.Run(&a.Download, &c)
 		break
 	case "register":
-		fmt.Println("Registering", a.Register)
+		logging.Infoln("Registering", a.Register)
 		register.Run(&a.Register, &c)
 	}
 

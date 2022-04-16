@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"mangathrV2/internal/downloader"
+	"mangathrV2/internal/logging"
 	"mangathrV2/internal/rester"
 	"mangathrV2/internal/sources/structs"
 	"mangathrV2/internal/utils"
@@ -33,7 +34,7 @@ type chapterResult struct {
 }
 
 func NewScraper(config *Config) *Scraper {
-	fmt.Println("Created a Mangadex scraper")
+	logging.Infoln("Created a Mangadex scraper")
 	return &Scraper{config: config}
 }
 
@@ -68,7 +69,6 @@ func (m *Scraper) Search(query string) []string {
 		names = append(names, item.Attributes.Title["en"])
 	}
 
-	//fmt.Println(mangaResp)
 	m.searchResults = searchResults
 
 	return names
@@ -147,7 +147,7 @@ func (m *Scraper) scrapeChapters() {
 				parsedFloat, err := strconv.ParseFloat(item.Attributes.Chapter, 64)
 				f = parsedFloat
 				if err != nil {
-					fmt.Println("Error: ", item)
+					logging.Errorln(item)
 					panic(err)
 				}
 			}
@@ -227,7 +227,6 @@ func (m *Scraper) SelectChapters(titles []string) {
 }
 
 func (m *Scraper) getChapterPages(id string) []downloader.Page {
-	fmt.Println(id)
 	jsonString := rester.New().Get(
 		fmt.Sprintf("https://api.mangadex.org/at-home/server/%s", id),
 		map[string]string{},
