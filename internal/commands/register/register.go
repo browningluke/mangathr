@@ -79,7 +79,11 @@ func promptMainMenu(args *Args, config *config.Config, driver *database.Driver) 
 	// Do manga scraping
 	scraper := sources.NewScraper(args.Plugin, config)
 	titles := scraper.Search(args.Query)
-	selection := ui.SingleCheckboxes("Select Manga:", titles)
+
+	selection := titles[0]
+	if len(titles) > 1 {
+		selection = ui.SingleCheckboxes("Select Manga:", titles)
+	}
 	scraper.SelectManga(selection)
 
 	chapterTitles := scraper.ChapterTitles()
