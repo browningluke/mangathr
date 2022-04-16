@@ -18,6 +18,7 @@ type Config struct {
 	Sources    struct {
 		Mangadex mangadex.Config
 	}
+	LogLevel string `yaml:"logLevel"`
 }
 
 func (c *Config) Load(path string) error {

@@ -19,11 +19,14 @@ type Argparse struct {
 
 	// Options (overrides options in config file)
 	Options struct {
+		LogLevel string
 	}
 }
 
 func (a *Argparse) Parse() error {
 	parser := argparse.NewParser("mangathr", "description")
+	loglevel := parser.Selector("l", "loglevel", []string{"INFO", "DEBUG", "WARN", "ERROR"},
+		&argparse.Options{Help: "", Required: false})
 
 	downloadCmd := parser.NewCommand("download", "")
 	downloadPlugin := downloadCmd.Selector("p", "plugin", []string{"mangadex", "cubari"},
@@ -42,6 +45,7 @@ func (a *Argparse) Parse() error {
 		return err
 	}
 
+	a.Options.LogLevel = *loglevel
 	if downloadCmd.Happened() {
 		a.Command = "download"
 		a.Download.Plugin = *downloadPlugin

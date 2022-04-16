@@ -1,4 +1,5 @@
 ---
+logLevel: "INFO"
 database:
   driver: "sqlite"
   uri: "./examples/database.sqlite"
