@@ -26,9 +26,9 @@ func (mc *MangaCreate) SetMangaID(s string) *MangaCreate {
 	return mc
 }
 
-// SetPlugin sets the "Plugin" field.
-func (mc *MangaCreate) SetPlugin(s string) *MangaCreate {
-	mc.mutation.SetPlugin(s)
+// SetSource sets the "Source" field.
+func (mc *MangaCreate) SetSource(s string) *MangaCreate {
+	mc.mutation.SetSource(s)
 	return mc
 }
 
@@ -38,13 +38,19 @@ func (mc *MangaCreate) SetTitle(s string) *MangaCreate {
 	return mc
 }
 
-// AddChapterIDs adds the "chapters" edge to the Chapter entity by IDs.
+// SetMapping sets the "Mapping" field.
+func (mc *MangaCreate) SetMapping(s string) *MangaCreate {
+	mc.mutation.SetMapping(s)
+	return mc
+}
+
+// AddChapterIDs adds the "Chapters" edge to the Chapter entity by IDs.
 func (mc *MangaCreate) AddChapterIDs(ids ...int) *MangaCreate {
 	mc.mutation.AddChapterIDs(ids...)
 	return mc
 }
 
-// AddChapters adds the "chapters" edges to the Chapter entity.
+// AddChapters adds the "Chapters" edges to the Chapter entity.
 func (mc *MangaCreate) AddChapters(c ...*Chapter) *MangaCreate {
 	ids := make([]int, len(c))
 	for i := range c {
@@ -126,11 +132,14 @@ func (mc *MangaCreate) check() error {
 	if _, ok := mc.mutation.MangaID(); !ok {
 		return &ValidationError{Name: "MangaID", err: errors.New(`ent: missing required field "Manga.MangaID"`)}
 	}
-	if _, ok := mc.mutation.Plugin(); !ok {
-		return &ValidationError{Name: "Plugin", err: errors.New(`ent: missing required field "Manga.Plugin"`)}
+	if _, ok := mc.mutation.Source(); !ok {
+		return &ValidationError{Name: "Source", err: errors.New(`ent: missing required field "Manga.Source"`)}
 	}
 	if _, ok := mc.mutation.Title(); !ok {
 		return &ValidationError{Name: "Title", err: errors.New(`ent: missing required field "Manga.Title"`)}
+	}
+	if _, ok := mc.mutation.Mapping(); !ok {
+		return &ValidationError{Name: "Mapping", err: errors.New(`ent: missing required field "Manga.Mapping"`)}
 	}
 	return nil
 }
@@ -167,13 +176,13 @@ func (mc *MangaCreate) createSpec() (*Manga, *sqlgraph.CreateSpec) {
 		})
 		_node.MangaID = value
 	}
-	if value, ok := mc.mutation.Plugin(); ok {
+	if value, ok := mc.mutation.Source(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: manga.FieldPlugin,
+			Column: manga.FieldSource,
 		})
-		_node.Plugin = value
+		_node.Source = value
 	}
 	if value, ok := mc.mutation.Title(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -182,6 +191,14 @@ func (mc *MangaCreate) createSpec() (*Manga, *sqlgraph.CreateSpec) {
 			Column: manga.FieldTitle,
 		})
 		_node.Title = value
+	}
+	if value, ok := mc.mutation.Mapping(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: manga.FieldMapping,
+		})
+		_node.Mapping = value
 	}
 	if nodes := mc.mutation.ChaptersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

@@ -22,8 +22,8 @@ func (Chapter) Fields() []ent.Field {
 // Edges of the Chapter.
 func (Chapter) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("manga", Manga.Type).
-			Ref("chapters").
+		edge.From("Manga", Manga.Type).
+			Ref("Chapters").
 			Unique(),
 	}
 }

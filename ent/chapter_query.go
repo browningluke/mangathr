@@ -64,7 +64,7 @@ func (cq *ChapterQuery) Order(o ...OrderFunc) *ChapterQuery {
 	return cq
 }
 
-// QueryManga chains the current query on the "manga" edge.
+// QueryManga chains the current query on the "Manga" edge.
 func (cq *ChapterQuery) QueryManga() *MangaQuery {
 	query := &MangaQuery{config: cq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
@@ -276,7 +276,7 @@ func (cq *ChapterQuery) Clone() *ChapterQuery {
 }
 
 // WithManga tells the query-builder to eager-load the nodes that are connected to
-// the "manga" edge. The optional arguments are used to configure the query builder of the edge.
+// the "Manga" edge. The optional arguments are used to configure the query builder of the edge.
 func (cq *ChapterQuery) WithManga(opts ...func(*MangaQuery)) *ChapterQuery {
 	query := &MangaQuery{config: cq.config}
 	for _, opt := range opts {

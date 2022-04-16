@@ -15,14 +15,15 @@ type Manga struct {
 func (Manga) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("MangaID"),
-		field.String("Plugin"),
+		field.String("Source"),
 		field.String("Title"),
+		field.String("Mapping"),
 	}
 }
 
 // Edges of the Manga.
 func (Manga) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("chapters", Chapter.Type),
+		edge.To("Chapters", Chapter.Type),
 	}
 }

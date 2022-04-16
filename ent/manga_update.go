@@ -34,9 +34,9 @@ func (mu *MangaUpdate) SetMangaID(s string) *MangaUpdate {
 	return mu
 }
 
-// SetPlugin sets the "Plugin" field.
-func (mu *MangaUpdate) SetPlugin(s string) *MangaUpdate {
-	mu.mutation.SetPlugin(s)
+// SetSource sets the "Source" field.
+func (mu *MangaUpdate) SetSource(s string) *MangaUpdate {
+	mu.mutation.SetSource(s)
 	return mu
 }
 
@@ -46,13 +46,19 @@ func (mu *MangaUpdate) SetTitle(s string) *MangaUpdate {
 	return mu
 }
 
-// AddChapterIDs adds the "chapters" edge to the Chapter entity by IDs.
+// SetMapping sets the "Mapping" field.
+func (mu *MangaUpdate) SetMapping(s string) *MangaUpdate {
+	mu.mutation.SetMapping(s)
+	return mu
+}
+
+// AddChapterIDs adds the "Chapters" edge to the Chapter entity by IDs.
 func (mu *MangaUpdate) AddChapterIDs(ids ...int) *MangaUpdate {
 	mu.mutation.AddChapterIDs(ids...)
 	return mu
 }
 
-// AddChapters adds the "chapters" edges to the Chapter entity.
+// AddChapters adds the "Chapters" edges to the Chapter entity.
 func (mu *MangaUpdate) AddChapters(c ...*Chapter) *MangaUpdate {
 	ids := make([]int, len(c))
 	for i := range c {
@@ -66,19 +72,19 @@ func (mu *MangaUpdate) Mutation() *MangaMutation {
 	return mu.mutation
 }
 
-// ClearChapters clears all "chapters" edges to the Chapter entity.
+// ClearChapters clears all "Chapters" edges to the Chapter entity.
 func (mu *MangaUpdate) ClearChapters() *MangaUpdate {
 	mu.mutation.ClearChapters()
 	return mu
 }
 
-// RemoveChapterIDs removes the "chapters" edge to Chapter entities by IDs.
+// RemoveChapterIDs removes the "Chapters" edge to Chapter entities by IDs.
 func (mu *MangaUpdate) RemoveChapterIDs(ids ...int) *MangaUpdate {
 	mu.mutation.RemoveChapterIDs(ids...)
 	return mu
 }
 
-// RemoveChapters removes "chapters" edges to Chapter entities.
+// RemoveChapters removes "Chapters" edges to Chapter entities.
 func (mu *MangaUpdate) RemoveChapters(c ...*Chapter) *MangaUpdate {
 	ids := make([]int, len(c))
 	for i := range c {
@@ -166,11 +172,11 @@ func (mu *MangaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: manga.FieldMangaID,
 		})
 	}
-	if value, ok := mu.mutation.Plugin(); ok {
+	if value, ok := mu.mutation.Source(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: manga.FieldPlugin,
+			Column: manga.FieldSource,
 		})
 	}
 	if value, ok := mu.mutation.Title(); ok {
@@ -178,6 +184,13 @@ func (mu *MangaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeString,
 			Value:  value,
 			Column: manga.FieldTitle,
+		})
+	}
+	if value, ok := mu.mutation.Mapping(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: manga.FieldMapping,
 		})
 	}
 	if mu.mutation.ChaptersCleared() {
@@ -259,9 +272,9 @@ func (muo *MangaUpdateOne) SetMangaID(s string) *MangaUpdateOne {
 	return muo
 }
 
-// SetPlugin sets the "Plugin" field.
-func (muo *MangaUpdateOne) SetPlugin(s string) *MangaUpdateOne {
-	muo.mutation.SetPlugin(s)
+// SetSource sets the "Source" field.
+func (muo *MangaUpdateOne) SetSource(s string) *MangaUpdateOne {
+	muo.mutation.SetSource(s)
 	return muo
 }
 
@@ -271,13 +284,19 @@ func (muo *MangaUpdateOne) SetTitle(s string) *MangaUpdateOne {
 	return muo
 }
 
-// AddChapterIDs adds the "chapters" edge to the Chapter entity by IDs.
+// SetMapping sets the "Mapping" field.
+func (muo *MangaUpdateOne) SetMapping(s string) *MangaUpdateOne {
+	muo.mutation.SetMapping(s)
+	return muo
+}
+
+// AddChapterIDs adds the "Chapters" edge to the Chapter entity by IDs.
 func (muo *MangaUpdateOne) AddChapterIDs(ids ...int) *MangaUpdateOne {
 	muo.mutation.AddChapterIDs(ids...)
 	return muo
 }
 
-// AddChapters adds the "chapters" edges to the Chapter entity.
+// AddChapters adds the "Chapters" edges to the Chapter entity.
 func (muo *MangaUpdateOne) AddChapters(c ...*Chapter) *MangaUpdateOne {
 	ids := make([]int, len(c))
 	for i := range c {
@@ -291,19 +310,19 @@ func (muo *MangaUpdateOne) Mutation() *MangaMutation {
 	return muo.mutation
 }
 
-// ClearChapters clears all "chapters" edges to the Chapter entity.
+// ClearChapters clears all "Chapters" edges to the Chapter entity.
 func (muo *MangaUpdateOne) ClearChapters() *MangaUpdateOne {
 	muo.mutation.ClearChapters()
 	return muo
 }
 
-// RemoveChapterIDs removes the "chapters" edge to Chapter entities by IDs.
+// RemoveChapterIDs removes the "Chapters" edge to Chapter entities by IDs.
 func (muo *MangaUpdateOne) RemoveChapterIDs(ids ...int) *MangaUpdateOne {
 	muo.mutation.RemoveChapterIDs(ids...)
 	return muo
 }
 
-// RemoveChapters removes "chapters" edges to Chapter entities.
+// RemoveChapters removes "Chapters" edges to Chapter entities.
 func (muo *MangaUpdateOne) RemoveChapters(c ...*Chapter) *MangaUpdateOne {
 	ids := make([]int, len(c))
 	for i := range c {
@@ -415,11 +434,11 @@ func (muo *MangaUpdateOne) sqlSave(ctx context.Context) (_node *Manga, err error
 			Column: manga.FieldMangaID,
 		})
 	}
-	if value, ok := muo.mutation.Plugin(); ok {
+	if value, ok := muo.mutation.Source(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: manga.FieldPlugin,
+			Column: manga.FieldSource,
 		})
 	}
 	if value, ok := muo.mutation.Title(); ok {
@@ -427,6 +446,13 @@ func (muo *MangaUpdateOne) sqlSave(ctx context.Context) (_node *Manga, err error
 			Type:   field.TypeString,
 			Value:  value,
 			Column: manga.FieldTitle,
+		})
+	}
+	if value, ok := muo.mutation.Mapping(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: manga.FieldMapping,
 		})
 	}
 	if muo.mutation.ChaptersCleared() {

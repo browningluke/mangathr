@@ -9,20 +9,22 @@ const (
 	FieldID = "id"
 	// FieldMangaID holds the string denoting the mangaid field in the database.
 	FieldMangaID = "manga_id"
-	// FieldPlugin holds the string denoting the plugin field in the database.
-	FieldPlugin = "plugin"
+	// FieldSource holds the string denoting the source field in the database.
+	FieldSource = "source"
 	// FieldTitle holds the string denoting the title field in the database.
 	FieldTitle = "title"
+	// FieldMapping holds the string denoting the mapping field in the database.
+	FieldMapping = "mapping"
 	// EdgeChapters holds the string denoting the chapters edge name in mutations.
-	EdgeChapters = "chapters"
+	EdgeChapters = "Chapters"
 	// Table holds the table name of the manga in the database.
 	Table = "mangas"
-	// ChaptersTable is the table that holds the chapters relation/edge.
+	// ChaptersTable is the table that holds the Chapters relation/edge.
 	ChaptersTable = "chapters"
 	// ChaptersInverseTable is the table name for the Chapter entity.
 	// It exists in this package in order to avoid circular dependency with the "chapter" package.
 	ChaptersInverseTable = "chapters"
-	// ChaptersColumn is the table column denoting the chapters relation/edge.
+	// ChaptersColumn is the table column denoting the Chapters relation/edge.
 	ChaptersColumn = "manga_chapters"
 )
 
@@ -30,8 +32,9 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldMangaID,
-	FieldPlugin,
+	FieldSource,
 	FieldTitle,
+	FieldMapping,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
