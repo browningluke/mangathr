@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"mangathrV2/internal/downloader"
 	"mangathrV2/internal/rester"
+	"mangathrV2/internal/sources/structs"
 	"mangathrV2/internal/utils"
 	"mangathrV2/internal/utils/ui"
 	"math"
@@ -112,7 +113,7 @@ func (m *Scraper) SearchByID(id string) interface{} {
 	panic("implement me")
 }
 
-func (m *Scraper) ListChapters() []string {
+func (m *Scraper) scrapeChapters() {
 	// Build query params
 	queryParams := []rester.QueryParam{
 		{Key: "limit", Value: "500", Encode: true},
@@ -149,7 +150,6 @@ func (m *Scraper) ListChapters() []string {
 	}
 
 	var searchResults []chapterResult
-	var names []string
 
 	for _, mangaFeedResp := range mangaFeedRespList {
 		for _, item := range mangaFeedResp.Data {
@@ -199,12 +199,29 @@ func (m *Scraper) ListChapters() []string {
 		}
 	}
 	m.allChapters = searchResults
+}
 
-	for _, item := range searchResults {
-		names = append(names, item.prettyTitle)
+func (m *Scraper) Chapters() []structs.Chapter {
+	if len(m.allChapters) == 0 {
+		m.scrapeChapters()
 	}
 
-	return names
+	var chapters []structs.Chapter
+	for _, item := range m.allChapters {
+		chapters = append(chapters, structs.Chapter{ID: item.id, Title: item.prettyTitle, Num: item.num})
+	}
+	return chapters
+}
+
+func (m *Scraper) ChapterTitles() []string {
+	if len(m.allChapters) == 0 {
+		m.scrapeChapters()
+	}
+	var titles []string
+	for _, item := range m.allChapters {
+		titles = append(titles, item.prettyTitle)
+	}
+	return titles
 }
 
 func (m *Scraper) SelectChapters(titles []string) {
@@ -303,10 +320,16 @@ func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 	progress.Wait()
 }
 
-func (m *Scraper) GetMangaTitle() string {
+// Getters
+
+func (m *Scraper) MangaTitle() string {
 	return m.manga.title
 }
 
-func (m *Scraper) GetScraperName() string {
+func (m *Scraper) MangaID() string {
+	return m.manga.id
+}
+
+func (m *Scraper) ScraperName() string {
 	return "Mangadex"
 }
