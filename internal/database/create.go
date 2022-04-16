@@ -20,3 +20,16 @@ func (d *Driver) CreateManga(mangaID, title, source, mapping string) (*ent.Manga
 	log.Println("user was created: ", u)
 	return u, nil
 }
+
+func (d *Driver) CreateChapter(chapterID, num string, manga *ent.Manga) error {
+	err := d.client.Chapter.
+		Create().
+		SetChapterID(chapterID).
+		SetNum(num).
+		SetManga(manga).
+		Exec(d.ctx)
+	if err != nil {
+		return fmt.Errorf("failed creating user: %w", err)
+	}
+	return nil
+}
