@@ -51,58 +51,51 @@ func SetLoggingLevel(level Level) {
 	Init()
 }
 
-// Debug
-
-func Debugln(log string) {
-	if debugLogger != nil {
-		debugLogger.Printf("%s%s%s\n", "\033[36m", log, "\033[0m")
+func output(logger *log.Logger, s string) {
+	if logger != nil {
+		err := debugLogger.Output(3, s)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
+// Debug
+
+func Debugln(a ...interface{}) {
+	output(debugLogger, fmt.Sprintf("%s%s%s\n", "\033[36m", fmt.Sprint(a...), "\033[0m"))
+}
+
 func Debugf(format string, a ...interface{}) {
-	if debugLogger != nil {
-		debugLogger.Printf("%s%s%s\n", "\033[36m", fmt.Sprintf(format, a...), "\033[0m")
-	}
+	output(debugLogger, fmt.Sprintf("%s%s%s\n", "\033[36m", fmt.Sprintf(format, a...), "\033[0m"))
 }
 
 // Info
 
-func Infoln(log string) {
-	if infoLogger != nil {
-		infoLogger.Println(log)
-	}
+func Infoln(a ...interface{}) {
+	output(infoLogger, fmt.Sprint(a...))
 }
 
 func Infof(format string, a ...interface{}) {
-	if infoLogger != nil {
-		infoLogger.Printf(format, a...)
-	}
+	output(infoLogger, fmt.Sprintf(format, a...))
 }
 
 // Warning
 
-func Warningln(log string) {
-	if warningLogger != nil {
-		warningLogger.Printf("%s%s%s\n", "\u001B[33m", log, "\033[0m")
-	}
+func Warningln(a ...interface{}) {
+	output(warningLogger, fmt.Sprintf("%s%s%s\n", "\u001B[33m", fmt.Sprint(a...), "\033[0m"))
 }
 
 func Warningf(format string, a ...interface{}) {
-	if warningLogger != nil {
-		warningLogger.Printf("%s%s%s\n", "\033[33m", fmt.Sprintf(format, a...), "\033[0m")
-	}
+	output(warningLogger, fmt.Sprintf("%s%s%s\n", "\033[33m", fmt.Sprintf(format, a...), "\033[0m"))
 }
 
 // Error
 
-func Errorln(log string) {
-	if errorLogger != nil {
-		errorLogger.Printf("%s%s%s\n", "\033[31m", log, "\033[0m")
-	}
+func Errorln(a ...interface{}) {
+	output(errorLogger, fmt.Sprintf("%s%s%s\n", "\033[31m", fmt.Sprint(a...), "\033[0m"))
 }
 
 func Errorf(format string, a ...interface{}) {
-	if errorLogger != nil {
-		errorLogger.Printf("%s%s%s\n", "\033[31m", fmt.Sprintf(format, a...), "\033[0m")
-	}
+	output(errorLogger, fmt.Sprintf("%s%s%s\n", "\033[31m", fmt.Sprintf(format, a...), "\033[0m"))
 }
