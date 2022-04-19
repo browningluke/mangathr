@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"mangathrV2/ent"
+	"time"
 )
 
 func (d *Driver) createManga(mangaID, title, source, mapping string) (*ent.Manga, error) {
@@ -13,6 +14,7 @@ func (d *Driver) createManga(mangaID, title, source, mapping string) (*ent.Manga
 		SetTitle(title).
 		SetSource(source).
 		SetMapping(mapping).
+		SetRegisteredOn(time.Now()).
 		Save(d.ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating user: %w", err)
@@ -29,13 +31,20 @@ func (d *Driver) CreateManga(mangaID, title, source, mapping string) (*ent.Manga
 	return manga, nil
 }
 
-func (d *Driver) CreateChapter(chapterID, num string, manga *ent.Manga) error {
-	err := d.client.Chapter.
+func (d *Driver) CreateChapter(chapterID, num, title string, manga *ent.Manga) error {
+	builder := d.client.Chapter.
 		Create().
 		SetChapterID(chapterID).
 		SetNum(num).
 		SetManga(manga).
-		Exec(d.ctx)
+		SetRegisteredOn(time.Now())
+	// TODO Add created time here
+
+	if title != "" {
+		builder.SetTitle("")
+	}
+
+	err := builder.Exec(d.ctx)
 	if err != nil {
 		return fmt.Errorf("failed creating user: %w", err)
 	}

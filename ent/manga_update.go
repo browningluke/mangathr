@@ -9,6 +9,7 @@ import (
 	"mangathrV2/ent/chapter"
 	"mangathrV2/ent/manga"
 	"mangathrV2/ent/predicate"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -49,6 +50,12 @@ func (mu *MangaUpdate) SetTitle(s string) *MangaUpdate {
 // SetMapping sets the "Mapping" field.
 func (mu *MangaUpdate) SetMapping(s string) *MangaUpdate {
 	mu.mutation.SetMapping(s)
+	return mu
+}
+
+// SetRegisteredOn sets the "RegisteredOn" field.
+func (mu *MangaUpdate) SetRegisteredOn(t time.Time) *MangaUpdate {
+	mu.mutation.SetRegisteredOn(t)
 	return mu
 }
 
@@ -193,6 +200,13 @@ func (mu *MangaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: manga.FieldMapping,
 		})
 	}
+	if value, ok := mu.mutation.RegisteredOn(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: manga.FieldRegisteredOn,
+		})
+	}
 	if mu.mutation.ChaptersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -287,6 +301,12 @@ func (muo *MangaUpdateOne) SetTitle(s string) *MangaUpdateOne {
 // SetMapping sets the "Mapping" field.
 func (muo *MangaUpdateOne) SetMapping(s string) *MangaUpdateOne {
 	muo.mutation.SetMapping(s)
+	return muo
+}
+
+// SetRegisteredOn sets the "RegisteredOn" field.
+func (muo *MangaUpdateOne) SetRegisteredOn(t time.Time) *MangaUpdateOne {
+	muo.mutation.SetRegisteredOn(t)
 	return muo
 }
 
@@ -453,6 +473,13 @@ func (muo *MangaUpdateOne) sqlSave(ctx context.Context) (_node *Manga, err error
 			Type:   field.TypeString,
 			Value:  value,
 			Column: manga.FieldMapping,
+		})
+	}
+	if value, ok := muo.mutation.RegisteredOn(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: manga.FieldRegisteredOn,
 		})
 	}
 	if muo.mutation.ChaptersCleared() {

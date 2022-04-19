@@ -16,6 +16,9 @@ func (Chapter) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("ChapterID"),
 		field.String("Num"),
+		field.String("Title").Optional(),
+		field.Time("CreatedOn").Optional(),
+		field.Time("RegisteredOn"),
 	}
 }
 

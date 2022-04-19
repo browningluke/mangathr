@@ -15,6 +15,8 @@ const (
 	FieldTitle = "title"
 	// FieldMapping holds the string denoting the mapping field in the database.
 	FieldMapping = "mapping"
+	// FieldRegisteredOn holds the string denoting the registeredon field in the database.
+	FieldRegisteredOn = "registered_on"
 	// EdgeChapters holds the string denoting the chapters edge name in mutations.
 	EdgeChapters = "Chapters"
 	// Table holds the table name of the manga in the database.
@@ -35,6 +37,7 @@ var Columns = []string{
 	FieldSource,
 	FieldTitle,
 	FieldMapping,
+	FieldRegisteredOn,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

@@ -44,7 +44,7 @@ func handleRegisterMenu(opts *options, driver *database.Driver) bool {
 		}
 
 		for _, c := range (*opts.scraper).Chapters() {
-			err := driver.CreateChapter(c.ID, c.Num, manga)
+			err := driver.CreateChapter(c.ID, c.Num, c.Title, manga)
 			if err != nil {
 				panic(err)
 			}

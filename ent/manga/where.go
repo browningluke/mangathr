@@ -4,6 +4,7 @@ package manga
 
 import (
 	"mangathrV2/ent/predicate"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -117,6 +118,13 @@ func Title(v string) predicate.Manga {
 func Mapping(v string) predicate.Manga {
 	return predicate.Manga(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldMapping), v))
+	})
+}
+
+// RegisteredOn applies equality check predicate on the "RegisteredOn" field. It's identical to RegisteredOnEQ.
+func RegisteredOn(v time.Time) predicate.Manga {
+	return predicate.Manga(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldRegisteredOn), v))
 	})
 }
 
@@ -561,6 +569,82 @@ func MappingEqualFold(v string) predicate.Manga {
 func MappingContainsFold(v string) predicate.Manga {
 	return predicate.Manga(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldMapping), v))
+	})
+}
+
+// RegisteredOnEQ applies the EQ predicate on the "RegisteredOn" field.
+func RegisteredOnEQ(v time.Time) predicate.Manga {
+	return predicate.Manga(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldRegisteredOn), v))
+	})
+}
+
+// RegisteredOnNEQ applies the NEQ predicate on the "RegisteredOn" field.
+func RegisteredOnNEQ(v time.Time) predicate.Manga {
+	return predicate.Manga(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldRegisteredOn), v))
+	})
+}
+
+// RegisteredOnIn applies the In predicate on the "RegisteredOn" field.
+func RegisteredOnIn(vs ...time.Time) predicate.Manga {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Manga(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldRegisteredOn), v...))
+	})
+}
+
+// RegisteredOnNotIn applies the NotIn predicate on the "RegisteredOn" field.
+func RegisteredOnNotIn(vs ...time.Time) predicate.Manga {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Manga(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldRegisteredOn), v...))
+	})
+}
+
+// RegisteredOnGT applies the GT predicate on the "RegisteredOn" field.
+func RegisteredOnGT(v time.Time) predicate.Manga {
+	return predicate.Manga(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldRegisteredOn), v))
+	})
+}
+
+// RegisteredOnGTE applies the GTE predicate on the "RegisteredOn" field.
+func RegisteredOnGTE(v time.Time) predicate.Manga {
+	return predicate.Manga(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldRegisteredOn), v))
+	})
+}
+
+// RegisteredOnLT applies the LT predicate on the "RegisteredOn" field.
+func RegisteredOnLT(v time.Time) predicate.Manga {
+	return predicate.Manga(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldRegisteredOn), v))
+	})
+}
+
+// RegisteredOnLTE applies the LTE predicate on the "RegisteredOn" field.
+func RegisteredOnLTE(v time.Time) predicate.Manga {
+	return predicate.Manga(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldRegisteredOn), v))
 	})
 }
 

@@ -18,6 +18,7 @@ func (Manga) Fields() []ent.Field {
 		field.String("Source"),
 		field.String("Title"),
 		field.String("Mapping"),
+		field.Time("RegisteredOn"),
 	}
 }
 

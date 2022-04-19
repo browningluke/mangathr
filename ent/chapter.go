@@ -7,6 +7,7 @@ import (
 	"mangathrV2/ent/chapter"
 	"mangathrV2/ent/manga"
 	"strings"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -20,6 +21,12 @@ type Chapter struct {
 	ChapterID string `json:"ChapterID,omitempty"`
 	// Num holds the value of the "Num" field.
 	Num string `json:"Num,omitempty"`
+	// Title holds the value of the "Title" field.
+	Title string `json:"Title,omitempty"`
+	// CreatedOn holds the value of the "CreatedOn" field.
+	CreatedOn time.Time `json:"CreatedOn,omitempty"`
+	// RegisteredOn holds the value of the "RegisteredOn" field.
+	RegisteredOn time.Time `json:"RegisteredOn,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ChapterQuery when eager-loading is set.
 	Edges          ChapterEdges `json:"edges"`
@@ -56,8 +63,10 @@ func (*Chapter) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case chapter.FieldID:
 			values[i] = new(sql.NullInt64)
-		case chapter.FieldChapterID, chapter.FieldNum:
+		case chapter.FieldChapterID, chapter.FieldNum, chapter.FieldTitle:
 			values[i] = new(sql.NullString)
+		case chapter.FieldCreatedOn, chapter.FieldRegisteredOn:
+			values[i] = new(sql.NullTime)
 		case chapter.ForeignKeys[0]: // manga_chapters
 			values[i] = new(sql.NullInt64)
 		default:
@@ -92,6 +101,24 @@ func (c *Chapter) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field Num", values[i])
 			} else if value.Valid {
 				c.Num = value.String
+			}
+		case chapter.FieldTitle:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field Title", values[i])
+			} else if value.Valid {
+				c.Title = value.String
+			}
+		case chapter.FieldCreatedOn:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field CreatedOn", values[i])
+			} else if value.Valid {
+				c.CreatedOn = value.Time
+			}
+		case chapter.FieldRegisteredOn:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field RegisteredOn", values[i])
+			} else if value.Valid {
+				c.RegisteredOn = value.Time
 			}
 		case chapter.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -137,6 +164,12 @@ func (c *Chapter) String() string {
 	builder.WriteString(c.ChapterID)
 	builder.WriteString(", Num=")
 	builder.WriteString(c.Num)
+	builder.WriteString(", Title=")
+	builder.WriteString(c.Title)
+	builder.WriteString(", CreatedOn=")
+	builder.WriteString(c.CreatedOn.Format(time.ANSIC))
+	builder.WriteString(", RegisteredOn=")
+	builder.WriteString(c.RegisteredOn.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

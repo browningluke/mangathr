@@ -10,6 +10,7 @@ import (
 	"mangathrV2/ent/manga"
 	"mangathrV2/ent/predicate"
 	"sync"
+	"time"
 
 	"entgo.io/ent"
 )
@@ -35,6 +36,9 @@ type ChapterMutation struct {
 	id            *int
 	_ChapterID    *string
 	_Num          *string
+	_Title        *string
+	_CreatedOn    *time.Time
+	_RegisteredOn *time.Time
 	clearedFields map[string]struct{}
 	_Manga        *int
 	cleared_Manga bool
@@ -213,6 +217,140 @@ func (m *ChapterMutation) ResetNum() {
 	m._Num = nil
 }
 
+// SetTitle sets the "Title" field.
+func (m *ChapterMutation) SetTitle(s string) {
+	m._Title = &s
+}
+
+// Title returns the value of the "Title" field in the mutation.
+func (m *ChapterMutation) Title() (r string, exists bool) {
+	v := m._Title
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTitle returns the old "Title" field's value of the Chapter entity.
+// If the Chapter object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChapterMutation) OldTitle(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTitle requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
+	}
+	return oldValue.Title, nil
+}
+
+// ClearTitle clears the value of the "Title" field.
+func (m *ChapterMutation) ClearTitle() {
+	m._Title = nil
+	m.clearedFields[chapter.FieldTitle] = struct{}{}
+}
+
+// TitleCleared returns if the "Title" field was cleared in this mutation.
+func (m *ChapterMutation) TitleCleared() bool {
+	_, ok := m.clearedFields[chapter.FieldTitle]
+	return ok
+}
+
+// ResetTitle resets all changes to the "Title" field.
+func (m *ChapterMutation) ResetTitle() {
+	m._Title = nil
+	delete(m.clearedFields, chapter.FieldTitle)
+}
+
+// SetCreatedOn sets the "CreatedOn" field.
+func (m *ChapterMutation) SetCreatedOn(t time.Time) {
+	m._CreatedOn = &t
+}
+
+// CreatedOn returns the value of the "CreatedOn" field in the mutation.
+func (m *ChapterMutation) CreatedOn() (r time.Time, exists bool) {
+	v := m._CreatedOn
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedOn returns the old "CreatedOn" field's value of the Chapter entity.
+// If the Chapter object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChapterMutation) OldCreatedOn(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedOn is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedOn requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedOn: %w", err)
+	}
+	return oldValue.CreatedOn, nil
+}
+
+// ClearCreatedOn clears the value of the "CreatedOn" field.
+func (m *ChapterMutation) ClearCreatedOn() {
+	m._CreatedOn = nil
+	m.clearedFields[chapter.FieldCreatedOn] = struct{}{}
+}
+
+// CreatedOnCleared returns if the "CreatedOn" field was cleared in this mutation.
+func (m *ChapterMutation) CreatedOnCleared() bool {
+	_, ok := m.clearedFields[chapter.FieldCreatedOn]
+	return ok
+}
+
+// ResetCreatedOn resets all changes to the "CreatedOn" field.
+func (m *ChapterMutation) ResetCreatedOn() {
+	m._CreatedOn = nil
+	delete(m.clearedFields, chapter.FieldCreatedOn)
+}
+
+// SetRegisteredOn sets the "RegisteredOn" field.
+func (m *ChapterMutation) SetRegisteredOn(t time.Time) {
+	m._RegisteredOn = &t
+}
+
+// RegisteredOn returns the value of the "RegisteredOn" field in the mutation.
+func (m *ChapterMutation) RegisteredOn() (r time.Time, exists bool) {
+	v := m._RegisteredOn
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRegisteredOn returns the old "RegisteredOn" field's value of the Chapter entity.
+// If the Chapter object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChapterMutation) OldRegisteredOn(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRegisteredOn is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRegisteredOn requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRegisteredOn: %w", err)
+	}
+	return oldValue.RegisteredOn, nil
+}
+
+// ResetRegisteredOn resets all changes to the "RegisteredOn" field.
+func (m *ChapterMutation) ResetRegisteredOn() {
+	m._RegisteredOn = nil
+}
+
 // SetMangaID sets the "Manga" edge to the Manga entity by id.
 func (m *ChapterMutation) SetMangaID(id int) {
 	m._Manga = &id
@@ -271,12 +409,21 @@ func (m *ChapterMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ChapterMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 5)
 	if m._ChapterID != nil {
 		fields = append(fields, chapter.FieldChapterID)
 	}
 	if m._Num != nil {
 		fields = append(fields, chapter.FieldNum)
+	}
+	if m._Title != nil {
+		fields = append(fields, chapter.FieldTitle)
+	}
+	if m._CreatedOn != nil {
+		fields = append(fields, chapter.FieldCreatedOn)
+	}
+	if m._RegisteredOn != nil {
+		fields = append(fields, chapter.FieldRegisteredOn)
 	}
 	return fields
 }
@@ -290,6 +437,12 @@ func (m *ChapterMutation) Field(name string) (ent.Value, bool) {
 		return m.ChapterID()
 	case chapter.FieldNum:
 		return m.Num()
+	case chapter.FieldTitle:
+		return m.Title()
+	case chapter.FieldCreatedOn:
+		return m.CreatedOn()
+	case chapter.FieldRegisteredOn:
+		return m.RegisteredOn()
 	}
 	return nil, false
 }
@@ -303,6 +456,12 @@ func (m *ChapterMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldChapterID(ctx)
 	case chapter.FieldNum:
 		return m.OldNum(ctx)
+	case chapter.FieldTitle:
+		return m.OldTitle(ctx)
+	case chapter.FieldCreatedOn:
+		return m.OldCreatedOn(ctx)
+	case chapter.FieldRegisteredOn:
+		return m.OldRegisteredOn(ctx)
 	}
 	return nil, fmt.Errorf("unknown Chapter field %s", name)
 }
@@ -325,6 +484,27 @@ func (m *ChapterMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetNum(v)
+		return nil
+	case chapter.FieldTitle:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTitle(v)
+		return nil
+	case chapter.FieldCreatedOn:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedOn(v)
+		return nil
+	case chapter.FieldRegisteredOn:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRegisteredOn(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Chapter field %s", name)
@@ -355,7 +535,14 @@ func (m *ChapterMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *ChapterMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(chapter.FieldTitle) {
+		fields = append(fields, chapter.FieldTitle)
+	}
+	if m.FieldCleared(chapter.FieldCreatedOn) {
+		fields = append(fields, chapter.FieldCreatedOn)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -368,6 +555,14 @@ func (m *ChapterMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *ChapterMutation) ClearField(name string) error {
+	switch name {
+	case chapter.FieldTitle:
+		m.ClearTitle()
+		return nil
+	case chapter.FieldCreatedOn:
+		m.ClearCreatedOn()
+		return nil
+	}
 	return fmt.Errorf("unknown Chapter nullable field %s", name)
 }
 
@@ -380,6 +575,15 @@ func (m *ChapterMutation) ResetField(name string) error {
 		return nil
 	case chapter.FieldNum:
 		m.ResetNum()
+		return nil
+	case chapter.FieldTitle:
+		m.ResetTitle()
+		return nil
+	case chapter.FieldCreatedOn:
+		m.ResetCreatedOn()
+		return nil
+	case chapter.FieldRegisteredOn:
+		m.ResetRegisteredOn()
 		return nil
 	}
 	return fmt.Errorf("unknown Chapter field %s", name)
@@ -471,6 +675,7 @@ type MangaMutation struct {
 	_Source          *string
 	_Title           *string
 	_Mapping         *string
+	_RegisteredOn    *time.Time
 	clearedFields    map[string]struct{}
 	_Chapters        map[int]struct{}
 	removed_Chapters map[int]struct{}
@@ -722,6 +927,42 @@ func (m *MangaMutation) ResetMapping() {
 	m._Mapping = nil
 }
 
+// SetRegisteredOn sets the "RegisteredOn" field.
+func (m *MangaMutation) SetRegisteredOn(t time.Time) {
+	m._RegisteredOn = &t
+}
+
+// RegisteredOn returns the value of the "RegisteredOn" field in the mutation.
+func (m *MangaMutation) RegisteredOn() (r time.Time, exists bool) {
+	v := m._RegisteredOn
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRegisteredOn returns the old "RegisteredOn" field's value of the Manga entity.
+// If the Manga object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MangaMutation) OldRegisteredOn(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRegisteredOn is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRegisteredOn requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRegisteredOn: %w", err)
+	}
+	return oldValue.RegisteredOn, nil
+}
+
+// ResetRegisteredOn resets all changes to the "RegisteredOn" field.
+func (m *MangaMutation) ResetRegisteredOn() {
+	m._RegisteredOn = nil
+}
+
 // AddChapterIDs adds the "Chapters" edge to the Chapter entity by ids.
 func (m *MangaMutation) AddChapterIDs(ids ...int) {
 	if m._Chapters == nil {
@@ -795,7 +1036,7 @@ func (m *MangaMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MangaMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m._MangaID != nil {
 		fields = append(fields, manga.FieldMangaID)
 	}
@@ -807,6 +1048,9 @@ func (m *MangaMutation) Fields() []string {
 	}
 	if m._Mapping != nil {
 		fields = append(fields, manga.FieldMapping)
+	}
+	if m._RegisteredOn != nil {
+		fields = append(fields, manga.FieldRegisteredOn)
 	}
 	return fields
 }
@@ -824,6 +1068,8 @@ func (m *MangaMutation) Field(name string) (ent.Value, bool) {
 		return m.Title()
 	case manga.FieldMapping:
 		return m.Mapping()
+	case manga.FieldRegisteredOn:
+		return m.RegisteredOn()
 	}
 	return nil, false
 }
@@ -841,6 +1087,8 @@ func (m *MangaMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldTitle(ctx)
 	case manga.FieldMapping:
 		return m.OldMapping(ctx)
+	case manga.FieldRegisteredOn:
+		return m.OldRegisteredOn(ctx)
 	}
 	return nil, fmt.Errorf("unknown Manga field %s", name)
 }
@@ -877,6 +1125,13 @@ func (m *MangaMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetMapping(v)
+		return nil
+	case manga.FieldRegisteredOn:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRegisteredOn(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Manga field %s", name)
@@ -938,6 +1193,9 @@ func (m *MangaMutation) ResetField(name string) error {
 		return nil
 	case manga.FieldMapping:
 		m.ResetMapping()
+		return nil
+	case manga.FieldRegisteredOn:
+		m.ResetRegisteredOn()
 		return nil
 	}
 	return fmt.Errorf("unknown Manga field %s", name)

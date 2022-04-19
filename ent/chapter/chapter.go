@@ -11,6 +11,12 @@ const (
 	FieldChapterID = "chapter_id"
 	// FieldNum holds the string denoting the num field in the database.
 	FieldNum = "num"
+	// FieldTitle holds the string denoting the title field in the database.
+	FieldTitle = "title"
+	// FieldCreatedOn holds the string denoting the createdon field in the database.
+	FieldCreatedOn = "created_on"
+	// FieldRegisteredOn holds the string denoting the registeredon field in the database.
+	FieldRegisteredOn = "registered_on"
 	// EdgeManga holds the string denoting the manga edge name in mutations.
 	EdgeManga = "Manga"
 	// Table holds the table name of the chapter in the database.
@@ -29,6 +35,9 @@ var Columns = []string{
 	FieldID,
 	FieldChapterID,
 	FieldNum,
+	FieldTitle,
+	FieldCreatedOn,
+	FieldRegisteredOn,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "chapters"

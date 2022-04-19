@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"mangathrV2/ent/manga"
 	"strings"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -23,6 +24,8 @@ type Manga struct {
 	Title string `json:"Title,omitempty"`
 	// Mapping holds the value of the "Mapping" field.
 	Mapping string `json:"Mapping,omitempty"`
+	// RegisteredOn holds the value of the "RegisteredOn" field.
+	RegisteredOn time.Time `json:"RegisteredOn,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MangaQuery when eager-loading is set.
 	Edges MangaEdges `json:"edges"`
@@ -55,6 +58,8 @@ func (*Manga) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullInt64)
 		case manga.FieldMangaID, manga.FieldSource, manga.FieldTitle, manga.FieldMapping:
 			values[i] = new(sql.NullString)
+		case manga.FieldRegisteredOn:
+			values[i] = new(sql.NullTime)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Manga", columns[i])
 		}
@@ -100,6 +105,12 @@ func (m *Manga) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				m.Mapping = value.String
 			}
+		case manga.FieldRegisteredOn:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field RegisteredOn", values[i])
+			} else if value.Valid {
+				m.RegisteredOn = value.Time
+			}
 		}
 	}
 	return nil
@@ -141,6 +152,8 @@ func (m *Manga) String() string {
 	builder.WriteString(m.Title)
 	builder.WriteString(", Mapping=")
 	builder.WriteString(m.Mapping)
+	builder.WriteString(", RegisteredOn=")
+	builder.WriteString(m.RegisteredOn.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

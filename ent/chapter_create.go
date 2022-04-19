@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"mangathrV2/ent/chapter"
 	"mangathrV2/ent/manga"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -29,6 +30,40 @@ func (cc *ChapterCreate) SetChapterID(s string) *ChapterCreate {
 // SetNum sets the "Num" field.
 func (cc *ChapterCreate) SetNum(s string) *ChapterCreate {
 	cc.mutation.SetNum(s)
+	return cc
+}
+
+// SetTitle sets the "Title" field.
+func (cc *ChapterCreate) SetTitle(s string) *ChapterCreate {
+	cc.mutation.SetTitle(s)
+	return cc
+}
+
+// SetNillableTitle sets the "Title" field if the given value is not nil.
+func (cc *ChapterCreate) SetNillableTitle(s *string) *ChapterCreate {
+	if s != nil {
+		cc.SetTitle(*s)
+	}
+	return cc
+}
+
+// SetCreatedOn sets the "CreatedOn" field.
+func (cc *ChapterCreate) SetCreatedOn(t time.Time) *ChapterCreate {
+	cc.mutation.SetCreatedOn(t)
+	return cc
+}
+
+// SetNillableCreatedOn sets the "CreatedOn" field if the given value is not nil.
+func (cc *ChapterCreate) SetNillableCreatedOn(t *time.Time) *ChapterCreate {
+	if t != nil {
+		cc.SetCreatedOn(*t)
+	}
+	return cc
+}
+
+// SetRegisteredOn sets the "RegisteredOn" field.
+func (cc *ChapterCreate) SetRegisteredOn(t time.Time) *ChapterCreate {
+	cc.mutation.SetRegisteredOn(t)
 	return cc
 }
 
@@ -127,6 +162,9 @@ func (cc *ChapterCreate) check() error {
 	if _, ok := cc.mutation.Num(); !ok {
 		return &ValidationError{Name: "Num", err: errors.New(`ent: missing required field "Chapter.Num"`)}
 	}
+	if _, ok := cc.mutation.RegisteredOn(); !ok {
+		return &ValidationError{Name: "RegisteredOn", err: errors.New(`ent: missing required field "Chapter.RegisteredOn"`)}
+	}
 	return nil
 }
 
@@ -169,6 +207,30 @@ func (cc *ChapterCreate) createSpec() (*Chapter, *sqlgraph.CreateSpec) {
 			Column: chapter.FieldNum,
 		})
 		_node.Num = value
+	}
+	if value, ok := cc.mutation.Title(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: chapter.FieldTitle,
+		})
+		_node.Title = value
+	}
+	if value, ok := cc.mutation.CreatedOn(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: chapter.FieldCreatedOn,
+		})
+		_node.CreatedOn = value
+	}
+	if value, ok := cc.mutation.RegisteredOn(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: chapter.FieldRegisteredOn,
+		})
+		_node.RegisteredOn = value
 	}
 	if nodes := cc.mutation.MangaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

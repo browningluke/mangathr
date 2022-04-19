@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"mangathrV2/ent/chapter"
 	"mangathrV2/ent/manga"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -41,6 +42,12 @@ func (mc *MangaCreate) SetTitle(s string) *MangaCreate {
 // SetMapping sets the "Mapping" field.
 func (mc *MangaCreate) SetMapping(s string) *MangaCreate {
 	mc.mutation.SetMapping(s)
+	return mc
+}
+
+// SetRegisteredOn sets the "RegisteredOn" field.
+func (mc *MangaCreate) SetRegisteredOn(t time.Time) *MangaCreate {
+	mc.mutation.SetRegisteredOn(t)
 	return mc
 }
 
@@ -141,6 +148,9 @@ func (mc *MangaCreate) check() error {
 	if _, ok := mc.mutation.Mapping(); !ok {
 		return &ValidationError{Name: "Mapping", err: errors.New(`ent: missing required field "Manga.Mapping"`)}
 	}
+	if _, ok := mc.mutation.RegisteredOn(); !ok {
+		return &ValidationError{Name: "RegisteredOn", err: errors.New(`ent: missing required field "Manga.RegisteredOn"`)}
+	}
 	return nil
 }
 
@@ -199,6 +209,14 @@ func (mc *MangaCreate) createSpec() (*Manga, *sqlgraph.CreateSpec) {
 			Column: manga.FieldMapping,
 		})
 		_node.Mapping = value
+	}
+	if value, ok := mc.mutation.RegisteredOn(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: manga.FieldRegisteredOn,
+		})
+		_node.RegisteredOn = value
 	}
 	if nodes := mc.mutation.ChaptersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

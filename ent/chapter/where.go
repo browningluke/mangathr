@@ -4,6 +4,7 @@ package chapter
 
 import (
 	"mangathrV2/ent/predicate"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -103,6 +104,27 @@ func ChapterID(v string) predicate.Chapter {
 func Num(v string) predicate.Chapter {
 	return predicate.Chapter(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldNum), v))
+	})
+}
+
+// Title applies equality check predicate on the "Title" field. It's identical to TitleEQ.
+func Title(v string) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldTitle), v))
+	})
+}
+
+// CreatedOn applies equality check predicate on the "CreatedOn" field. It's identical to CreatedOnEQ.
+func CreatedOn(v time.Time) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldCreatedOn), v))
+	})
+}
+
+// RegisteredOn applies equality check predicate on the "RegisteredOn" field. It's identical to RegisteredOnEQ.
+func RegisteredOn(v time.Time) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldRegisteredOn), v))
 	})
 }
 
@@ -325,6 +347,297 @@ func NumEqualFold(v string) predicate.Chapter {
 func NumContainsFold(v string) predicate.Chapter {
 	return predicate.Chapter(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldNum), v))
+	})
+}
+
+// TitleEQ applies the EQ predicate on the "Title" field.
+func TitleEQ(v string) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldTitle), v))
+	})
+}
+
+// TitleNEQ applies the NEQ predicate on the "Title" field.
+func TitleNEQ(v string) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldTitle), v))
+	})
+}
+
+// TitleIn applies the In predicate on the "Title" field.
+func TitleIn(vs ...string) predicate.Chapter {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Chapter(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldTitle), v...))
+	})
+}
+
+// TitleNotIn applies the NotIn predicate on the "Title" field.
+func TitleNotIn(vs ...string) predicate.Chapter {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Chapter(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldTitle), v...))
+	})
+}
+
+// TitleGT applies the GT predicate on the "Title" field.
+func TitleGT(v string) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldTitle), v))
+	})
+}
+
+// TitleGTE applies the GTE predicate on the "Title" field.
+func TitleGTE(v string) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldTitle), v))
+	})
+}
+
+// TitleLT applies the LT predicate on the "Title" field.
+func TitleLT(v string) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldTitle), v))
+	})
+}
+
+// TitleLTE applies the LTE predicate on the "Title" field.
+func TitleLTE(v string) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldTitle), v))
+	})
+}
+
+// TitleContains applies the Contains predicate on the "Title" field.
+func TitleContains(v string) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldTitle), v))
+	})
+}
+
+// TitleHasPrefix applies the HasPrefix predicate on the "Title" field.
+func TitleHasPrefix(v string) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldTitle), v))
+	})
+}
+
+// TitleHasSuffix applies the HasSuffix predicate on the "Title" field.
+func TitleHasSuffix(v string) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldTitle), v))
+	})
+}
+
+// TitleIsNil applies the IsNil predicate on the "Title" field.
+func TitleIsNil() predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldTitle)))
+	})
+}
+
+// TitleNotNil applies the NotNil predicate on the "Title" field.
+func TitleNotNil() predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldTitle)))
+	})
+}
+
+// TitleEqualFold applies the EqualFold predicate on the "Title" field.
+func TitleEqualFold(v string) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldTitle), v))
+	})
+}
+
+// TitleContainsFold applies the ContainsFold predicate on the "Title" field.
+func TitleContainsFold(v string) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldTitle), v))
+	})
+}
+
+// CreatedOnEQ applies the EQ predicate on the "CreatedOn" field.
+func CreatedOnEQ(v time.Time) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldCreatedOn), v))
+	})
+}
+
+// CreatedOnNEQ applies the NEQ predicate on the "CreatedOn" field.
+func CreatedOnNEQ(v time.Time) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldCreatedOn), v))
+	})
+}
+
+// CreatedOnIn applies the In predicate on the "CreatedOn" field.
+func CreatedOnIn(vs ...time.Time) predicate.Chapter {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Chapter(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldCreatedOn), v...))
+	})
+}
+
+// CreatedOnNotIn applies the NotIn predicate on the "CreatedOn" field.
+func CreatedOnNotIn(vs ...time.Time) predicate.Chapter {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Chapter(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldCreatedOn), v...))
+	})
+}
+
+// CreatedOnGT applies the GT predicate on the "CreatedOn" field.
+func CreatedOnGT(v time.Time) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldCreatedOn), v))
+	})
+}
+
+// CreatedOnGTE applies the GTE predicate on the "CreatedOn" field.
+func CreatedOnGTE(v time.Time) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldCreatedOn), v))
+	})
+}
+
+// CreatedOnLT applies the LT predicate on the "CreatedOn" field.
+func CreatedOnLT(v time.Time) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldCreatedOn), v))
+	})
+}
+
+// CreatedOnLTE applies the LTE predicate on the "CreatedOn" field.
+func CreatedOnLTE(v time.Time) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldCreatedOn), v))
+	})
+}
+
+// CreatedOnIsNil applies the IsNil predicate on the "CreatedOn" field.
+func CreatedOnIsNil() predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldCreatedOn)))
+	})
+}
+
+// CreatedOnNotNil applies the NotNil predicate on the "CreatedOn" field.
+func CreatedOnNotNil() predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldCreatedOn)))
+	})
+}
+
+// RegisteredOnEQ applies the EQ predicate on the "RegisteredOn" field.
+func RegisteredOnEQ(v time.Time) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldRegisteredOn), v))
+	})
+}
+
+// RegisteredOnNEQ applies the NEQ predicate on the "RegisteredOn" field.
+func RegisteredOnNEQ(v time.Time) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldRegisteredOn), v))
+	})
+}
+
+// RegisteredOnIn applies the In predicate on the "RegisteredOn" field.
+func RegisteredOnIn(vs ...time.Time) predicate.Chapter {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Chapter(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldRegisteredOn), v...))
+	})
+}
+
+// RegisteredOnNotIn applies the NotIn predicate on the "RegisteredOn" field.
+func RegisteredOnNotIn(vs ...time.Time) predicate.Chapter {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Chapter(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldRegisteredOn), v...))
+	})
+}
+
+// RegisteredOnGT applies the GT predicate on the "RegisteredOn" field.
+func RegisteredOnGT(v time.Time) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldRegisteredOn), v))
+	})
+}
+
+// RegisteredOnGTE applies the GTE predicate on the "RegisteredOn" field.
+func RegisteredOnGTE(v time.Time) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldRegisteredOn), v))
+	})
+}
+
+// RegisteredOnLT applies the LT predicate on the "RegisteredOn" field.
+func RegisteredOnLT(v time.Time) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldRegisteredOn), v))
+	})
+}
+
+// RegisteredOnLTE applies the LTE predicate on the "RegisteredOn" field.
+func RegisteredOnLTE(v time.Time) predicate.Chapter {
+	return predicate.Chapter(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldRegisteredOn), v))
 	})
 }
 

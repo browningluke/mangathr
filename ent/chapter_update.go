@@ -9,6 +9,7 @@ import (
 	"mangathrV2/ent/chapter"
 	"mangathrV2/ent/manga"
 	"mangathrV2/ent/predicate"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -37,6 +38,52 @@ func (cu *ChapterUpdate) SetChapterID(s string) *ChapterUpdate {
 // SetNum sets the "Num" field.
 func (cu *ChapterUpdate) SetNum(s string) *ChapterUpdate {
 	cu.mutation.SetNum(s)
+	return cu
+}
+
+// SetTitle sets the "Title" field.
+func (cu *ChapterUpdate) SetTitle(s string) *ChapterUpdate {
+	cu.mutation.SetTitle(s)
+	return cu
+}
+
+// SetNillableTitle sets the "Title" field if the given value is not nil.
+func (cu *ChapterUpdate) SetNillableTitle(s *string) *ChapterUpdate {
+	if s != nil {
+		cu.SetTitle(*s)
+	}
+	return cu
+}
+
+// ClearTitle clears the value of the "Title" field.
+func (cu *ChapterUpdate) ClearTitle() *ChapterUpdate {
+	cu.mutation.ClearTitle()
+	return cu
+}
+
+// SetCreatedOn sets the "CreatedOn" field.
+func (cu *ChapterUpdate) SetCreatedOn(t time.Time) *ChapterUpdate {
+	cu.mutation.SetCreatedOn(t)
+	return cu
+}
+
+// SetNillableCreatedOn sets the "CreatedOn" field if the given value is not nil.
+func (cu *ChapterUpdate) SetNillableCreatedOn(t *time.Time) *ChapterUpdate {
+	if t != nil {
+		cu.SetCreatedOn(*t)
+	}
+	return cu
+}
+
+// ClearCreatedOn clears the value of the "CreatedOn" field.
+func (cu *ChapterUpdate) ClearCreatedOn() *ChapterUpdate {
+	cu.mutation.ClearCreatedOn()
+	return cu
+}
+
+// SetRegisteredOn sets the "RegisteredOn" field.
+func (cu *ChapterUpdate) SetRegisteredOn(t time.Time) *ChapterUpdate {
+	cu.mutation.SetRegisteredOn(t)
 	return cu
 }
 
@@ -156,6 +203,39 @@ func (cu *ChapterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: chapter.FieldNum,
 		})
 	}
+	if value, ok := cu.mutation.Title(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: chapter.FieldTitle,
+		})
+	}
+	if cu.mutation.TitleCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: chapter.FieldTitle,
+		})
+	}
+	if value, ok := cu.mutation.CreatedOn(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: chapter.FieldCreatedOn,
+		})
+	}
+	if cu.mutation.CreatedOnCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: chapter.FieldCreatedOn,
+		})
+	}
+	if value, ok := cu.mutation.RegisteredOn(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: chapter.FieldRegisteredOn,
+		})
+	}
 	if cu.mutation.MangaCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -219,6 +299,52 @@ func (cuo *ChapterUpdateOne) SetChapterID(s string) *ChapterUpdateOne {
 // SetNum sets the "Num" field.
 func (cuo *ChapterUpdateOne) SetNum(s string) *ChapterUpdateOne {
 	cuo.mutation.SetNum(s)
+	return cuo
+}
+
+// SetTitle sets the "Title" field.
+func (cuo *ChapterUpdateOne) SetTitle(s string) *ChapterUpdateOne {
+	cuo.mutation.SetTitle(s)
+	return cuo
+}
+
+// SetNillableTitle sets the "Title" field if the given value is not nil.
+func (cuo *ChapterUpdateOne) SetNillableTitle(s *string) *ChapterUpdateOne {
+	if s != nil {
+		cuo.SetTitle(*s)
+	}
+	return cuo
+}
+
+// ClearTitle clears the value of the "Title" field.
+func (cuo *ChapterUpdateOne) ClearTitle() *ChapterUpdateOne {
+	cuo.mutation.ClearTitle()
+	return cuo
+}
+
+// SetCreatedOn sets the "CreatedOn" field.
+func (cuo *ChapterUpdateOne) SetCreatedOn(t time.Time) *ChapterUpdateOne {
+	cuo.mutation.SetCreatedOn(t)
+	return cuo
+}
+
+// SetNillableCreatedOn sets the "CreatedOn" field if the given value is not nil.
+func (cuo *ChapterUpdateOne) SetNillableCreatedOn(t *time.Time) *ChapterUpdateOne {
+	if t != nil {
+		cuo.SetCreatedOn(*t)
+	}
+	return cuo
+}
+
+// ClearCreatedOn clears the value of the "CreatedOn" field.
+func (cuo *ChapterUpdateOne) ClearCreatedOn() *ChapterUpdateOne {
+	cuo.mutation.ClearCreatedOn()
+	return cuo
+}
+
+// SetRegisteredOn sets the "RegisteredOn" field.
+func (cuo *ChapterUpdateOne) SetRegisteredOn(t time.Time) *ChapterUpdateOne {
+	cuo.mutation.SetRegisteredOn(t)
 	return cuo
 }
 
@@ -360,6 +486,39 @@ func (cuo *ChapterUpdateOne) sqlSave(ctx context.Context) (_node *Chapter, err e
 			Type:   field.TypeString,
 			Value:  value,
 			Column: chapter.FieldNum,
+		})
+	}
+	if value, ok := cuo.mutation.Title(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: chapter.FieldTitle,
+		})
+	}
+	if cuo.mutation.TitleCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: chapter.FieldTitle,
+		})
+	}
+	if value, ok := cuo.mutation.CreatedOn(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: chapter.FieldCreatedOn,
+		})
+	}
+	if cuo.mutation.CreatedOnCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: chapter.FieldCreatedOn,
+		})
+	}
+	if value, ok := cuo.mutation.RegisteredOn(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: chapter.FieldRegisteredOn,
 		})
 	}
 	if cuo.mutation.MangaCleared() {
