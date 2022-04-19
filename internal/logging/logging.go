@@ -53,7 +53,7 @@ func SetLoggingLevel(level Level) {
 
 func output(logger *log.Logger, s string) {
 	if logger != nil {
-		err := debugLogger.Output(3, s)
+		err := logger.Output(3, s)
 		if err != nil {
 			panic(err)
 		}
