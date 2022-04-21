@@ -29,8 +29,8 @@ type Page struct {
 }
 
 type Job struct {
-	Title, Num, ID string
-	Bar            *mpb.Bar
+	Title, Filename, Num, ID string
+	Bar                      *mpb.Bar
 }
 
 func NewDownloader(config *Config) *Downloader {

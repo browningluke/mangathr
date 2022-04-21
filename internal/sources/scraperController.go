@@ -8,21 +8,30 @@ import (
 )
 
 type Scraper interface {
+	// Searching
+
 	Search(query string) []string
 	SearchByID(id string) interface{}
 
-	SelectManga(name string)
-	Chapters() []structs.Chapter
-	ChapterTitles() []string
+	// Selection
 
+	SelectManga(name string)
 	//SelectNewChapters() interface{}
 	SelectChapters(titles []string)
 
+	// Downloading
+
 	Download(downloader *downloader.Downloader, downloadType string)
 
-	MangaTitle() string
-	ScraperName() string
+	// Getters
+
 	MangaID() string
+	MangaTitle() string
+
+	Chapters() []structs.Chapter
+	ChapterTitles() []string
+
+	ScraperName() string
 }
 
 func NewScraper(name string, config *config.Config) Scraper {

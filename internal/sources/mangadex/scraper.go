@@ -279,11 +279,11 @@ func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 		if len(m.config.LanguageFilter) > 1 {
 			language = fmt.Sprintf("%s", chapter.language)
 		}
-		chapterTitle := dl.GetNameFromTemplate(m.config.FilenameTemplate,
+		chapterFilename := dl.GetNameFromTemplate(m.config.FilenameTemplate,
 			chapter.num, chapter.title, language)
 
-		downloadQueue[i] = downloader.Job{Title: chapterTitle, Num: chapter.num,
-			ID: chapter.id}
+		downloadQueue[i] = downloader.Job{Title: chapter.prettyTitle,
+			Filename: chapterFilename, Num: chapter.num, ID: chapter.id}
 	}
 
 	runJob := func(job downloader.Job) {
@@ -293,7 +293,7 @@ func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 			fmt.Sprintf("Chapter %s", job.Num))
 
 		dl.SetMetadataAgent(job.Title, job.Num)
-		dl.Download(path, job.Title, pages, bar)
+		dl.Download(path, job.Filename, pages, bar)
 	}
 
 	// Execute download queue, potential to add workerpool here later
