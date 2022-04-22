@@ -11,8 +11,7 @@ func NewAgent(title, num string) *Agent {
 }
 
 func (a *Agent) GenerateMetadataFile() (filename, body string) {
-	b := fmt.Sprintf(`
-<?xml version="1.0"?>
+	b := fmt.Sprintf(`<?xml version="1.0"?>
 <ComicInfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 	<Number>%s</Number>
