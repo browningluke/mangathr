@@ -30,10 +30,18 @@ func FindInSlice(list interface{}, match interface{}) (interface{}, bool) {
 }
 
 func PadString(s string, length int) string {
+	stringSlice := strings.Split(s, ".")
+	s = stringSlice[0]
+
 	if utf8.RuneCountInString(s) >= length {
 		return s
 	}
-	return strings.Repeat("0", length-utf8.RuneCountInString(s)) + s
+
+	rString := strings.Repeat("0", length-utf8.RuneCountInString(s)) + s
+	if len(stringSlice) > 1 {
+		rString += "." + stringSlice[1]
+	}
+	return rString
 }
 
 func GetImageExtension(filename string) string {
