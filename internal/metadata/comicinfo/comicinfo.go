@@ -11,8 +11,7 @@ type Agent struct {
 
 func NewAgent() *Agent {
 	t := fmt.Sprintf("<?xml version=\"1.0\"?>\n" +
-		"<ComicInfo xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-		"xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\n")
+		"<ComicInfo>\n")
 
 	return &Agent{template: t}
 	//return &Agent{title: title, num: num}
