@@ -50,7 +50,7 @@ func (d *Downloader) MetadataAgent() *metadata.Agent {
 */
 
 func cleanPath(path string) string {
-	re := regexp.MustCompile(`[<>:"\\|/?*]|\.$`)
+	re := regexp.MustCompile(`[<>:"\\|/?*]|\.([<>:"\\|/?*]|$)+`)
 	return re.ReplaceAllString(path, "")
 }
 
