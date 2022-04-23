@@ -34,6 +34,9 @@ func PadString(s string, length int) string {
 	s = stringSlice[0]
 
 	if utf8.RuneCountInString(s) >= length {
+		if len(stringSlice) > 1 {
+			s += "." + stringSlice[1]
+		}
 		return s
 	}
 
