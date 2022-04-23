@@ -369,7 +369,7 @@ func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 			chapter.num, chapter.title, language, chapter.metadata.Groups)
 
 		downloadQueue[i] = downloader.Job{
-			Title: chapter.title, Num: chapter.num, ID: chapter.id,
+			Title: chapter.prettyTitle, Num: chapter.num, ID: chapter.id,
 			Filename: chapterFilename, Metadata: chapter.metadata,
 		}
 	}
