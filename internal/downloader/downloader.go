@@ -11,6 +11,7 @@ import (
 	"log"
 	"mangathrV2/internal/metadata"
 	"mangathrV2/internal/rester"
+	"mangathrV2/internal/sources/structs"
 	"mangathrV2/internal/utils"
 	"os"
 	"path/filepath"
@@ -30,6 +31,7 @@ type Page struct {
 
 type Job struct {
 	Title, Filename, Num, ID string
+	Metadata                 structs.Metadata
 	Bar                      *mpb.Bar
 }
 
@@ -76,7 +78,7 @@ func (d *Downloader) CreateDirectory(title, downloadType string) string {
 	return newPath
 }
 
-func (d *Downloader) GetNameFromTemplate(pluginTemplate, num, title, language string) string {
+func (d *Downloader) GetNameFromTemplate(pluginTemplate, num, title, language string, groups []string) string {
 	var template string
 	if pluginTemplate != "" {
 		template = pluginTemplate
@@ -91,14 +93,20 @@ func (d *Downloader) GetNameFromTemplate(pluginTemplate, num, title, language st
 
 	conditionalLanguage := ""
 	if language != "" {
-		conditionalLanguage = fmt.Sprintf(" - %s", language)
+		conditionalLanguage = fmt.Sprintf(" [%s]", language)
+	}
+
+	conditionalGroups := ""
+	if len(groups) > 0 {
+		conditionalGroups = fmt.Sprintf(" [%s]", strings.Join(groups[:], ", "))
 	}
 
 	conditionalTitle := ""
 	if title != "" {
 		conditionalTitle = fmt.Sprintf(" - %s", title)
 	}
-	return fmt.Sprintf("%s - Chapter %s%s%s", paddedNum, num, conditionalLanguage, conditionalTitle)
+	return fmt.Sprintf("%s - Chapter %s%s%s%s", paddedNum, num, conditionalTitle,
+		conditionalLanguage, conditionalGroups)
 }
 
 func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *mpb.Bar) {

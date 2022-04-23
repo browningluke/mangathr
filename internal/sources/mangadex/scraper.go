@@ -11,6 +11,7 @@ import (
 	"mangathrV2/internal/utils/ui"
 	"math"
 	"strconv"
+	"strings"
 )
 
 type Scraper struct {
@@ -21,6 +22,9 @@ type Scraper struct {
 	manga         searchResult
 
 	allChapters, selectedChapters []chapterResult
+
+	// Group queries
+	groups map[string]string // Map groupID -> groupName
 }
 
 type searchResult struct {
@@ -28,15 +32,23 @@ type searchResult struct {
 }
 
 type chapterResult struct {
-	id, title, prettyTitle,
+	id, title, prettyTitle, promptTitle,
 	num, language string
 	sortNum float64
+
+	metadata structs.Metadata
 }
 
 func NewScraper(config *Config) *Scraper {
 	logging.Infoln("Created a Mangadex scraper")
-	return &Scraper{config: config}
+	s := &Scraper{config: config}
+	s.groups = make(map[string]string)
+	return s
 }
+
+/*
+	-- Manga --
+*/
 
 // Search for a Manga, will fill searchResults with 0 or more results
 func (m *Scraper) Search(query string) []string {
@@ -99,6 +111,48 @@ func (m *Scraper) SearchByID(id string) interface{} {
 	panic("implement me")
 }
 
+/*
+	-- Chapters --
+*/
+
+func (m *Scraper) getGroupNames(ids []string) []string {
+	getGroupNameCached := func(id string) string {
+		if val, ok := m.groups[id]; ok {
+			return val
+		}
+		return ""
+	}
+	var groups []string
+
+	var queryParams []rester.QueryParam
+	for _, id := range ids {
+		if name := getGroupNameCached(id); name != "" {
+			groups = append(groups, name)
+		} else {
+			queryParams = append(queryParams, rester.QueryParam{Key: "ids[]", Value: id, Encode: true})
+		}
+	}
+
+	if len(queryParams) > 0 {
+		jsonString := rester.New().Get("https://api.mangadex.org/group", map[string]string{},
+			append(queryParams, rester.QueryParam{Key: "limit", Value: "100", Encode: true})).Do(2).(string)
+
+		var groupResp groupResponse
+		err := json.Unmarshal([]byte(jsonString), &groupResp)
+		if err != nil {
+			panic(err)
+		}
+
+		for _, group := range groupResp.Data {
+			groups = append(groups, group.Attributes.Name)
+			m.groups[group.Id] = group.Attributes.Name
+		}
+	}
+	return groups
+}
+
+//func (m *Scraper)
+
 func (m *Scraper) scrapeChapters() {
 	// Build query params
 	queryParams := []rester.QueryParam{
@@ -139,6 +193,11 @@ func (m *Scraper) scrapeChapters() {
 
 	for _, mangaFeedResp := range mangaFeedRespList {
 		for _, item := range mangaFeedResp.Data {
+			//fmt.Println(i)
+			//if i == 5 {
+			//	os.Exit(0)
+			//}
+
 			var f float64
 
 			if item.Attributes.Chapter == "" {
@@ -157,6 +216,18 @@ func (m *Scraper) scrapeChapters() {
 				num = "0"
 			}
 
+			// Extract all group info
+			var groupQueue []string
+			for _, relationship := range item.Relationships {
+				if relationship.RelationType == "scanlation_group" {
+					groupQueue = append(groupQueue, relationship.Id)
+				}
+			}
+			var groups []string
+			if len(groupQueue) > 0 {
+				groups = m.getGroupNames(groupQueue)
+			}
+
 			// Generate title padding
 			titlePadding := ""
 
@@ -164,23 +235,33 @@ func (m *Scraper) scrapeChapters() {
 				titlePadding += fmt.Sprintf(" - %s", item.Attributes.TranslatedLanguage)
 			}
 
-			if item.Attributes.Title == "" {
-				titlePadding += ""
-			} else {
+			if item.Attributes.Title != "" {
 				titlePadding += fmt.Sprintf(" - %s", item.Attributes.Title)
 			}
 
 			prettyTitle := fmt.Sprintf("Chapter %s%s",
 				num, titlePadding)
 
+			promptTitle := ""
+			if len(groups) > 0 {
+				promptTitle = prettyTitle + fmt.Sprintf(" [%s]", strings.Join(groups[:], ", "))
+			}
+
 			searchResults = append(searchResults,
 				chapterResult{
 					prettyTitle: prettyTitle,
+					promptTitle: promptTitle,
 					title:       item.Attributes.Title,
 					num:         num,
 					sortNum:     f,
 					id:          item.Id,
 					language:    item.Attributes.TranslatedLanguage,
+
+					metadata: structs.Metadata{
+						Groups: groups,
+						Link:   fmt.Sprintf("https://mangadex.org/chapter/%s", item.Id),
+						Date:   item.Attributes.CreatedAt[0:11],
+					},
 				})
 		}
 	}
@@ -194,7 +275,8 @@ func (m *Scraper) Chapters() []structs.Chapter {
 
 	var chapters []structs.Chapter
 	for _, item := range m.allChapters {
-		chapters = append(chapters, structs.Chapter{ID: item.id, Title: item.prettyTitle, Num: item.num})
+		chapters = append(chapters, structs.Chapter{
+			ID: item.id, Title: item.prettyTitle, Num: item.num, Metadata: item.metadata})
 	}
 	return chapters
 }
@@ -205,7 +287,7 @@ func (m *Scraper) ChapterTitles() []string {
 	}
 	var titles []string
 	for _, item := range m.allChapters {
-		titles = append(titles, item.prettyTitle)
+		titles = append(titles, item.promptTitle)
 	}
 	return titles
 }
@@ -214,8 +296,8 @@ func (m *Scraper) SelectChapters(titles []string) {
 	var chapters []chapterResult
 
 	for _, chapter := range m.allChapters {
-		for _, prettyTitle := range titles {
-			if chapter.prettyTitle == prettyTitle {
+		for _, promptTitle := range titles {
+			if chapter.promptTitle == promptTitle {
 				chapters = append(chapters, chapter)
 			}
 		}
@@ -225,6 +307,10 @@ func (m *Scraper) SelectChapters(titles []string) {
 	// Once chapters have been selected, clear all chapters
 	m.allChapters = []chapterResult{}
 }
+
+/*
+	-- Pages & Download --
+*/
 
 func (m *Scraper) getChapterPages(id string) []downloader.Page {
 	jsonString := rester.New().Get(
@@ -280,10 +366,12 @@ func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 			language = fmt.Sprintf("%s", chapter.language)
 		}
 		chapterFilename := dl.GetNameFromTemplate(m.config.FilenameTemplate,
-			chapter.num, chapter.title, language)
+			chapter.num, chapter.title, language, chapter.metadata.Groups)
 
-		downloadQueue[i] = downloader.Job{Title: chapter.prettyTitle,
-			Filename: chapterFilename, Num: chapter.num, ID: chapter.id}
+		downloadQueue[i] = downloader.Job{
+			Title: chapter.title, Num: chapter.num, ID: chapter.id,
+			Filename: chapterFilename, Metadata: chapter.metadata,
+		}
 	}
 
 	runJob := func(job downloader.Job) {
@@ -295,7 +383,9 @@ func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 		mdAgent := dl.MetadataAgent()
 		(*mdAgent).SetTitle(job.Title)
 		(*mdAgent).SetNum(job.Num)
-		(*mdAgent).SetWebLink(fmt.Sprintf("https://mangadex.org/chapter/%s", job.ID))
+		(*mdAgent).SetWebLink(job.Metadata.Link)
+		(*mdAgent).SetDate(job.Metadata.Date)
+		(*mdAgent).SetEditors(job.Metadata.Groups)
 		dl.Download(path, job.Filename, pages, bar)
 	}
 
@@ -307,7 +397,9 @@ func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 	progress.Wait()
 }
 
-// Getters
+/*
+	-- Getters --
+*/
 
 func (m *Scraper) MangaTitle() string {
 	return m.manga.title
