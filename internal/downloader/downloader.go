@@ -15,6 +15,7 @@ import (
 	"mangathrV2/internal/utils"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -44,6 +45,15 @@ func (d *Downloader) MetadataAgent() *metadata.Agent {
 	return &d.agent
 }
 
+/*
+	-- Utils --
+*/
+
+func cleanPath(path string) string {
+	re := regexp.MustCompile(`[<>:"\\|/?*]|\.$`)
+	return re.ReplaceAllString(path, "")
+}
+
 func (d *Downloader) CreateDirectory(title, downloadType string) string {
 	var dirname string
 
@@ -69,7 +79,7 @@ func (d *Downloader) CreateDirectory(title, downloadType string) string {
 		}
 	}
 
-	newPath := filepath.Join(dirname, title)
+	newPath := filepath.Join(dirname, cleanPath(title))
 	err := os.MkdirAll(newPath, os.ModePerm)
 	if err != nil {
 		log.Fatalln(err)
@@ -119,7 +129,7 @@ func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *m
 
 	//fmt.Println(chapterFilename)
 
-	chapterPath := filepath.Join(path, fmt.Sprintf("%s.cbz", chapterFilename))
+	chapterPath := filepath.Join(path, fmt.Sprintf("%s.cbz", cleanPath(chapterFilename)))
 
 	if _, err := os.Stat(chapterPath); err == nil {
 		fmt.Println("Chapter already exists.")
