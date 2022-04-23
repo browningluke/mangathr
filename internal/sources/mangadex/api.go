@@ -37,6 +37,9 @@ type mangaFeedResponse struct {
 		Relationships []struct {
 			Id           string `json:"id"`
 			RelationType string `json:"type"`
+			Attributes   struct {
+				Name string `json:"name"`
+			} `json:"attributes"`
 		} `json:"relationships"`
 	} `json:"data"`
 
@@ -53,21 +56,4 @@ type chapterResponse struct {
 		Data      []string `json:"data"`
 		DataSaver []string `json:"dataSaver"`
 	} `json:"chapter"`
-}
-
-type groupResponse struct {
-	Result   string `json:"result"`
-	Response string `json:"response"`
-	Data     []struct {
-		Id   string `json:"id"`
-		Type string `json:"type"`
-
-		Attributes struct {
-			Name string `json:"name"`
-		} `json:"attributes"`
-	} `json:"data"`
-
-	Limit  int `json:"limit"`
-	Offset int `json:"offset"`
-	Total  int `json:"total"`
 }

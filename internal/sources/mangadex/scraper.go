@@ -115,44 +115,6 @@ func (m *Scraper) SearchByID(id string) interface{} {
 	-- Chapters --
 */
 
-func (m *Scraper) getGroupNames(ids []string) []string {
-	getGroupNameCached := func(id string) string {
-		if val, ok := m.groups[id]; ok {
-			return val
-		}
-		return ""
-	}
-	var groups []string
-
-	var queryParams []rester.QueryParam
-	for _, id := range ids {
-		if name := getGroupNameCached(id); name != "" {
-			groups = append(groups, name)
-		} else {
-			queryParams = append(queryParams, rester.QueryParam{Key: "ids[]", Value: id, Encode: true})
-		}
-	}
-
-	if len(queryParams) > 0 {
-		jsonString := rester.New().Get("https://api.mangadex.org/group", map[string]string{},
-			append(queryParams, rester.QueryParam{Key: "limit", Value: "100", Encode: true})).Do(2).(string)
-
-		var groupResp groupResponse
-		err := json.Unmarshal([]byte(jsonString), &groupResp)
-		if err != nil {
-			panic(err)
-		}
-
-		for _, group := range groupResp.Data {
-			groups = append(groups, group.Attributes.Name)
-			m.groups[group.Id] = group.Attributes.Name
-		}
-	}
-	return groups
-}
-
-//func (m *Scraper)
-
 func (m *Scraper) scrapeChapters() {
 	// Build query params
 	queryParams := []rester.QueryParam{
@@ -168,7 +130,9 @@ func (m *Scraper) scrapeChapters() {
 		jsonString := rester.New().Get(
 			fmt.Sprintf("https://api.mangadex.org/manga/%s/feed", m.manga.id),
 			map[string]string{},
-			append(queryParams, rester.QueryParam{Key: "offset", Value: strconv.Itoa(offset), Encode: true}),
+			append(queryParams,
+				rester.QueryParam{Key: "offset", Value: strconv.Itoa(offset), Encode: true},
+				rester.QueryParam{Key: "includes[]", Value: "scanlation_group", Encode: true}),
 		).Do(1).(string)
 
 		var mangaFeedResp mangaFeedResponse
@@ -193,11 +157,6 @@ func (m *Scraper) scrapeChapters() {
 
 	for _, mangaFeedResp := range mangaFeedRespList {
 		for _, item := range mangaFeedResp.Data {
-			//fmt.Println(i)
-			//if i == 5 {
-			//	os.Exit(0)
-			//}
-
 			var f float64
 
 			if item.Attributes.Chapter == "" {
@@ -217,15 +176,11 @@ func (m *Scraper) scrapeChapters() {
 			}
 
 			// Extract all group info
-			var groupQueue []string
+			var groups []string
 			for _, relationship := range item.Relationships {
 				if relationship.RelationType == "scanlation_group" {
-					groupQueue = append(groupQueue, relationship.Id)
+					groups = append(groups, relationship.Attributes.Name)
 				}
-			}
-			var groups []string
-			if len(groupQueue) > 0 {
-				groups = m.getGroupNames(groupQueue)
 			}
 
 			// Generate title padding
@@ -242,9 +197,9 @@ func (m *Scraper) scrapeChapters() {
 			prettyTitle := fmt.Sprintf("Chapter %s%s",
 				num, titlePadding)
 
-			promptTitle := ""
+			promptTitle := prettyTitle
 			if len(groups) > 0 {
-				promptTitle = prettyTitle + fmt.Sprintf(" [%s]", strings.Join(groups[:], ", "))
+				promptTitle += fmt.Sprintf(" [%s]", strings.Join(groups[:], ", "))
 			}
 
 			searchResults = append(searchResults,
