@@ -6,11 +6,17 @@ import (
 
 type Agent interface {
 	GenerateMetadataFile() (filename, body string)
+
+	SetTitle(title string)
+	SetNum(num string)
+	SetDate(date string) // MUST BE yyyy-mm-dd
+	SetEditor(editor string)
+	SetWebLink(link string)
 }
 
-func NewAgent(name, title, num string) Agent {
+func NewAgent(name string) Agent {
 	m := map[string]func() Agent{
-		"comicinfo": func() Agent { return comicinfo.NewAgent(title, num) },
+		"comicinfo": func() Agent { return comicinfo.NewAgent() },
 	}
 
 	agent, ok := m[name]

@@ -37,8 +37,9 @@ func NewDownloader(config *Config) *Downloader {
 	return &Downloader{config: config}
 }
 
-func (d *Downloader) SetMetadataAgent(title, num string) {
-	d.agent = metadata.NewAgent(d.config.Metadata.Agent, title, num)
+func (d *Downloader) MetadataAgent() *metadata.Agent {
+	d.agent = metadata.NewAgent(d.config.Metadata.Agent)
+	return &d.agent
 }
 
 func (d *Downloader) CreateDirectory(title, downloadType string) string {

@@ -292,7 +292,10 @@ func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 		bar := ui.AddBar(progress, int64(len(pages)),
 			fmt.Sprintf("Chapter %s", job.Num))
 
-		dl.SetMetadataAgent(job.Title, job.Num)
+		mdAgent := dl.MetadataAgent()
+		(*mdAgent).SetTitle(job.Title)
+		(*mdAgent).SetNum(job.Num)
+		(*mdAgent).SetWebLink(fmt.Sprintf("https://mangadex.org/chapter/%s", job.ID))
 		dl.Download(path, job.Filename, pages, bar)
 	}
 
