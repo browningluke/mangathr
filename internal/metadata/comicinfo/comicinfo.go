@@ -2,6 +2,7 @@ package comicinfo
 
 import (
 	"fmt"
+	"strings"
 )
 
 type Agent struct {
@@ -39,8 +40,8 @@ func (a *Agent) SetDate(date string) {
 	a.template += fmt.Sprintf("<Day>%s</Day>\n", date[8:10])
 }
 
-func (a *Agent) SetEditor(editor string) {
-	a.template += fmt.Sprintf("<Editor>%s</Editor>\n", editor)
+func (a *Agent) SetEditors(editors []string) {
+	a.template += fmt.Sprintf("<Editor>%s</Editor>\n", strings.Join(editors[:], ", "))
 }
 
 func (a *Agent) SetWebLink(link string) {

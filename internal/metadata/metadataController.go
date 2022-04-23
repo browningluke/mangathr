@@ -10,7 +10,7 @@ type Agent interface {
 	SetTitle(title string)
 	SetNum(num string)
 	SetDate(date string) // MUST BE yyyy-mm-dd
-	SetEditor(editor string)
+	SetEditors(editors []string)
 	SetWebLink(link string)
 }
 
