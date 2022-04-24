@@ -27,7 +27,7 @@ const (
 func Init() {
 	debugLogger = nil
 	if loggingLevel <= DEBUG {
-		debugLogger = log.New(os.Stderr, "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile)
+		debugLogger = log.New(os.Stderr, "\u001B[36mDEBUG: \u001B[0m", log.Ldate|log.Ltime|log.Lshortfile)
 	}
 
 	infoLogger = nil
@@ -37,12 +37,12 @@ func Init() {
 
 	warningLogger = nil
 	if loggingLevel <= WARNING {
-		warningLogger = log.New(os.Stderr, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)
+		warningLogger = log.New(os.Stderr, "\u001B[33mWARNING: \u001B[0m", log.Ldate|log.Ltime|log.Lshortfile)
 	}
 
 	errorLogger = nil
 	if loggingLevel <= ERROR {
-		errorLogger = log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
+		errorLogger = log.New(os.Stderr, "\u001B[31mERROR: \u001B[0m", log.Ldate|log.Ltime|log.Lshortfile)
 	}
 }
 
