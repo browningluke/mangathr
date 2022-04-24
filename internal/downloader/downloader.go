@@ -213,7 +213,7 @@ func (d *Downloader) downloadImage(url, filename string, zipWriter *zip.Writer, 
 
 	imageBytes := rester.New().GetBytes(url,
 		map[string]string{},
-		[]rester.QueryParam{}).Do(d.config.PageRetries).([]byte)
+		[]rester.QueryParam{}).Do(d.config.PageRetries, "100ms").([]byte)
 
 	//fmt.Println("Downloading image: ", filename)
 

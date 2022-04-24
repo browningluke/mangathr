@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strconv"
+	"time"
 )
 
 type RESTer struct {
@@ -26,7 +26,7 @@ func New() *RESTer {
 	}
 }
 
-func (r RESTer) Do(retries int) interface{} {
+func (r RESTer) Do(retries int, timeout string) interface{} {
 	if retries == 0 {
 		panic(errors.New("retried too many times, giving up"))
 	}
@@ -34,7 +34,12 @@ func (r RESTer) Do(retries int) interface{} {
 
 	if err != nil {
 		fmt.Printf("Failed, retrying... (retries left %d)\n", retries)
-		return r.Do(retries - 1)
+		dur, err := time.ParseDuration(timeout)
+		if err != nil {
+			panic(err)
+		}
+		time.Sleep(dur)
+		return r.Do(retries-1, timeout)
 	}
 
 	return res
