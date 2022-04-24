@@ -12,6 +12,7 @@ import (
 	"math"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Scraper struct {
@@ -268,10 +269,33 @@ func (m *Scraper) SelectChapters(titles []string) {
 */
 
 func (m *Scraper) getChapterPages(id string) []downloader.Page {
-	jsonString := rester.New().Get(
+	resInterface := rester.New().Get(
 		fmt.Sprintf("https://api.mangadex.org/at-home/server/%s", id),
 		map[string]string{},
-		[]rester.QueryParam{}).Do(1).(string)
+		[]rester.QueryParam{},
+	).DoWithHelperFunc(4, "200ms", func(res rester.Response, err error) {
+		logging.Errorln(res.StatusCode)
+
+		if res.StatusCode == 429 {
+			header := res.Headers
+
+			nextRetryTimeInt := header["X-Ratelimit-Retry-After"][0]
+			nextRetryTime, err := strconv.ParseInt(nextRetryTimeInt, 10, 64)
+			if err != nil {
+				panic(err)
+			}
+
+			now := time.Now().Unix()
+			timeDiff := nextRetryTime - now
+			logging.Warningln(fmt.Sprintf("Time right now: %d", now))
+			logging.Warningln(fmt.Sprintf("Sleeping for: %d", timeDiff))
+
+			time.Sleep(time.Duration(timeDiff) * time.Second)
+		}
+
+	})
+
+	jsonString := resInterface.(string)
 
 	var chapterResp chapterResponse
 
