@@ -24,6 +24,11 @@ import (
 type Downloader struct {
 	config *Config
 	agent  metadata.Agent
+
+	updateMode bool
+
+	enforceChapterDuration bool
+	chapterDuration        int64
 }
 
 type Page struct {
@@ -36,13 +41,23 @@ type Job struct {
 	Bar                      *progressbar.ProgressBar
 }
 
-func NewDownloader(config *Config) *Downloader {
-	return &Downloader{config: config}
+func NewDownloader(config *Config,
+	updateMode bool,
+	enforceChapterDuration bool) *Downloader {
+	return &Downloader{
+		config:                 config,
+		updateMode:             updateMode,
+		enforceChapterDuration: enforceChapterDuration,
+	}
 }
 
 func (d *Downloader) MetadataAgent() *metadata.Agent {
 	d.agent = metadata.NewAgent(d.config.Metadata.Agent)
 	return &d.agent
+}
+
+func (d *Downloader) SetChapterDuration(duration int64) {
+	d.chapterDuration = duration
 }
 
 /*
@@ -124,12 +139,18 @@ func (d *Downloader) GetNameFromTemplate(pluginTemplate, num, title, language st
 */
 
 func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *progressbar.ProgressBar) {
-	// TODO: differentiate between Download & Update delay
-	dur, err := time.ParseDuration(d.config.Delay.Chapter)
-	if err != nil {
-		panic(err)
+
+	var timeStart int64
+	if d.enforceChapterDuration {
+		timeStart = time.Now().UnixMilli()
+	} else {
+		// TODO: differentiate between Download & Update delay
+		dur, err := time.ParseDuration(d.config.Delay.Chapter)
+		if err != nil {
+			panic(err)
+		}
+		time.Sleep(dur)
 	}
-	time.Sleep(dur)
 
 	//fmt.Println(chapterFilename)
 
@@ -201,6 +222,17 @@ func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *p
 
 	} else {
 		panic(err)
+	}
+
+	// Ensure chapter time is correct
+	if d.enforceChapterDuration {
+		timeEnd := time.Now().UnixMilli()
+		downloadDuration := timeEnd - timeStart
+
+		if downloadDuration < d.chapterDuration {
+			timeDiff := d.chapterDuration - downloadDuration
+			time.Sleep(time.Duration(timeDiff) * time.Millisecond)
+		}
 	}
 }
 

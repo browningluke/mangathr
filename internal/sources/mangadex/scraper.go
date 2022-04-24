@@ -333,6 +333,13 @@ func (m *Scraper) getChapterPages(id string) []downloader.Page {
 }
 
 func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
+	chaptersPerMinute := 60 // set from API docs
+	duration := int64((chaptersPerMinute * 1000) / 40)
+	if numChapters := len(m.selectedChapters); numChapters < chaptersPerMinute {
+		duration = int64((numChapters * 1000) / 40)
+	}
+	dl.SetChapterDuration(duration)
+
 	// downloadType is one of ["download", "update"]
 	path := dl.CreateDirectory(m.manga.title, downloadType)
 	downloadQueue := make([]downloader.Job, len(m.selectedChapters))
@@ -390,4 +397,8 @@ func (m *Scraper) MangaID() string {
 
 func (m *Scraper) ScraperName() string {
 	return "Mangadex"
+}
+
+func (m *Scraper) EnforceChapterLength() bool {
+	return true
 }

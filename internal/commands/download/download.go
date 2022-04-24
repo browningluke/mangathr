@@ -35,6 +35,9 @@ func Run(args *Args, config *config.Config) {
 	//fmt.Println(chapterSelections)
 	scraper.SelectChapters(chapterSelections)
 
-	scraper.Download(downloader.NewDownloader(&config.Downloader), "download")
+	scraper.Download(downloader.NewDownloader(
+		&config.Downloader, false,
+		scraper.EnforceChapterLength(),
+	), "download")
 
 }

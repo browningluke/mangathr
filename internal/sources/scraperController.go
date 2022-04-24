@@ -32,6 +32,8 @@ type Scraper interface {
 	ChapterTitles() []string
 
 	ScraperName() string
+
+	EnforceChapterLength() bool
 }
 
 func NewScraper(name string, config *config.Config) Scraper {
