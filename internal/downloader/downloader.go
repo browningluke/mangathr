@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gammazero/workerpool"
-	"github.com/vbauerster/mpb/v7"
+	"github.com/schollz/progressbar/v3"
 	"io"
 	"log"
 	"mangathrV2/internal/metadata"
@@ -33,7 +33,7 @@ type Page struct {
 type Job struct {
 	Title, Filename, Num, ID string
 	Metadata                 structs.Metadata
-	Bar                      *mpb.Bar
+	Bar                      *progressbar.ProgressBar
 }
 
 func NewDownloader(config *Config) *Downloader {
@@ -119,7 +119,11 @@ func (d *Downloader) GetNameFromTemplate(pluginTemplate, num, title, language st
 		conditionalLanguage, conditionalGroups)
 }
 
-func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *mpb.Bar) {
+/*
+	-- Chapter Downloading --
+*/
+
+func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *progressbar.ProgressBar) {
 	// TODO: differentiate between Download & Update delay
 	dur, err := time.ParseDuration(d.config.Delay.Chapter)
 	if err != nil {
@@ -133,7 +137,10 @@ func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *m
 
 	if _, err := os.Stat(chapterPath); err == nil {
 		fmt.Println("Chapter already exists.")
-		bar.Abort(true)
+		err := bar.Finish()
+		if err != nil {
+			panic(err)
+		}
 		return
 	} else if errors.Is(err, os.ErrNotExist) {
 		// Create empty file
@@ -169,7 +176,10 @@ func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *m
 				if err := d.downloadImage(image.Url, image.Filename, zipWriter, &mu); err != nil {
 					log.Fatalln(err)
 				}
-				bar.Increment()
+				err := bar.Add(1)
+				if err != nil {
+					panic(err)
+				}
 			})
 
 		}

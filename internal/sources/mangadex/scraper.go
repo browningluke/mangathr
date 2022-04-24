@@ -3,12 +3,12 @@ package mangadex
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/schollz/progressbar/v3"
 	"mangathrV2/internal/downloader"
 	"mangathrV2/internal/logging"
 	"mangathrV2/internal/rester"
 	"mangathrV2/internal/sources/structs"
 	"mangathrV2/internal/utils"
-	"mangathrV2/internal/utils/ui"
 	"math"
 	"strconv"
 	"strings"
@@ -311,8 +311,6 @@ func (m *Scraper) getChapterPages(id string) []downloader.Page {
 func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 	// downloadType is one of ["download", "update"]
 	path := dl.CreateDirectory(m.manga.title, downloadType)
-	progress := ui.CreateProgress()
-
 	downloadQueue := make([]downloader.Job, len(m.selectedChapters))
 
 	for i, chapter := range m.selectedChapters {
@@ -332,8 +330,9 @@ func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 	runJob := func(job downloader.Job) {
 		pages := m.getChapterPages(job.ID)
 
-		bar := ui.AddBar(progress, int64(len(pages)),
-			fmt.Sprintf("Chapter %s", job.Num))
+		progress := progressbar.NewOptions(len(pages),
+			progressbar.OptionSetDescription(fmt.Sprintf("Chapter %s", job.Num)),
+		)
 
 		mdAgent := dl.MetadataAgent()
 		(*mdAgent).SetTitle(job.Title)
@@ -341,7 +340,9 @@ func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 		(*mdAgent).SetWebLink(job.Metadata.Link)
 		(*mdAgent).SetDate(job.Metadata.Date)
 		(*mdAgent).SetEditors(job.Metadata.Groups)
-		dl.Download(path, job.Filename, pages, bar)
+		dl.Download(path, job.Filename, pages, progress)
+
+		fmt.Println("") // Create a new bar for each chapter
 	}
 
 	// Execute download queue, potential to add workerpool here later
@@ -349,7 +350,6 @@ func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 		runJob(job)
 	}
 
-	progress.Wait()
 }
 
 /*
