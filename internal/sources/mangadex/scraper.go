@@ -78,8 +78,18 @@ func (m *Scraper) Search(query string) []string {
 	var names []string
 
 	for _, item := range mangaResp.Data {
-		searchResults = append(searchResults, searchResult{title: item.Attributes.Title["en"], id: item.Id})
-		names = append(names, item.Attributes.Title["en"])
+		name := item.Attributes.Title["en"]
+		if name == "" {
+			for _, n := range item.Attributes.Title {
+				name = n
+				break
+			}
+		}
+
+		sr := searchResult{title: name, id: item.Id}
+
+		searchResults = append(searchResults, sr)
+		names = append(names, name)
 	}
 
 	m.searchResults = searchResults
