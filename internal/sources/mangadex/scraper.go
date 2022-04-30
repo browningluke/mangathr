@@ -25,7 +25,7 @@ type Scraper struct {
 	allChapters, selectedChapters []chapterResult
 
 	// Group queries
-	groups map[string]string // Map groupID -> groupName
+	groups []string
 }
 
 type searchResult struct {
@@ -43,12 +43,11 @@ type chapterResult struct {
 func NewScraper(config *Config) *Scraper {
 	logging.Infoln("Created a Mangadex scraper")
 	s := &Scraper{config: config}
-	s.groups = make(map[string]string)
 	return s
 }
 
 /*
-	-- Manga --
+	-- Searching --
 */
 
 // Search for a Manga, will fill searchResults with 0 or more results
@@ -97,25 +96,6 @@ func (m *Scraper) Search(query string) []string {
 	return names
 }
 
-// SelectManga from searchResults list
-func (m *Scraper) SelectManga(name string) {
-	found := false
-	for _, item := range m.searchResults {
-		if item.title == name {
-			m.manga = item
-			found = true
-			break
-		}
-	}
-
-	if !found {
-		panic("Selected manga not is search result list")
-	}
-
-	// Once manga has been selected, clear all search results
-	m.searchResults = []searchResult{}
-}
-
 // SearchByID for a Manga, will fill searchResults with ONLY 1 result (first result)
 func (m *Scraper) SearchByID(id string) interface{} {
 	//TODO implement me
@@ -123,7 +103,7 @@ func (m *Scraper) SearchByID(id string) interface{} {
 }
 
 /*
-	-- Chapters --
+	-- Chapter scraping --
 */
 
 func (m *Scraper) scrapeChapters() {
@@ -135,6 +115,10 @@ func (m *Scraper) scrapeChapters() {
 
 	for _, language := range m.config.LanguageFilter {
 		queryParams = append(queryParams, rester.QueryParam{Key: "translatedLanguage[]", Value: language, Encode: true})
+	}
+
+	for _, rating := range m.config.RatingFilter {
+		queryParams = append(queryParams, rester.QueryParam{Key: "contentRating[]", Value: rating, Encode: true})
 	}
 
 	getMangaFeedResp := func(offset int) mangaFeedResponse {
@@ -194,6 +178,20 @@ func (m *Scraper) scrapeChapters() {
 				}
 			}
 
+			// Add groups to scraper
+			for _, group := range groups {
+				skip := false
+				for _, a := range m.groups {
+					if a == group {
+						skip = true
+						break
+					}
+				}
+				if !skip {
+					m.groups = append(m.groups, group)
+				}
+			}
+
 			// Generate title padding
 			titlePadding := ""
 
@@ -234,28 +232,23 @@ func (m *Scraper) scrapeChapters() {
 	m.allChapters = searchResults
 }
 
-func (m *Scraper) Chapters() []structs.Chapter {
-	if len(m.allChapters) == 0 {
-		m.scrapeChapters()
+// SelectManga from searchResults list
+func (m *Scraper) SelectManga(name string) {
+	found := false
+	for _, item := range m.searchResults {
+		if item.title == name {
+			m.manga = item
+			found = true
+			break
+		}
 	}
 
-	var chapters []structs.Chapter
-	for _, item := range m.allChapters {
-		chapters = append(chapters, structs.Chapter{
-			ID: item.id, Title: item.prettyTitle, Num: item.num, Metadata: item.metadata})
+	if !found {
+		panic("Selected manga not is search result list")
 	}
-	return chapters
-}
 
-func (m *Scraper) ChapterTitles() []string {
-	if len(m.allChapters) == 0 {
-		m.scrapeChapters()
-	}
-	var titles []string
-	for _, item := range m.allChapters {
-		titles = append(titles, item.promptTitle)
-	}
-	return titles
+	// Once manga has been selected, clear all search results
+	m.searchResults = []searchResult{}
 }
 
 func (m *Scraper) SelectChapters(titles []string) {
@@ -272,6 +265,91 @@ func (m *Scraper) SelectChapters(titles []string) {
 
 	// Once chapters have been selected, clear all chapters
 	m.allChapters = []chapterResult{}
+}
+
+func (m *Scraper) SelectNewChapters(chapters []structs.Chapter) []structs.Chapter {
+	//TODO implement me
+	panic("implement me")
+}
+
+/*
+	-- Chapter data --
+*/
+
+// Getters
+
+func (m *Scraper) Chapters() []structs.Chapter {
+	if len(m.allChapters) == 0 {
+		m.scrapeChapters()
+	}
+
+	c := m.allChapters
+
+	if len(m.selectedChapters) != 0 {
+		c = m.selectedChapters
+	}
+
+	var chapters []structs.Chapter
+	for _, item := range c {
+		chapters = append(chapters,
+			structs.Chapter{ID: item.id, Title: item.prettyTitle, Num: item.num, Metadata: item.metadata})
+	}
+	return chapters
+}
+
+func (m *Scraper) ChapterTitles() []string {
+	if len(m.allChapters) == 0 {
+		m.scrapeChapters()
+	}
+
+	chapters := m.allChapters
+
+	if len(m.selectedChapters) != 0 {
+		chapters = m.selectedChapters
+	}
+
+	var titles []string
+	for _, item := range chapters {
+		titles = append(titles, item.promptTitle)
+	}
+	return titles
+}
+
+func (m *Scraper) GroupNames() []string {
+	if len(m.groups) == 0 {
+		m.Chapters()
+	}
+
+	var groupNames []string
+	for _, val := range m.groups {
+		groupNames = append(groupNames, val)
+	}
+	return groupNames
+}
+
+// Setters
+
+func (m *Scraper) FilterGroups(groups []string) {
+	findElemInSlice := func(slice []string, elem string) bool {
+		for _, v := range slice {
+			if elem == v {
+				return true
+			}
+		}
+		return false
+	}
+
+	var selectedChapters []chapterResult
+	for _, chapter := range m.allChapters { // go through each chapter
+		for _, group := range groups { // go through each filtered group
+			exists := findElemInSlice(chapter.metadata.Groups, group)
+			if exists {
+				selectedChapters = append(selectedChapters, chapter)
+				break
+			}
+		}
+	}
+	m.selectedChapters = selectedChapters
 }
 
 /*

@@ -8,16 +8,34 @@ import (
 )
 
 type Scraper interface {
-	// Searching
+	/*
+		-- Searching --
+	*/
 
 	Search(query string) []string
 	SearchByID(id string) interface{}
 
-	// Selection
+	/*
+		-- Chapter scraping --
+	*/
 
 	SelectManga(name string)
-	//SelectNewChapters() interface{}
+	SelectNewChapters(chapters []structs.Chapter) []structs.Chapter
 	SelectChapters(titles []string)
+
+	/*
+		-- Chapter data --
+	*/
+
+	// Getters
+
+	Chapters() []structs.Chapter
+	ChapterTitles() []string
+	GroupNames() []string
+
+	// Setters
+
+	FilterGroups(groups []string)
 
 	// Downloading
 
@@ -25,14 +43,9 @@ type Scraper interface {
 
 	// Getters
 
-	MangaID() string
 	MangaTitle() string
-
-	Chapters() []structs.Chapter
-	ChapterTitles() []string
-
+	MangaID() string
 	ScraperName() string
-
 	EnforceChapterLength() bool
 }
 
