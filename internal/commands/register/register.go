@@ -5,19 +5,23 @@ import (
 	"log"
 	"mangathrV2/internal/config"
 	"mangathrV2/internal/database"
+	"mangathrV2/internal/downloader"
 	"mangathrV2/internal/sources"
 	"mangathrV2/internal/utils/ui"
+	"strings"
 )
 
 type options struct {
-	title         string
-	chapterTitles []string
-	source        string
-	mapping       string
-	scraper       *sources.Scraper
+	title          string
+	mapping        string
+	filteredGroups []string
+	scraper        *sources.Scraper
 }
 
 func generateString(opts *options, prompt string) string {
+	chapterTitles := (*opts.scraper).ChapterTitles()
+	source := (*opts.scraper).ScraperName()
+
 	return fmt.Sprintf(
 		"\rTitle: %s"+
 			"\nSource: %s"+
@@ -25,9 +29,10 @@ func generateString(opts *options, prompt string) string {
 			"\nLatest Chapter: %s"+
 			"\nFirst  Chapter: %s"+
 			"\nMapped to: ./%s"+
+			"\nFiltered groups: [%s]"+
 			"\n%s",
-		opts.title, opts.source, len(opts.chapterTitles), opts.chapterTitles[0],
-		opts.chapterTitles[len(opts.chapterTitles)-1], opts.mapping, prompt)
+		opts.title, source, len(chapterTitles), chapterTitles[0],
+		chapterTitles[len(chapterTitles)-1], opts.mapping, strings.Join(opts.filteredGroups, ", "), prompt)
 }
 
 func handleRegisterMenu(opts *options, driver *database.Driver) bool {
@@ -37,8 +42,9 @@ func handleRegisterMenu(opts *options, driver *database.Driver) bool {
 		fmt.Println("confirmed")
 
 		mangaID := (*opts.scraper).MangaID()
+		source := (*opts.scraper).ScraperName()
 
-		manga, err := driver.CreateManga(mangaID, opts.title, opts.source, opts.mapping)
+		manga, err := driver.CreateManga(mangaID, opts.title, source, opts.mapping, opts.filteredGroups)
 		if err != nil {
 			panic(err)
 		}
@@ -59,12 +65,19 @@ func handleRegisterMenu(opts *options, driver *database.Driver) bool {
 }
 
 func handleCustomizeMenu(opts *options) bool {
-	option := ui.SingleCheckboxes("Select an option", []string{"Change mapping", "Back"})
+	option := ui.SingleCheckboxes("Select an option",
+		[]string{"Change mapping", "Filter groups", "Back"})
 
 	switch option {
 	case "Change mapping":
 		res := ui.InputPrompt("Map to:")
-		opts.mapping = res
+		opts.mapping = downloader.CleanPath(res)
+		return true
+	case "Filter groups":
+		groups := (*opts.scraper).GroupNames()
+		selectedGroups := ui.Checkboxes("Select groups to filter: ", groups)
+		opts.filteredGroups = selectedGroups
+		(*opts.scraper).FilterGroups(selectedGroups)
 		return true
 	case "Back":
 		return true
@@ -85,20 +98,17 @@ func promptMainMenu(args *Args, config *config.Config, driver *database.Driver) 
 		selection = ui.SingleCheckboxes("Select Manga:", titles)
 	}
 	scraper.SelectManga(selection)
-
-	chapterTitles := scraper.ChapterTitles()
 	mangaTitle := scraper.MangaTitle()
-	sourceName := scraper.ScraperName()
+
 	opts := options{
-		title:         mangaTitle,
-		chapterTitles: chapterTitles,
-		source:        sourceName,
-		mapping:       mangaTitle,
-		scraper:       &scraper,
+		title:          mangaTitle,
+		mapping:        downloader.CleanPath(mangaTitle),
+		scraper:        &scraper,
+		filteredGroups: []string{},
 	}
 
-	if _, err := driver.QueryManga(scraper.MangaID()); err == nil {
-		fmt.Printf("Title: %s\nSource: %s\n", mangaTitle, sourceName)
+	if exists, _ := driver.CheckMangaExistence(scraper.MangaID()); exists {
+		fmt.Printf("Title: %s\nSource: %s\n", mangaTitle, scraper.ScraperName())
 		ui.PrintlnColor(fmt.Sprint("Manga is already registered. Exiting..."), ui.Red)
 		return
 	}
@@ -133,6 +143,4 @@ func Run(args *Args, config *config.Config) {
 	}(driver)
 
 	promptMainMenu(args, config, driver)
-
-	// Close database
 }

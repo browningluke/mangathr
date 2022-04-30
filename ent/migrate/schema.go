@@ -40,6 +40,7 @@ var (
 		{Name: "title", Type: field.TypeString},
 		{Name: "mapping", Type: field.TypeString},
 		{Name: "registered_on", Type: field.TypeTime},
+		{Name: "filtered_groups", Type: field.TypeJSON},
 	}
 	// MangasTable holds the schema information for the "mangas" table.
 	MangasTable = &schema.Table{

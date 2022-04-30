@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func (d *Driver) createManga(mangaID, title, source, mapping string) (*ent.Manga, error) {
+func (d *Driver) createManga(mangaID, title, source, mapping string, groups []string) (*ent.Manga, error) {
 	u, err := d.client.Manga.
 		Create().
 		SetMangaID(mangaID).
@@ -15,6 +15,7 @@ func (d *Driver) createManga(mangaID, title, source, mapping string) (*ent.Manga
 		SetSource(source).
 		SetMapping(mapping).
 		SetRegisteredOn(time.Now()).
+		SetFilteredGroups(groups).
 		Save(d.ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating user: %w", err)
@@ -23,10 +24,10 @@ func (d *Driver) createManga(mangaID, title, source, mapping string) (*ent.Manga
 	return u, nil
 }
 
-func (d *Driver) CreateManga(mangaID, title, source, mapping string) (*ent.Manga, error) {
+func (d *Driver) CreateManga(mangaID, title, source, mapping string, groups []string) (*ent.Manga, error) {
 	manga, err := d.QueryManga(mangaID)
 	if err != nil {
-		return d.createManga(mangaID, title, source, mapping)
+		return d.createManga(mangaID, title, source, mapping, groups)
 	}
 	return manga, nil
 }

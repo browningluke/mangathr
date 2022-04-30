@@ -676,6 +676,7 @@ type MangaMutation struct {
 	_Title           *string
 	_Mapping         *string
 	_RegisteredOn    *time.Time
+	_FilteredGroups  *[]string
 	clearedFields    map[string]struct{}
 	_Chapters        map[int]struct{}
 	removed_Chapters map[int]struct{}
@@ -963,6 +964,42 @@ func (m *MangaMutation) ResetRegisteredOn() {
 	m._RegisteredOn = nil
 }
 
+// SetFilteredGroups sets the "FilteredGroups" field.
+func (m *MangaMutation) SetFilteredGroups(s []string) {
+	m._FilteredGroups = &s
+}
+
+// FilteredGroups returns the value of the "FilteredGroups" field in the mutation.
+func (m *MangaMutation) FilteredGroups() (r []string, exists bool) {
+	v := m._FilteredGroups
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFilteredGroups returns the old "FilteredGroups" field's value of the Manga entity.
+// If the Manga object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MangaMutation) OldFilteredGroups(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFilteredGroups is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFilteredGroups requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFilteredGroups: %w", err)
+	}
+	return oldValue.FilteredGroups, nil
+}
+
+// ResetFilteredGroups resets all changes to the "FilteredGroups" field.
+func (m *MangaMutation) ResetFilteredGroups() {
+	m._FilteredGroups = nil
+}
+
 // AddChapterIDs adds the "Chapters" edge to the Chapter entity by ids.
 func (m *MangaMutation) AddChapterIDs(ids ...int) {
 	if m._Chapters == nil {
@@ -1036,7 +1073,7 @@ func (m *MangaMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MangaMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m._MangaID != nil {
 		fields = append(fields, manga.FieldMangaID)
 	}
@@ -1051,6 +1088,9 @@ func (m *MangaMutation) Fields() []string {
 	}
 	if m._RegisteredOn != nil {
 		fields = append(fields, manga.FieldRegisteredOn)
+	}
+	if m._FilteredGroups != nil {
+		fields = append(fields, manga.FieldFilteredGroups)
 	}
 	return fields
 }
@@ -1070,6 +1110,8 @@ func (m *MangaMutation) Field(name string) (ent.Value, bool) {
 		return m.Mapping()
 	case manga.FieldRegisteredOn:
 		return m.RegisteredOn()
+	case manga.FieldFilteredGroups:
+		return m.FilteredGroups()
 	}
 	return nil, false
 }
@@ -1089,6 +1131,8 @@ func (m *MangaMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldMapping(ctx)
 	case manga.FieldRegisteredOn:
 		return m.OldRegisteredOn(ctx)
+	case manga.FieldFilteredGroups:
+		return m.OldFilteredGroups(ctx)
 	}
 	return nil, fmt.Errorf("unknown Manga field %s", name)
 }
@@ -1132,6 +1176,13 @@ func (m *MangaMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetRegisteredOn(v)
+		return nil
+	case manga.FieldFilteredGroups:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFilteredGroups(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Manga field %s", name)
@@ -1196,6 +1247,9 @@ func (m *MangaMutation) ResetField(name string) error {
 		return nil
 	case manga.FieldRegisteredOn:
 		m.ResetRegisteredOn()
+		return nil
+	case manga.FieldFilteredGroups:
+		m.ResetFilteredGroups()
 		return nil
 	}
 	return fmt.Errorf("unknown Manga field %s", name)

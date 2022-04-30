@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"mangathrV2/ent/manga"
 	"strings"
@@ -26,6 +27,8 @@ type Manga struct {
 	Mapping string `json:"Mapping,omitempty"`
 	// RegisteredOn holds the value of the "RegisteredOn" field.
 	RegisteredOn time.Time `json:"RegisteredOn,omitempty"`
+	// FilteredGroups holds the value of the "FilteredGroups" field.
+	FilteredGroups []string `json:"FilteredGroups,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MangaQuery when eager-loading is set.
 	Edges MangaEdges `json:"edges"`
@@ -54,6 +57,8 @@ func (*Manga) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case manga.FieldFilteredGroups:
+			values[i] = new([]byte)
 		case manga.FieldID:
 			values[i] = new(sql.NullInt64)
 		case manga.FieldMangaID, manga.FieldSource, manga.FieldTitle, manga.FieldMapping:
@@ -111,6 +116,14 @@ func (m *Manga) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				m.RegisteredOn = value.Time
 			}
+		case manga.FieldFilteredGroups:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field FilteredGroups", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &m.FilteredGroups); err != nil {
+					return fmt.Errorf("unmarshal field FilteredGroups: %w", err)
+				}
+			}
 		}
 	}
 	return nil
@@ -154,6 +167,8 @@ func (m *Manga) String() string {
 	builder.WriteString(m.Mapping)
 	builder.WriteString(", RegisteredOn=")
 	builder.WriteString(m.RegisteredOn.Format(time.ANSIC))
+	builder.WriteString(", FilteredGroups=")
+	builder.WriteString(fmt.Sprintf("%v", m.FilteredGroups))
 	builder.WriteByte(')')
 	return builder.String()
 }

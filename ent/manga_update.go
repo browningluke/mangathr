@@ -59,6 +59,12 @@ func (mu *MangaUpdate) SetRegisteredOn(t time.Time) *MangaUpdate {
 	return mu
 }
 
+// SetFilteredGroups sets the "FilteredGroups" field.
+func (mu *MangaUpdate) SetFilteredGroups(s []string) *MangaUpdate {
+	mu.mutation.SetFilteredGroups(s)
+	return mu
+}
+
 // AddChapterIDs adds the "Chapters" edge to the Chapter entity by IDs.
 func (mu *MangaUpdate) AddChapterIDs(ids ...int) *MangaUpdate {
 	mu.mutation.AddChapterIDs(ids...)
@@ -207,6 +213,13 @@ func (mu *MangaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: manga.FieldRegisteredOn,
 		})
 	}
+	if value, ok := mu.mutation.FilteredGroups(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Value:  value,
+			Column: manga.FieldFilteredGroups,
+		})
+	}
 	if mu.mutation.ChaptersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -307,6 +320,12 @@ func (muo *MangaUpdateOne) SetMapping(s string) *MangaUpdateOne {
 // SetRegisteredOn sets the "RegisteredOn" field.
 func (muo *MangaUpdateOne) SetRegisteredOn(t time.Time) *MangaUpdateOne {
 	muo.mutation.SetRegisteredOn(t)
+	return muo
+}
+
+// SetFilteredGroups sets the "FilteredGroups" field.
+func (muo *MangaUpdateOne) SetFilteredGroups(s []string) *MangaUpdateOne {
+	muo.mutation.SetFilteredGroups(s)
 	return muo
 }
 
@@ -480,6 +499,13 @@ func (muo *MangaUpdateOne) sqlSave(ctx context.Context) (_node *Manga, err error
 			Type:   field.TypeTime,
 			Value:  value,
 			Column: manga.FieldRegisteredOn,
+		})
+	}
+	if value, ok := muo.mutation.FilteredGroups(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Value:  value,
+			Column: manga.FieldFilteredGroups,
 		})
 	}
 	if muo.mutation.ChaptersCleared() {
