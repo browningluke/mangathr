@@ -64,7 +64,7 @@ func (d *Downloader) SetChapterDuration(duration int64) {
 	-- Utils --
 */
 
-func cleanPath(path string) string {
+func CleanPath(path string) string {
 	re := regexp.MustCompile(`[<>:"\\|/?*]|\.([<>:"\\|/?*]|$)+`)
 	return re.ReplaceAllString(path, "")
 }
@@ -94,7 +94,7 @@ func (d *Downloader) CreateDirectory(title, downloadType string) string {
 		}
 	}
 
-	newPath := filepath.Join(dirname, cleanPath(title))
+	newPath := filepath.Join(dirname, CleanPath(title))
 	err := os.MkdirAll(newPath, os.ModePerm)
 	if err != nil {
 		log.Fatalln(err)
@@ -154,7 +154,7 @@ func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *p
 
 	//fmt.Println(chapterFilename)
 
-	chapterPath := filepath.Join(path, fmt.Sprintf("%s.cbz", cleanPath(chapterFilename)))
+	chapterPath := filepath.Join(path, fmt.Sprintf("%s.cbz", CleanPath(chapterFilename)))
 
 	if _, err := os.Stat(chapterPath); err == nil {
 		fmt.Println("Chapter already exists.")
