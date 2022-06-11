@@ -380,7 +380,6 @@ func (m *Scraper) getChapterPages(id string) []downloader.Page {
 
 			time.Sleep(time.Duration(timeDiff) * time.Second)
 		}
-
 	})
 
 	jsonString := resInterface.(string)
@@ -394,6 +393,8 @@ func (m *Scraper) getChapterPages(id string) []downloader.Page {
 
 	length := len(chapterResp.Chapter.Data)
 	digits := int(math.Floor(math.Log10(float64(length))) + 1)
+
+	logging.Debugln("Chapter pages: ", jsonString)
 
 	getPages := func(slice []string, key string) []downloader.Page {
 		var pages []downloader.Page
@@ -421,6 +422,8 @@ func (m *Scraper) getChapterPages(id string) []downloader.Page {
 }
 
 func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
+	logging.Debugln("Downloading...")
+
 	chaptersPerMinute := 60 // set from API docs
 	duration := int64((chaptersPerMinute * 1000) / 40)
 	if numChapters := len(m.selectedChapters); numChapters < chaptersPerMinute {

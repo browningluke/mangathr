@@ -50,10 +50,14 @@ func (r RESTer) Do(retries int, timeout string) interface{} {
 	if retries == 0 {
 		panic(errors.New("retried too many times, giving up"))
 	}
-	body, _, err := r.job()
+	body, res, err := r.job()
 
 	if err != nil {
 		fmt.Printf("Failed, retrying... (retries left %d)\n", retries)
+		logging.Debugln("Status code: ", res.StatusCode)
+		logging.Debugln("Body: ", body)
+		logging.Debugln("Error: ", err)
+
 		dur, err := time.ParseDuration(timeout)
 		if err != nil {
 			panic(err)
@@ -72,6 +76,10 @@ func (r RESTer) DoWithHelperFunc(retries int, timeout string, f func(res Respons
 
 	if res.StatusCode != 200 || err != nil {
 		fmt.Printf("Failed, retrying... (retries left %d)\n", retries)
+		logging.Debugln("Status code: ", res.StatusCode)
+		logging.Debugln("Body: ", body)
+		logging.Debugln("Error: ", err)
+
 		f(res, err)
 		dur, err := time.ParseDuration(timeout)
 		if err != nil {
@@ -80,6 +88,9 @@ func (r RESTer) DoWithHelperFunc(retries int, timeout string, f func(res Respons
 		time.Sleep(dur)
 		return r.DoWithHelperFunc(retries-1, timeout, f)
 	}
+
+	logging.Debugln("Status code: ", res.StatusCode)
+	logging.Debugln("Error: ", err)
 	return body
 }
 

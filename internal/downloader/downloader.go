@@ -193,7 +193,7 @@ func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *p
 		var mu sync.Mutex
 
 		for _, image := range pages {
-			//fmt.Println("Processing " + image.Filename + ".png")
+			logging.Debugln("Processing " + image.Filename)
 			//fmt.Println("Adding ", image.Filename)
 			image := image
 			zipWriter := zipWriter
@@ -243,6 +243,8 @@ func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *p
 }
 
 func (d *Downloader) downloadImage(url, filename string, zipWriter *zip.Writer, mu *sync.Mutex) error {
+	logging.Debugln("Starting download of page: ", filename)
+
 	dur, err := time.ParseDuration(d.config.Delay.Page)
 	if err != nil {
 		return err
@@ -253,7 +255,7 @@ func (d *Downloader) downloadImage(url, filename string, zipWriter *zip.Writer, 
 		map[string]string{},
 		[]rester.QueryParam{}).Do(d.config.PageRetries, "100ms").([]byte)
 
-	//fmt.Println("Downloading image: ", filename)
+	logging.Debugln("Downloaded page. Byte length: ", len(imageBytes))
 
 	mu.Lock()
 	defer mu.Unlock()
