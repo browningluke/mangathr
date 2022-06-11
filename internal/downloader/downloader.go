@@ -9,6 +9,7 @@ import (
 	"github.com/schollz/progressbar/v3"
 	"io"
 	"log"
+	"mangathrV2/internal/logging"
 	"mangathrV2/internal/metadata"
 	"mangathrV2/internal/rester"
 	"mangathrV2/internal/sources/structs"
@@ -156,13 +157,18 @@ func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *p
 
 	chapterPath := filepath.Join(path, fmt.Sprintf("%s.cbz", CleanPath(chapterFilename)))
 
-	if _, err := os.Stat(chapterPath); err == nil {
+	if d.config.DryRun {
+		fmt.Println("DRY RUN: not downloading")
+		err := bar.Finish()
+		if err != nil {
+			panic(err)
+		}
+	} else if _, err := os.Stat(chapterPath); err == nil {
 		fmt.Println("Chapter already exists.")
 		err := bar.Finish()
 		if err != nil {
 			panic(err)
 		}
-		return
 	} else if errors.Is(err, os.ErrNotExist) {
 		// Create empty file
 		archive, err := os.Create(chapterPath)

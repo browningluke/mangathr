@@ -62,6 +62,8 @@ func main() {
 	logging.Debugln(c)
 	logging.Debugln(a)
 
+	c.Downloader.DryRun = a.Options.DryRun
+
 	switch a.Command {
 	case "download":
 		logging.Infoln("Downloading", a.Download)

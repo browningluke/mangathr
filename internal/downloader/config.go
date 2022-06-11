@@ -1,8 +1,9 @@
 package downloader
 
 type Config struct {
-	SimultaneousPages int `yaml:"simultaneousPages"`
-	PageRetries       int `yaml:"pageRetries"`
+	DryRun            bool `yaml:"dryRun"`
+	SimultaneousPages int  `yaml:"simultaneousPages"`
+	PageRetries       int  `yaml:"pageRetries"`
 	Delay             struct {
 		Page          string
 		Chapter       string

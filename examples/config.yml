@@ -4,6 +4,7 @@ database:
   driver: "sqlite"
   uri: "./examples/database.sqlite"
 downloader:
+  dryRun: false
   simultaneousPages: 2
   pageRetries: 5
   delay:
