@@ -2,8 +2,8 @@ package database
 
 import (
 	"fmt"
-	"log"
 	"mangathrV2/ent"
+	"mangathrV2/internal/logging"
 	"time"
 )
 
@@ -18,9 +18,9 @@ func (d *Driver) createManga(mangaID, title, source, mapping string, groups []st
 		SetFilteredGroups(groups).
 		Save(d.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed creating user: %w", err)
+		return nil, fmt.Errorf("failed creating manga: %w", err)
 	}
-	log.Println("user was created: ", u)
+	logging.Debugln("manga was created: ", u)
 	return u, nil
 }
 

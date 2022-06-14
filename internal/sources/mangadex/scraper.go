@@ -41,7 +41,7 @@ type chapterResult struct {
 }
 
 func NewScraper(config *Config) *Scraper {
-	logging.Infoln("Created a Mangadex scraper")
+	logging.Debugln("Created a Mangadex scraper")
 	s := &Scraper{config: config}
 	return s
 }

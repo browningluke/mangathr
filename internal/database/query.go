@@ -2,9 +2,9 @@ package database
 
 import (
 	"fmt"
-	"log"
 	"mangathrV2/ent"
 	"mangathrV2/ent/manga"
+	"mangathrV2/internal/logging"
 )
 
 func (d *Driver) queryManga(mangaID string, eager bool) (*ent.Manga, error) {
@@ -18,7 +18,7 @@ func (d *Driver) queryManga(mangaID string, eager bool) (*ent.Manga, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed querying user: %w", err)
 	}
-	log.Println("user returned: ", u)
+	logging.Debugln("manga returned: ", u)
 	return u, nil
 }
 
@@ -38,12 +38,10 @@ func (d *Driver) QueryAllManga() ([]*ent.Manga, error) {
 	u, err := d.client.Manga.
 		Query().
 		WithChapters().
-		// `Only` fails if no user found,
-		// or more than 1 user returned.
 		All(d.ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed querying user: %w", err)
 	}
-	log.Println("user returned: ", u)
+	logging.Debugln("manga returned: ", u)
 	return u, nil
 }
