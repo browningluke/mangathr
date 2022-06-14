@@ -2,6 +2,7 @@ package mangadex
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/schollz/progressbar/v3"
 	"mangathrV2/internal/downloader"
@@ -98,9 +99,20 @@ func (m *Scraper) Search(query string) []string {
 }
 
 // SearchByID for a Manga, will fill searchResults with ONLY 1 result (first result)
-func (m *Scraper) SearchByID(id string) interface{} {
-	//TODO implement me
-	panic("implement me")
+func (m *Scraper) SearchByID(id, title string) error {
+
+	// Test if ID is valid
+	_, resp := rester.New().Get(
+		fmt.Sprintf("https://api.mangadex.org/manga/%s", id),
+		map[string]string{},
+		[]rester.QueryParam{}).Do(4, "100ms")
+
+	if resp.StatusCode != 200 {
+		return errors.New("SearchByID: validation status code != 200")
+	}
+
+	m.manga = searchResult{title: title, id: id}
+	return nil
 }
 
 /*
@@ -270,8 +282,37 @@ func (m *Scraper) SelectChapters(titles []string) {
 }
 
 func (m *Scraper) SelectNewChapters(chapters []structs.Chapter) []structs.Chapter {
-	//TODO implement me
-	panic("implement me")
+	// Populate .allChapters
+	_ = m.Chapters()
+
+	var diffChapters []chapterResult
+	for _, newChapter := range m.allChapters {
+		exists := false
+		for _, oldChapter := range chapters {
+			if oldChapter.ID == newChapter.id {
+				exists = true
+				break
+			}
+		}
+		if !exists {
+			diffChapters = append(diffChapters, newChapter)
+		}
+	}
+	m.selectedChapters = diffChapters
+	m.allChapters = []chapterResult{}
+
+	logging.Debugln("SelectNewChapters: New chapters: ", diffChapters)
+	var diffStructChapters []structs.Chapter
+	for _, chapter := range diffChapters {
+		diffStructChapters = append(diffStructChapters, structs.Chapter{
+			ID:       chapter.id,
+			Num:      chapter.num,
+			Title:    chapter.title,
+			Metadata: chapter.metadata,
+		})
+	}
+
+	return diffStructChapters
 }
 
 /*
@@ -281,7 +322,7 @@ func (m *Scraper) SelectNewChapters(chapters []structs.Chapter) []structs.Chapte
 // Getters
 
 func (m *Scraper) Chapters() []structs.Chapter {
-	if len(m.allChapters) == 0 {
+	if len(m.allChapters) == 0 && len(m.selectedChapters) == 0 {
 		m.scrapeChapters()
 	}
 
@@ -300,7 +341,7 @@ func (m *Scraper) Chapters() []structs.Chapter {
 }
 
 func (m *Scraper) ChapterTitles() []string {
-	if len(m.allChapters) == 0 {
+	if len(m.allChapters) == 0 && len(m.selectedChapters) == 0 {
 		m.scrapeChapters()
 	}
 

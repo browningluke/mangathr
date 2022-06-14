@@ -5,6 +5,7 @@ import (
 	"mangathrV2/internal/downloader"
 	"mangathrV2/internal/sources/mangadex"
 	"mangathrV2/internal/sources/structs"
+	"strings"
 )
 
 type Scraper interface {
@@ -13,7 +14,7 @@ type Scraper interface {
 	*/
 
 	Search(query string) []string
-	SearchByID(id string) interface{}
+	SearchByID(id, title string) error
 
 	/*
 		-- Chapter scraping --
@@ -50,6 +51,8 @@ type Scraper interface {
 }
 
 func NewScraper(name string, config *config.Config) Scraper {
+	name = strings.ToLower(name)
+
 	m := map[string]func() Scraper{
 		"mangadex": func() Scraper { return mangadex.NewScraper(&config.Sources.Mangadex) },
 		//"cubari":   func() Scraper { return cubari.NewScraper() },
