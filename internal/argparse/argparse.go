@@ -47,6 +47,8 @@ func (a *Argparse) Parse() error {
 	registerQuery := registerCmd.String("q", "query", &argparse.Options{Help: "", Required: true})
 	registerYes := registerCmd.Flag("y", "yes", &argparse.Options{Help: "", Required: false})
 
+	updateCmd := parser.NewCommand("update", "")
+
 	err := parser.Parse(os.Args)
 	if err != nil {
 		return err
@@ -66,6 +68,8 @@ func (a *Argparse) Parse() error {
 		a.Register.Yes = *registerYes
 
 		a.Register.Plugin = *registerPlugin
+	} else if updateCmd.Happened() {
+		a.Command = "update"
 	}
 
 	return nil

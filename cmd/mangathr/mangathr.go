@@ -5,6 +5,7 @@ import (
 	"mangathrV2/internal/argparse"
 	"mangathrV2/internal/commands/download"
 	"mangathrV2/internal/commands/register"
+	"mangathrV2/internal/commands/update"
 	"mangathrV2/internal/config"
 	"mangathrV2/internal/logging"
 	"mangathrV2/internal/utils"
@@ -72,6 +73,9 @@ func main() {
 	case "register":
 		logging.Infoln("Registering", a.Register)
 		register.Run(&a.Register, &c)
+	case "update":
+		logging.Infoln("Updating")
+		update.Run(&c)
 	}
 
 	// Merge Config & ArgParse (ArgParse priority) into ProgramOptions
