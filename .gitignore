@@ -2,3 +2,5 @@
 build/**
 downloads/**
 *.sqlite
+
+downloads-update/
