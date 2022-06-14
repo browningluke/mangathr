@@ -251,9 +251,10 @@ func (d *Downloader) downloadImage(url, filename string, zipWriter *zip.Writer, 
 	}
 	time.Sleep(dur)
 
-	imageBytes := rester.New().GetBytes(url,
+	imageBytesResp, _ := rester.New().GetBytes(url,
 		map[string]string{},
-		[]rester.QueryParam{}).Do(d.config.PageRetries, "100ms").([]byte)
+		[]rester.QueryParam{}).Do(d.config.PageRetries, "100ms")
+	imageBytes := imageBytesResp.([]byte)
 
 	logging.Debugln("Downloaded page. Byte length: ", len(imageBytes))
 

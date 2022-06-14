@@ -47,7 +47,7 @@ func New() *RESTer {
 	}
 }
 
-func (r RESTer) Do(retries int, timeout string) interface{} {
+func (r RESTer) Do(retries int, timeout string) (interface{}, Response) {
 	if retries == 0 {
 		panic(errors.New("retried too many times, giving up"))
 	}
@@ -66,7 +66,7 @@ func (r RESTer) Do(retries int, timeout string) interface{} {
 		time.Sleep(dur)
 		return r.Do(retries-1, timeout)
 	}
-	return body
+	return body, res
 }
 
 func (r RESTer) DoWithHelperFunc(retries int, timeout string, f func(res Response, err error)) interface{} {

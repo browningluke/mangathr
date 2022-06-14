@@ -62,10 +62,11 @@ func (m *Scraper) Search(query string) []string {
 		queryParams = append(queryParams, rester.QueryParam{Key: "contentRating[]", Value: rating, Encode: true})
 	}
 
-	jsonString := rester.New().Get(
+	jsonResp, _ := rester.New().Get(
 		"https://api.mangadex.org/manga",
 		map[string]string{},
-		queryParams).Do(4, "100ms").(string)
+		queryParams).Do(4, "100ms")
+	jsonString := jsonResp.(string)
 
 	var mangaResp mangaResponse
 	err := json.Unmarshal([]byte(jsonString), &mangaResp)
@@ -122,13 +123,14 @@ func (m *Scraper) scrapeChapters() {
 	}
 
 	getMangaFeedResp := func(offset int) mangaFeedResponse {
-		jsonString := rester.New().Get(
+		jsonResp, _ := rester.New().Get(
 			fmt.Sprintf("https://api.mangadex.org/manga/%s/feed", m.manga.id),
 			map[string]string{},
 			append(queryParams,
 				rester.QueryParam{Key: "offset", Value: strconv.Itoa(offset), Encode: true},
 				rester.QueryParam{Key: "includes[]", Value: "scanlation_group", Encode: true}),
-		).Do(4, "100ms").(string)
+		).Do(4, "100ms")
+		jsonString := jsonResp.(string)
 
 		var mangaFeedResp mangaFeedResponse
 
