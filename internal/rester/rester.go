@@ -42,7 +42,7 @@ func New() *RESTer {
 					return conn, err
 				},
 			},
-			Timeout: time.Second * 10,
+			Timeout: time.Second * 50,
 		},
 	}
 }
