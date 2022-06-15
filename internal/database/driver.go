@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"entgo.io/ent/dialect"
 	"fmt"
 	"mangathrV2/ent"
 	_ "mangathrV2/internal/database/sqlite3"
@@ -17,7 +18,7 @@ type Driver struct {
 	ctx    context.Context
 }
 
-func GetDriver(driver int) (*Driver, error) {
+func GetDriver(driver int, path string) (*Driver, error) {
 	d := Driver{}
 
 	// Extract driver information
@@ -26,8 +27,8 @@ func GetDriver(driver int) (*Driver, error) {
 
 	switch driver {
 	case SQLITE:
-		driverName = "sqlite3"
-		options = "file:examples/db.sqlite?cache=shared&_fk=1"
+		driverName = dialect.SQLite
+		options = fmt.Sprintf("file:%s?cache=shared", path)
 		break
 	default:
 		return nil, fmt.Errorf("%s", "Request driver not implemented")

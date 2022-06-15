@@ -13,7 +13,7 @@ import (
 
 func Run(config *config.Config) {
 	// Open database
-	driver, err := database.GetDriver(database.SQLITE)
+	driver, err := database.GetDriver(database.SQLITE, config.Database.Uri)
 	if err != nil {
 		logging.Errorln(err)
 	}

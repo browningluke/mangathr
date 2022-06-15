@@ -2,7 +2,7 @@
 logLevel: "INFO"
 database:
   driver: "sqlite"
-  uri: "./examples/database.sqlite"
+  uri: "examples/db.sqlite"
 downloader:
   dryRun: false
   simultaneousPages: 2

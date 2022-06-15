@@ -131,7 +131,7 @@ func promptMainMenu(args *Args, config *config.Config, driver *database.Driver) 
 
 func Run(args *Args, config *config.Config) {
 	// Open database
-	driver, err := database.GetDriver(database.SQLITE)
+	driver, err := database.GetDriver(database.SQLITE, config.Database.Uri)
 	if err != nil {
 		log.Fatalln(err)
 	}
