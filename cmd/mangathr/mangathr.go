@@ -1,7 +1,6 @@
 package main
 
 import (
-	_ "github.com/mattn/go-sqlite3"
 	"mangathrV2/internal/argparse"
 	"mangathrV2/internal/commands/download"
 	"mangathrV2/internal/commands/register"

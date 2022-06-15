@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"mangathrV2/ent"
+	_ "mangathrV2/internal/database/sqlite3"
 )
 
 const (
