@@ -510,12 +510,14 @@ func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 
 		progress := utils.CreateProgressBar(len(pages), maxRuneCount, job.Num)
 
-		mdAgent := dl.MetadataAgent()
-		(*mdAgent).SetTitle(job.Title)
-		(*mdAgent).SetNum(job.Num)
-		(*mdAgent).SetWebLink(job.Metadata.Link)
-		(*mdAgent).SetDate(job.Metadata.Date)
-		(*mdAgent).SetEditors(job.Metadata.Groups)
+		// Set MetadataAgent values
+		(*dl.MetadataAgent()).
+			SetTitle(job.Title).
+			SetNum(job.Num).
+			SetWebLink(job.Metadata.Link).
+			SetDate(job.Metadata.Date).
+			SetEditors(job.Metadata.Groups).
+			SetPageCount(len(pages))
 		dl.Download(path, job.Filename, pages, progress)
 
 		fmt.Println("") // Create a new bar for each chapter

@@ -1,22 +1,19 @@
 package metadata
 
-import (
-	"mangathrV2/internal/metadata/comicinfo"
-)
-
 type Agent interface {
 	GenerateMetadataFile() (filename, body string)
 
-	SetTitle(title string)
-	SetNum(num string)
-	SetDate(date string) // MUST BE yyyy-mm-dd
-	SetEditors(editors []string)
-	SetWebLink(link string)
+	SetTitle(title string) Agent
+	SetNum(num string) Agent
+	SetDate(date string) Agent // MUST BE yyyy-mm-dd
+	SetEditors(editors []string) Agent
+	SetWebLink(link string) Agent
+	SetPageCount(count int) Agent
 }
 
 func NewAgent(name string) Agent {
 	m := map[string]func() Agent{
-		"comicinfo": func() Agent { return comicinfo.NewAgent() },
+		"comicinfo": func() Agent { return newComicInfoAgent() },
 	}
 
 	agent, ok := m[name]
