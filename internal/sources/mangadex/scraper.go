@@ -17,6 +17,7 @@ import (
 )
 
 const (
+	SCRAPERNAME    = "Mangadex"
 	APIROOT        = "https://api.mangadex.org"
 	CHAPTERSPERMIN = 40 // set from API docs
 )
@@ -543,7 +544,7 @@ func (m *Scraper) MangaID() string {
 }
 
 func (m *Scraper) ScraperName() string {
-	return "Mangadex"
+	return SCRAPERNAME
 }
 
 func (m *Scraper) EnforceChapterDuration() bool {

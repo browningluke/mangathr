@@ -8,6 +8,17 @@ import (
 	"strings"
 )
 
+var SCRAPERS = map[string]func(c *config.Config) Scraper{
+	// Mangadex
+	strings.ToLower(mangadex.SCRAPERNAME): func(c *config.Config) Scraper {
+		return mangadex.NewScraper(&c.Sources.Mangadex)
+	},
+	// Cubari
+	//strings.ToLower(cubari.SCRAPERNAME): func(c *config.Config) Scraper {
+	//	return cubari.NewScraper(&c.Sources.Cubari)
+	//},
+}
+
 type Scraper interface {
 	/*
 		-- Searching --
@@ -51,16 +62,9 @@ type Scraper interface {
 }
 
 func NewScraper(name string, config *config.Config) Scraper {
-	name = strings.ToLower(name)
-
-	m := map[string]func() Scraper{
-		"mangadex": func() Scraper { return mangadex.NewScraper(&config.Sources.Mangadex) },
-		//"cubari":   func() Scraper { return cubari.NewScraper() },
-	}
-
-	scraper, ok := m[name]
+	getScraper, ok := SCRAPERS[strings.ToLower(name)]
 	if !ok {
 		panic("Passed scraper name not in map")
 	}
-	return scraper()
+	return getScraper(config)
 }
