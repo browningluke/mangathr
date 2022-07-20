@@ -208,8 +208,13 @@ func (d *Downloader) runDownload(pages []Page, chapterPath string, bar *progress
 
 	for _, image := range pages {
 		logging.Debugln("Processing " + image.Filename)
+
+		// Copy variables
+		URL := image.Url
+		filename := image.Filename
+
 		wp.Submit(func() {
-			if err := d.downloadImage(image.Url, image.Filename, zipWriter, &mu); err != nil {
+			if err := d.downloadImage(URL, filename, zipWriter, &mu); err != nil {
 				log.Fatalln(err)
 			}
 			err := bar.Add(1)
