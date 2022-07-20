@@ -47,7 +47,7 @@ type Scraper interface {
 	MangaTitle() string
 	MangaID() string
 	ScraperName() string
-	EnforceChapterLength() bool
+	EnforceChapterDuration() bool
 }
 
 func NewScraper(name string, config *config.Config) Scraper {

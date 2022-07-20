@@ -135,15 +135,26 @@ func (d *Downloader) GetNameFromTemplate(pluginTemplate, num, title, language st
 		conditionalLanguage, conditionalGroups)
 }
 
+func (d *Downloader) waitChapterDuration(timeStart int64) {
+	timeEnd := time.Now().UnixMilli()
+	downloadDuration := timeEnd - timeStart
+
+	if downloadDuration < d.chapterDuration {
+		timeDiff := d.chapterDuration - downloadDuration
+		time.Sleep(time.Duration(timeDiff) * time.Millisecond)
+	}
+}
+
 /*
 	-- Chapter Downloading --
 */
 
 func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *progressbar.ProgressBar) {
 
-	var timeStart int64
+	// Ensure chapter time is correct
 	if d.enforceChapterDuration {
-		timeStart = time.Now().UnixMilli()
+		timeStart := time.Now().UnixMilli()
+		defer d.waitChapterDuration(timeStart)
 	} else {
 		// TODO: differentiate between Download & Update delay
 		dur, err := time.ParseDuration(d.config.Delay.Chapter)
@@ -153,92 +164,73 @@ func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *p
 		time.Sleep(dur)
 	}
 
-	//fmt.Println(chapterFilename)
-
 	chapterPath := filepath.Join(path, fmt.Sprintf("%s.cbz", CleanPath(chapterFilename)))
 
 	if d.config.DryRun {
 		fmt.Println("DRY RUN: not downloading")
-		err := bar.Finish()
-		if err != nil {
+		if err := bar.Finish(); err != nil {
 			panic(err)
 		}
 	} else if _, err := os.Stat(chapterPath); err == nil {
 		fmt.Println("Chapter already exists.")
-		err := bar.Finish()
-		if err != nil {
+		if err := bar.Finish(); err != nil {
 			panic(err)
 		}
 	} else if errors.Is(err, os.ErrNotExist) {
-		// Create empty file
-		archive, err := os.Create(chapterPath)
-		defer func(archive *os.File) {
-			err := archive.Close()
-			if err != nil {
-				panic(err)
-			}
-		}(archive)
-		if err != nil {
-			panic(err)
-		}
-		zipWriter := zip.NewWriter(archive)
-		defer func(zipWriter *zip.Writer) {
-			err := zipWriter.Close()
-			if err != nil {
-				panic(err)
-			}
-		}(zipWriter)
-
-		wp := workerpool.New(d.config.SimultaneousPages)
-		var mu sync.Mutex
-
-		for _, image := range pages {
-			logging.Debugln("Processing " + image.Filename)
-			//fmt.Println("Adding ", image.Filename)
-			image := image
-			zipWriter := zipWriter
-			wp.Submit(func() {
-				//mu.Lock()
-				//defer mu.Unlock()
-				if err := d.downloadImage(image.Url, image.Filename, zipWriter, &mu); err != nil {
-					log.Fatalln(err)
-				}
-				err := bar.Add(1)
-				if err != nil {
-					panic(err)
-				}
-			})
-
-		}
-		wp.StopWait()
-
-		//fmt.Println("Saving metadata")
-		filename, body := d.agent.GenerateMetadataFile()
-
-		comicInfo, err := zipWriter.Create(filename)
-		if err != nil {
-			panic(err)
-		}
-
-		reader := strings.NewReader(body)
-		_, err = io.Copy(comicInfo, reader)
-		if err != nil {
-			panic(err)
-		}
-
+		d.runDownload(pages, chapterPath, bar)
 	} else {
 		panic(err)
 	}
+}
 
-	// Ensure chapter time is correct
-	if d.enforceChapterDuration {
-		timeEnd := time.Now().UnixMilli()
-		downloadDuration := timeEnd - timeStart
-
-		if downloadDuration < d.chapterDuration {
-			timeDiff := d.chapterDuration - downloadDuration
-			time.Sleep(time.Duration(timeDiff) * time.Millisecond)
+func (d *Downloader) runDownload(pages []Page, chapterPath string, bar *progressbar.ProgressBar) {
+	// Create empty file
+	archive, err := os.Create(chapterPath)
+	defer func(archive *os.File) {
+		err := archive.Close()
+		if err != nil {
+			panic(err)
 		}
+	}(archive)
+	if err != nil {
+		panic(err)
+	}
+	zipWriter := zip.NewWriter(archive)
+	defer func(zipWriter *zip.Writer) {
+		err := zipWriter.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(zipWriter)
+
+	wp := workerpool.New(d.config.SimultaneousPages)
+	var mu sync.Mutex
+
+	for _, image := range pages {
+		logging.Debugln("Processing " + image.Filename)
+		wp.Submit(func() {
+			if err := d.downloadImage(image.Url, image.Filename, zipWriter, &mu); err != nil {
+				log.Fatalln(err)
+			}
+			err := bar.Add(1)
+			if err != nil {
+				panic(err)
+			}
+		})
+
+	}
+	wp.StopWait()
+	filename, body := d.agent.GenerateMetadataFile()
+
+	comicInfo, err := zipWriter.Create(filename)
+	if err != nil {
+		panic(err)
+	}
+
+	reader := strings.NewReader(body)
+	_, err = io.Copy(comicInfo, reader)
+	if err != nil {
+		panic(err)
 	}
 }
 

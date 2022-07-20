@@ -544,6 +544,6 @@ func (m *Scraper) ScraperName() string {
 	return "Mangadex"
 }
 
-func (m *Scraper) EnforceChapterLength() bool {
+func (m *Scraper) EnforceChapterDuration() bool {
 	return true
 }

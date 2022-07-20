@@ -37,7 +37,7 @@ func Run(args *Args, config *config.Config) {
 
 	scraper.Download(downloader.NewDownloader(
 		&config.Downloader, false,
-		scraper.EnforceChapterLength(),
+		scraper.EnforceChapterDuration(),
 	), "download")
 
 }
