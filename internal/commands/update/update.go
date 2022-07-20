@@ -58,6 +58,7 @@ func Run(config *config.Config) {
 		newChapters := scraper.SelectNewChapters(chapters)
 
 		if len(newChapters) > 0 {
+			fmt.Printf("\033[2K") // Clear line
 			fmt.Printf(fmt.Sprintf("\rTitle: %s\nSource: %s\n# of new chapters: %d\n",
 				scraper.MangaTitle(), scraper.ScraperName(), len(newChapters)))
 

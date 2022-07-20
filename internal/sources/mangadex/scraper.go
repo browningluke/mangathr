@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/schollz/progressbar/v3"
 	"mangathrV2/internal/downloader"
 	"mangathrV2/internal/logging"
 	"mangathrV2/internal/rester"
@@ -14,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 type Scraper struct {
@@ -478,6 +478,7 @@ func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 	path := dl.CreateDirectory(m.manga.title, downloadType)
 	downloadQueue := make([]downloader.Job, len(m.selectedChapters))
 
+	maxRuneCount := 0 // Used for padding (e.g. Chapter 10 vs Chapter 10.5)
 	for i, chapter := range m.selectedChapters {
 		language := ""
 		if len(m.config.LanguageFilter) > 1 {
@@ -490,14 +491,16 @@ func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 			Title: chapter.prettyTitle, Num: chapter.num, ID: chapter.id,
 			Filename: chapterFilename, Metadata: chapter.metadata,
 		}
+
+		if runeCount := utf8.RuneCountInString(chapter.num); runeCount > maxRuneCount {
+			maxRuneCount = runeCount
+		}
 	}
 
 	runJob := func(job downloader.Job) {
 		pages := m.getChapterPages(job.ID)
 
-		progress := progressbar.NewOptions(len(pages),
-			progressbar.OptionSetDescription(fmt.Sprintf("Chapter %s", job.Num)),
-		)
+		progress := utils.CreateProgressBar(len(pages), maxRuneCount, job.Num)
 
 		mdAgent := dl.MetadataAgent()
 		(*mdAgent).SetTitle(job.Title)

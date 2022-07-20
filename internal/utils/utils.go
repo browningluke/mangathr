@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"github.com/schollz/progressbar/v3"
 	"mangathrV2/internal/utils/ui"
 	"regexp"
 	"strings"
@@ -49,4 +50,14 @@ func PadString(s string, length int) string {
 
 func GetImageExtension(filename string) string {
 	return "." + regexp.MustCompile(`.*\.(jpg|jpeg|webp|png|gif)$`).FindAllStringSubmatch(filename, -1)[0][1]
+}
+
+func CreateProgressBar(length, maxRunes int, chapterNum string) *progressbar.ProgressBar {
+	if rc := utf8.RuneCountInString(chapterNum); rc < maxRunes {
+		chapterNum += strings.Repeat(" ", maxRunes-rc)
+	}
+
+	return progressbar.NewOptions(length,
+		progressbar.OptionSetDescription(fmt.Sprintf("Chapter %s", chapterNum)),
+	)
 }
