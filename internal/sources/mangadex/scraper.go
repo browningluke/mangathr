@@ -16,6 +16,11 @@ import (
 	"unicode/utf8"
 )
 
+const (
+	APIROOT        = "https://api.mangadex.org"
+	CHAPTERSPERMIN = 40 // set from API docs
+)
+
 type Scraper struct {
 	name   string
 	config *Config
@@ -64,7 +69,7 @@ func (m *Scraper) Search(query string) []string {
 	}
 
 	jsonResp, _ := rester.New().Get(
-		"https://api.mangadex.org/manga",
+		fmt.Sprintf("%s/manga", APIROOT),
 		map[string]string{},
 		queryParams).Do(4, "100ms")
 	jsonString := jsonResp.(string)
@@ -103,7 +108,7 @@ func (m *Scraper) SearchByID(id, title string) error {
 
 	// Test if ID is valid
 	_, resp := rester.New().Get(
-		fmt.Sprintf("https://api.mangadex.org/manga/%s", id),
+		fmt.Sprintf("%s/manga/%s", APIROOT, id),
 		map[string]string{},
 		[]rester.QueryParam{}).Do(4, "100ms")
 
@@ -136,7 +141,7 @@ func (m *Scraper) scrapeChapters() {
 
 	getMangaFeedResp := func(offset int) mangaFeedResponse {
 		jsonResp, _ := rester.New().Get(
-			fmt.Sprintf("https://api.mangadex.org/manga/%s/feed", m.manga.id),
+			fmt.Sprintf("%s/manga/%s/feed", APIROOT, m.manga.id),
 			map[string]string{},
 			append(queryParams,
 				rester.QueryParam{Key: "offset", Value: strconv.Itoa(offset), Encode: true},
@@ -401,7 +406,7 @@ func (m *Scraper) FilterGroups(groups []string) {
 
 func (m *Scraper) getChapterPages(id string) []downloader.Page {
 	resInterface := rester.New().Get(
-		fmt.Sprintf("https://api.mangadex.org/at-home/server/%s", id),
+		fmt.Sprintf("%s/at-home/server/%s", APIROOT, id),
 		map[string]string{},
 		[]rester.QueryParam{},
 	).DoWithHelperFunc(4, "200ms", func(res rester.Response, err error) {
@@ -467,10 +472,13 @@ func (m *Scraper) getChapterPages(id string) []downloader.Page {
 func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 	logging.Debugln("Downloading...")
 
-	chaptersPerMinute := 60 // set from API docs
-	duration := int64((chaptersPerMinute * 1000) / 40)
-	if numChapters := len(m.selectedChapters); numChapters < chaptersPerMinute {
-		duration = int64((numChapters * 1000) / 40)
+	// 60 seconds / CHAPTERSPERMIN = x = seconds per chapter
+	// x * 1000 = milliseconds per chapter
+
+	duration := int64((60 / CHAPTERSPERMIN) * 1000)
+	if numChapters := len(m.selectedChapters); numChapters < CHAPTERSPERMIN {
+		// Not going to exceed limit during batch, duration doesn't matter
+		duration = int64(500)
 	}
 	dl.SetChapterDuration(duration)
 
