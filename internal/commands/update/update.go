@@ -64,7 +64,7 @@ func Run(config *config.Config) {
 
 			scraper.Download(downloader.NewDownloader(
 				&config.Downloader, true,
-				scraper.EnforceChapterLength()), "update")
+				scraper.EnforceChapterDuration()), "update")
 
 			if !config.Downloader.DryRun {
 				// update in db
