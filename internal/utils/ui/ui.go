@@ -59,7 +59,7 @@ func Checkboxes(label string, opts []string) []string {
 	err := survey.AskOne(prompt, &res, survey.WithIcons(func(icons *survey.IconSet) {
 		icons.Question.Text = ""
 		icons.Question.Format = "yellow+hb"
-	}))
+	}), survey.WithKeepFilter(true))
 	if err != nil {
 		panic(err)
 	}
