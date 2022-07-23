@@ -2,12 +2,12 @@ package update
 
 import (
 	"fmt"
-	"mangathrV2/internal/config"
-	"mangathrV2/internal/database"
-	"mangathrV2/internal/downloader"
-	"mangathrV2/internal/logging"
-	"mangathrV2/internal/sources"
-	"mangathrV2/internal/sources/structs"
+	"github.com/browningluke/mangathrV2/internal/config"
+	"github.com/browningluke/mangathrV2/internal/database"
+	"github.com/browningluke/mangathrV2/internal/downloader"
+	"github.com/browningluke/mangathrV2/internal/logging"
+	"github.com/browningluke/mangathrV2/internal/sources"
+	"github.com/browningluke/mangathrV2/internal/sources/structs"
 	"time"
 )
 

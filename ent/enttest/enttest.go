@@ -4,9 +4,10 @@ package enttest
 
 import (
 	"context"
-	"mangathrV2/ent"
+
+	"github.com/browningluke/mangathrV2/ent"
 	// required by schema hooks.
-	_ "mangathrV2/ent/runtime"
+	_ "github.com/browningluke/mangathrV2/ent/runtime"
 
 	"entgo.io/ent/dialect/sql/schema"
 )

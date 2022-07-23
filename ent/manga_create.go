@@ -6,12 +6,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"mangathrV2/ent/chapter"
-	"mangathrV2/ent/manga"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/browningluke/mangathrV2/ent/chapter"
+	"github.com/browningluke/mangathrV2/ent/manga"
 )
 
 // MangaCreate is the builder for creating a Manga entity.

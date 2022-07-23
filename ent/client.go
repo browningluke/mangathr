@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"log"
 
-	"mangathrV2/ent/migrate"
+	"github.com/browningluke/mangathrV2/ent/migrate"
 
-	"mangathrV2/ent/chapter"
-	"mangathrV2/ent/manga"
+	"github.com/browningluke/mangathrV2/ent/chapter"
+	"github.com/browningluke/mangathrV2/ent/manga"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"

@@ -5,11 +5,11 @@ package ent
 import (
 	"encoding/json"
 	"fmt"
-	"mangathrV2/ent/manga"
 	"strings"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/browningluke/mangathrV2/ent/manga"
 )
 
 // Manga is the model entity for the Manga schema.

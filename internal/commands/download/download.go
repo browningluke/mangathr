@@ -2,10 +2,10 @@ package download
 
 import (
 	"fmt"
-	"mangathrV2/internal/config"
-	"mangathrV2/internal/downloader"
-	"mangathrV2/internal/sources"
-	"mangathrV2/internal/utils/ui"
+	"github.com/browningluke/mangathrV2/internal/config"
+	"github.com/browningluke/mangathrV2/internal/downloader"
+	"github.com/browningluke/mangathrV2/internal/sources"
+	"github.com/browningluke/mangathrV2/internal/utils/ui"
 )
 
 func SelectChapters(titles []string, mangaTitle string, sourceName string) []string {

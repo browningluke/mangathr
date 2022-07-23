@@ -4,12 +4,12 @@ package ent
 
 import (
 	"fmt"
-	"mangathrV2/ent/chapter"
-	"mangathrV2/ent/manga"
 	"strings"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/browningluke/mangathrV2/ent/chapter"
+	"github.com/browningluke/mangathrV2/ent/manga"
 )
 
 // Chapter is the model entity for the Chapter schema.

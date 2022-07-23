@@ -2,7 +2,7 @@ package cubari
 
 import (
 	"fmt"
-	"mangathrV2/internal/downloader"
+	"github.com/browningluke/mangathrV2/internal/downloader"
 )
 
 type Scraper struct {

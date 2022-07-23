@@ -4,8 +4,8 @@ import (
 	"context"
 	"entgo.io/ent/dialect"
 	"fmt"
-	"mangathrV2/ent"
-	_ "mangathrV2/internal/database/sqlite3"
+	"github.com/browningluke/mangathrV2/ent"
+	_ "github.com/browningluke/mangathrV2/internal/database/sqlite3"
 )
 
 const (

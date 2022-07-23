@@ -5,7 +5,8 @@ package hook
 import (
 	"context"
 	"fmt"
-	"mangathrV2/ent"
+
+	"github.com/browningluke/mangathrV2/ent"
 )
 
 // The ChapterFunc type is an adapter to allow the use of ordinary

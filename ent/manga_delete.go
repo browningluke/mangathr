@@ -5,12 +5,12 @@ package ent
 import (
 	"context"
 	"fmt"
-	"mangathrV2/ent/manga"
-	"mangathrV2/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/browningluke/mangathrV2/ent/manga"
+	"github.com/browningluke/mangathrV2/ent/predicate"
 )
 
 // MangaDelete is the builder for deleting a Manga entity.

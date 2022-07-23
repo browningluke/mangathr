@@ -1,13 +1,13 @@
 package main
 
 import (
-	"mangathrV2/internal/argparse"
-	"mangathrV2/internal/commands/download"
-	"mangathrV2/internal/commands/register"
-	"mangathrV2/internal/commands/update"
-	"mangathrV2/internal/config"
-	"mangathrV2/internal/logging"
-	"mangathrV2/internal/utils"
+	"github.com/browningluke/mangathrV2/internal/argparse"
+	"github.com/browningluke/mangathrV2/internal/commands/download"
+	"github.com/browningluke/mangathrV2/internal/commands/register"
+	"github.com/browningluke/mangathrV2/internal/commands/update"
+	"github.com/browningluke/mangathrV2/internal/config"
+	"github.com/browningluke/mangathrV2/internal/logging"
+	"github.com/browningluke/mangathrV2/internal/utils"
 )
 
 func main() {

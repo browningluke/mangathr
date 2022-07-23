@@ -1,4 +1,4 @@
-module mangathrV2
+module github.com/browningluke/mangathrV2
 
 go 1.17
 

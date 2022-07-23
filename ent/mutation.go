@@ -6,11 +6,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"mangathrV2/ent/chapter"
-	"mangathrV2/ent/manga"
-	"mangathrV2/ent/predicate"
 	"sync"
 	"time"
+
+	"github.com/browningluke/mangathrV2/ent/chapter"
+	"github.com/browningluke/mangathrV2/ent/manga"
+	"github.com/browningluke/mangathrV2/ent/predicate"
 
 	"entgo.io/ent"
 )

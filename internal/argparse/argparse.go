@@ -2,8 +2,8 @@ package argparse
 
 import (
 	"github.com/akamensky/argparse"
-	"mangathrV2/internal/commands/download"
-	"mangathrV2/internal/commands/register"
+	"github.com/browningluke/mangathrV2/internal/commands/download"
+	"github.com/browningluke/mangathrV2/internal/commands/register"
 	"os"
 )
 

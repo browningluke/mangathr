@@ -5,16 +5,15 @@ package ent
 import (
 	"context"
 	"database/sql/driver"
-	"errors"
 	"fmt"
-	"mangathrV2/ent/chapter"
-	"mangathrV2/ent/manga"
-	"mangathrV2/ent/predicate"
 	"math"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/browningluke/mangathrV2/ent/chapter"
+	"github.com/browningluke/mangathrV2/ent/manga"
+	"github.com/browningluke/mangathrV2/ent/predicate"
 )
 
 // MangaQuery is the builder for querying Manga entities.
@@ -302,15 +301,17 @@ func (mq *MangaQuery) WithChapters(opts ...func(*ChapterQuery)) *MangaQuery {
 //		Scan(ctx, &v)
 //
 func (mq *MangaQuery) GroupBy(field string, fields ...string) *MangaGroupBy {
-	group := &MangaGroupBy{config: mq.config}
-	group.fields = append([]string{field}, fields...)
-	group.path = func(ctx context.Context) (prev *sql.Selector, err error) {
+	grbuild := &MangaGroupBy{config: mq.config}
+	grbuild.fields = append([]string{field}, fields...)
+	grbuild.path = func(ctx context.Context) (prev *sql.Selector, err error) {
 		if err := mq.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
 		return mq.sqlQuery(ctx), nil
 	}
-	return group
+	grbuild.label = manga.Label
+	grbuild.flds, grbuild.scan = &grbuild.fields, grbuild.Scan
+	return grbuild
 }
 
 // Select allows the selection one or more fields/columns for the given query,
@@ -328,7 +329,10 @@ func (mq *MangaQuery) GroupBy(field string, fields ...string) *MangaGroupBy {
 //
 func (mq *MangaQuery) Select(fields ...string) *MangaSelect {
 	mq.fields = append(mq.fields, fields...)
-	return &MangaSelect{MangaQuery: mq}
+	selbuild := &MangaSelect{MangaQuery: mq}
+	selbuild.label = manga.Label
+	selbuild.flds, selbuild.scan = &mq.fields, selbuild.Scan
+	return selbuild
 }
 
 func (mq *MangaQuery) prepareQuery(ctx context.Context) error {
@@ -347,7 +351,7 @@ func (mq *MangaQuery) prepareQuery(ctx context.Context) error {
 	return nil
 }
 
-func (mq *MangaQuery) sqlAll(ctx context.Context) ([]*Manga, error) {
+func (mq *MangaQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Manga, error) {
 	var (
 		nodes       = []*Manga{}
 		_spec       = mq.querySpec()
@@ -356,17 +360,16 @@ func (mq *MangaQuery) sqlAll(ctx context.Context) ([]*Manga, error) {
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
-		node := &Manga{config: mq.config}
-		nodes = append(nodes, node)
-		return node.scanValues(columns)
+		return (*Manga).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []interface{}) error {
-		if len(nodes) == 0 {
-			return fmt.Errorf("ent: Assign called without calling ScanValues")
-		}
-		node := nodes[len(nodes)-1]
+		node := &Manga{config: mq.config}
+		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
+	}
+	for i := range hooks {
+		hooks[i](ctx, _spec)
 	}
 	if err := sqlgraph.QueryNodes(ctx, mq.driver, _spec); err != nil {
 		return nil, err
@@ -507,6 +510,7 @@ func (mq *MangaQuery) sqlQuery(ctx context.Context) *sql.Selector {
 // MangaGroupBy is the group-by builder for Manga entities.
 type MangaGroupBy struct {
 	config
+	selector
 	fields []string
 	fns    []AggregateFunc
 	// intermediate query (i.e. traversal path).
@@ -528,209 +532,6 @@ func (mgb *MangaGroupBy) Scan(ctx context.Context, v interface{}) error {
 	}
 	mgb.sql = query
 	return mgb.sqlScan(ctx, v)
-}
-
-// ScanX is like Scan, but panics if an error occurs.
-func (mgb *MangaGroupBy) ScanX(ctx context.Context, v interface{}) {
-	if err := mgb.Scan(ctx, v); err != nil {
-		panic(err)
-	}
-}
-
-// Strings returns list of strings from group-by.
-// It is only allowed when executing a group-by query with one field.
-func (mgb *MangaGroupBy) Strings(ctx context.Context) ([]string, error) {
-	if len(mgb.fields) > 1 {
-		return nil, errors.New("ent: MangaGroupBy.Strings is not achievable when grouping more than 1 field")
-	}
-	var v []string
-	if err := mgb.Scan(ctx, &v); err != nil {
-		return nil, err
-	}
-	return v, nil
-}
-
-// StringsX is like Strings, but panics if an error occurs.
-func (mgb *MangaGroupBy) StringsX(ctx context.Context) []string {
-	v, err := mgb.Strings(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// String returns a single string from a group-by query.
-// It is only allowed when executing a group-by query with one field.
-func (mgb *MangaGroupBy) String(ctx context.Context) (_ string, err error) {
-	var v []string
-	if v, err = mgb.Strings(ctx); err != nil {
-		return
-	}
-	switch len(v) {
-	case 1:
-		return v[0], nil
-	case 0:
-		err = &NotFoundError{manga.Label}
-	default:
-		err = fmt.Errorf("ent: MangaGroupBy.Strings returned %d results when one was expected", len(v))
-	}
-	return
-}
-
-// StringX is like String, but panics if an error occurs.
-func (mgb *MangaGroupBy) StringX(ctx context.Context) string {
-	v, err := mgb.String(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Ints returns list of ints from group-by.
-// It is only allowed when executing a group-by query with one field.
-func (mgb *MangaGroupBy) Ints(ctx context.Context) ([]int, error) {
-	if len(mgb.fields) > 1 {
-		return nil, errors.New("ent: MangaGroupBy.Ints is not achievable when grouping more than 1 field")
-	}
-	var v []int
-	if err := mgb.Scan(ctx, &v); err != nil {
-		return nil, err
-	}
-	return v, nil
-}
-
-// IntsX is like Ints, but panics if an error occurs.
-func (mgb *MangaGroupBy) IntsX(ctx context.Context) []int {
-	v, err := mgb.Ints(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Int returns a single int from a group-by query.
-// It is only allowed when executing a group-by query with one field.
-func (mgb *MangaGroupBy) Int(ctx context.Context) (_ int, err error) {
-	var v []int
-	if v, err = mgb.Ints(ctx); err != nil {
-		return
-	}
-	switch len(v) {
-	case 1:
-		return v[0], nil
-	case 0:
-		err = &NotFoundError{manga.Label}
-	default:
-		err = fmt.Errorf("ent: MangaGroupBy.Ints returned %d results when one was expected", len(v))
-	}
-	return
-}
-
-// IntX is like Int, but panics if an error occurs.
-func (mgb *MangaGroupBy) IntX(ctx context.Context) int {
-	v, err := mgb.Int(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Float64s returns list of float64s from group-by.
-// It is only allowed when executing a group-by query with one field.
-func (mgb *MangaGroupBy) Float64s(ctx context.Context) ([]float64, error) {
-	if len(mgb.fields) > 1 {
-		return nil, errors.New("ent: MangaGroupBy.Float64s is not achievable when grouping more than 1 field")
-	}
-	var v []float64
-	if err := mgb.Scan(ctx, &v); err != nil {
-		return nil, err
-	}
-	return v, nil
-}
-
-// Float64sX is like Float64s, but panics if an error occurs.
-func (mgb *MangaGroupBy) Float64sX(ctx context.Context) []float64 {
-	v, err := mgb.Float64s(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Float64 returns a single float64 from a group-by query.
-// It is only allowed when executing a group-by query with one field.
-func (mgb *MangaGroupBy) Float64(ctx context.Context) (_ float64, err error) {
-	var v []float64
-	if v, err = mgb.Float64s(ctx); err != nil {
-		return
-	}
-	switch len(v) {
-	case 1:
-		return v[0], nil
-	case 0:
-		err = &NotFoundError{manga.Label}
-	default:
-		err = fmt.Errorf("ent: MangaGroupBy.Float64s returned %d results when one was expected", len(v))
-	}
-	return
-}
-
-// Float64X is like Float64, but panics if an error occurs.
-func (mgb *MangaGroupBy) Float64X(ctx context.Context) float64 {
-	v, err := mgb.Float64(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Bools returns list of bools from group-by.
-// It is only allowed when executing a group-by query with one field.
-func (mgb *MangaGroupBy) Bools(ctx context.Context) ([]bool, error) {
-	if len(mgb.fields) > 1 {
-		return nil, errors.New("ent: MangaGroupBy.Bools is not achievable when grouping more than 1 field")
-	}
-	var v []bool
-	if err := mgb.Scan(ctx, &v); err != nil {
-		return nil, err
-	}
-	return v, nil
-}
-
-// BoolsX is like Bools, but panics if an error occurs.
-func (mgb *MangaGroupBy) BoolsX(ctx context.Context) []bool {
-	v, err := mgb.Bools(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Bool returns a single bool from a group-by query.
-// It is only allowed when executing a group-by query with one field.
-func (mgb *MangaGroupBy) Bool(ctx context.Context) (_ bool, err error) {
-	var v []bool
-	if v, err = mgb.Bools(ctx); err != nil {
-		return
-	}
-	switch len(v) {
-	case 1:
-		return v[0], nil
-	case 0:
-		err = &NotFoundError{manga.Label}
-	default:
-		err = fmt.Errorf("ent: MangaGroupBy.Bools returned %d results when one was expected", len(v))
-	}
-	return
-}
-
-// BoolX is like Bool, but panics if an error occurs.
-func (mgb *MangaGroupBy) BoolX(ctx context.Context) bool {
-	v, err := mgb.Bool(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
 }
 
 func (mgb *MangaGroupBy) sqlScan(ctx context.Context, v interface{}) error {
@@ -774,6 +575,7 @@ func (mgb *MangaGroupBy) sqlQuery() *sql.Selector {
 // MangaSelect is the builder for selecting fields of Manga entities.
 type MangaSelect struct {
 	*MangaQuery
+	selector
 	// intermediate query (i.e. traversal path).
 	sql *sql.Selector
 }
@@ -785,201 +587,6 @@ func (ms *MangaSelect) Scan(ctx context.Context, v interface{}) error {
 	}
 	ms.sql = ms.MangaQuery.sqlQuery(ctx)
 	return ms.sqlScan(ctx, v)
-}
-
-// ScanX is like Scan, but panics if an error occurs.
-func (ms *MangaSelect) ScanX(ctx context.Context, v interface{}) {
-	if err := ms.Scan(ctx, v); err != nil {
-		panic(err)
-	}
-}
-
-// Strings returns list of strings from a selector. It is only allowed when selecting one field.
-func (ms *MangaSelect) Strings(ctx context.Context) ([]string, error) {
-	if len(ms.fields) > 1 {
-		return nil, errors.New("ent: MangaSelect.Strings is not achievable when selecting more than 1 field")
-	}
-	var v []string
-	if err := ms.Scan(ctx, &v); err != nil {
-		return nil, err
-	}
-	return v, nil
-}
-
-// StringsX is like Strings, but panics if an error occurs.
-func (ms *MangaSelect) StringsX(ctx context.Context) []string {
-	v, err := ms.Strings(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// String returns a single string from a selector. It is only allowed when selecting one field.
-func (ms *MangaSelect) String(ctx context.Context) (_ string, err error) {
-	var v []string
-	if v, err = ms.Strings(ctx); err != nil {
-		return
-	}
-	switch len(v) {
-	case 1:
-		return v[0], nil
-	case 0:
-		err = &NotFoundError{manga.Label}
-	default:
-		err = fmt.Errorf("ent: MangaSelect.Strings returned %d results when one was expected", len(v))
-	}
-	return
-}
-
-// StringX is like String, but panics if an error occurs.
-func (ms *MangaSelect) StringX(ctx context.Context) string {
-	v, err := ms.String(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Ints returns list of ints from a selector. It is only allowed when selecting one field.
-func (ms *MangaSelect) Ints(ctx context.Context) ([]int, error) {
-	if len(ms.fields) > 1 {
-		return nil, errors.New("ent: MangaSelect.Ints is not achievable when selecting more than 1 field")
-	}
-	var v []int
-	if err := ms.Scan(ctx, &v); err != nil {
-		return nil, err
-	}
-	return v, nil
-}
-
-// IntsX is like Ints, but panics if an error occurs.
-func (ms *MangaSelect) IntsX(ctx context.Context) []int {
-	v, err := ms.Ints(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Int returns a single int from a selector. It is only allowed when selecting one field.
-func (ms *MangaSelect) Int(ctx context.Context) (_ int, err error) {
-	var v []int
-	if v, err = ms.Ints(ctx); err != nil {
-		return
-	}
-	switch len(v) {
-	case 1:
-		return v[0], nil
-	case 0:
-		err = &NotFoundError{manga.Label}
-	default:
-		err = fmt.Errorf("ent: MangaSelect.Ints returned %d results when one was expected", len(v))
-	}
-	return
-}
-
-// IntX is like Int, but panics if an error occurs.
-func (ms *MangaSelect) IntX(ctx context.Context) int {
-	v, err := ms.Int(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Float64s returns list of float64s from a selector. It is only allowed when selecting one field.
-func (ms *MangaSelect) Float64s(ctx context.Context) ([]float64, error) {
-	if len(ms.fields) > 1 {
-		return nil, errors.New("ent: MangaSelect.Float64s is not achievable when selecting more than 1 field")
-	}
-	var v []float64
-	if err := ms.Scan(ctx, &v); err != nil {
-		return nil, err
-	}
-	return v, nil
-}
-
-// Float64sX is like Float64s, but panics if an error occurs.
-func (ms *MangaSelect) Float64sX(ctx context.Context) []float64 {
-	v, err := ms.Float64s(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Float64 returns a single float64 from a selector. It is only allowed when selecting one field.
-func (ms *MangaSelect) Float64(ctx context.Context) (_ float64, err error) {
-	var v []float64
-	if v, err = ms.Float64s(ctx); err != nil {
-		return
-	}
-	switch len(v) {
-	case 1:
-		return v[0], nil
-	case 0:
-		err = &NotFoundError{manga.Label}
-	default:
-		err = fmt.Errorf("ent: MangaSelect.Float64s returned %d results when one was expected", len(v))
-	}
-	return
-}
-
-// Float64X is like Float64, but panics if an error occurs.
-func (ms *MangaSelect) Float64X(ctx context.Context) float64 {
-	v, err := ms.Float64(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Bools returns list of bools from a selector. It is only allowed when selecting one field.
-func (ms *MangaSelect) Bools(ctx context.Context) ([]bool, error) {
-	if len(ms.fields) > 1 {
-		return nil, errors.New("ent: MangaSelect.Bools is not achievable when selecting more than 1 field")
-	}
-	var v []bool
-	if err := ms.Scan(ctx, &v); err != nil {
-		return nil, err
-	}
-	return v, nil
-}
-
-// BoolsX is like Bools, but panics if an error occurs.
-func (ms *MangaSelect) BoolsX(ctx context.Context) []bool {
-	v, err := ms.Bools(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Bool returns a single bool from a selector. It is only allowed when selecting one field.
-func (ms *MangaSelect) Bool(ctx context.Context) (_ bool, err error) {
-	var v []bool
-	if v, err = ms.Bools(ctx); err != nil {
-		return
-	}
-	switch len(v) {
-	case 1:
-		return v[0], nil
-	case 0:
-		err = &NotFoundError{manga.Label}
-	default:
-		err = fmt.Errorf("ent: MangaSelect.Bools returned %d results when one was expected", len(v))
-	}
-	return
-}
-
-// BoolX is like Bool, but panics if an error occurs.
-func (ms *MangaSelect) BoolX(ctx context.Context) bool {
-	v, err := ms.Bool(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
 }
 
 func (ms *MangaSelect) sqlScan(ctx context.Context, v interface{}) error {

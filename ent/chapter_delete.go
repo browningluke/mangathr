@@ -5,12 +5,12 @@ package ent
 import (
 	"context"
 	"fmt"
-	"mangathrV2/ent/chapter"
-	"mangathrV2/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/browningluke/mangathrV2/ent/chapter"
+	"github.com/browningluke/mangathrV2/ent/predicate"
 )
 
 // ChapterDelete is the builder for deleting a Chapter entity.

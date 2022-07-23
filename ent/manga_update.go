@@ -6,14 +6,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"mangathrV2/ent/chapter"
-	"mangathrV2/ent/manga"
-	"mangathrV2/ent/predicate"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/browningluke/mangathrV2/ent/chapter"
+	"github.com/browningluke/mangathrV2/ent/manga"
+	"github.com/browningluke/mangathrV2/ent/predicate"
 )
 
 // MangaUpdate is the builder for updating Manga entities.

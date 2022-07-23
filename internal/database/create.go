@@ -2,8 +2,8 @@ package database
 
 import (
 	"fmt"
-	"mangathrV2/ent"
-	"mangathrV2/internal/logging"
+	"github.com/browningluke/mangathrV2/ent"
+	"github.com/browningluke/mangathrV2/internal/logging"
 	"time"
 )
 

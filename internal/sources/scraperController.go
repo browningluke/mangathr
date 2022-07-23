@@ -1,10 +1,10 @@
 package sources
 
 import (
-	"mangathrV2/internal/config"
-	"mangathrV2/internal/downloader"
-	"mangathrV2/internal/sources/mangadex"
-	"mangathrV2/internal/sources/structs"
+	"github.com/browningluke/mangathrV2/internal/config"
+	"github.com/browningluke/mangathrV2/internal/downloader"
+	"github.com/browningluke/mangathrV2/internal/sources/mangadex"
+	"github.com/browningluke/mangathrV2/internal/sources/structs"
 	"strings"
 )
 

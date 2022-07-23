@@ -2,9 +2,9 @@ package database
 
 import (
 	"fmt"
-	"mangathrV2/ent"
-	"mangathrV2/ent/manga"
-	"mangathrV2/internal/logging"
+	"github.com/browningluke/mangathrV2/ent"
+	"github.com/browningluke/mangathrV2/ent/manga"
+	"github.com/browningluke/mangathrV2/internal/logging"
 )
 
 func (d *Driver) queryManga(mangaID string, eager bool) (*ent.Manga, error) {

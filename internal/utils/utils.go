@@ -2,8 +2,8 @@ package utils
 
 import (
 	"fmt"
+	"github.com/browningluke/mangathrV2/internal/utils/ui"
 	"github.com/schollz/progressbar/v3"
-	"mangathrV2/internal/utils/ui"
 	"regexp"
 	"strings"
 	"syscall"

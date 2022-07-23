@@ -2,10 +2,10 @@ package config
 
 import (
 	"errors"
+	"github.com/browningluke/mangathrV2/internal/downloader"
+	"github.com/browningluke/mangathrV2/internal/sources/mangadex"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"mangathrV2/internal/downloader"
-	"mangathrV2/internal/sources/mangadex"
 	"strings"
 )
 
