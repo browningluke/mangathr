@@ -10,3 +10,12 @@ type Config struct {
 	// Connection
 	SyncDeletions bool `yaml:"syncDeletions"`
 }
+
+func (c *Config) Default() {
+	c.FilenameTemplate = "" // No override of downloader.output.filenameTemplate
+	c.RatingFilter = []string{"safe", "suggestive"}
+	c.LanguageFilter = []string{"en"}
+	c.DataSaver = false
+
+	c.SyncDeletions = false
+}

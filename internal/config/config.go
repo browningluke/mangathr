@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"github.com/browningluke/mangathrV2/internal/config/defaults"
 	"github.com/browningluke/mangathrV2/internal/downloader"
 	"github.com/browningluke/mangathrV2/internal/sources/mangadex"
 	"gopkg.in/yaml.v2"
@@ -22,6 +23,7 @@ type Config struct {
 }
 
 func (c *Config) Load(path string) error {
+	c.useDefaults()
 
 	yamlFile, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -35,6 +37,21 @@ func (c *Config) Load(path string) error {
 	}
 
 	return nil
+}
+
+func (c *Config) useDefaults() {
+	c.Database.Driver = defaults.DatabaseDriver()
+	c.Database.Uri = defaults.DatabaseUri()
+
+	downloadConf := downloader.Config{}
+	downloadConf.Default()
+	c.Downloader = downloadConf
+
+	mangadexConf := mangadex.Config{}
+	mangadexConf.Default()
+	c.Sources.Mangadex = mangadexConf
+
+	c.LogLevel = defaults.LogLevel()
 }
 
 func (c *Config) validate() error {
