@@ -28,7 +28,7 @@ func (a *Argparse) Parse() error {
 	parser := argparse.NewParser("mangathr", "description")
 
 	// Options
-	loglevel := parser.Selector("l", "loglevel", []string{"INFO", "DEBUG", "WARN", "ERROR"},
+	loglevel := parser.Selector("l", "loglevel", []string{"INFO", "DEBUG", "WARNING", "ERROR"},
 		&argparse.Options{Help: "", Required: false})
 
 	dryrun := parser.Flag("d", "dry-run", &argparse.Options{Help: "", Required: false})

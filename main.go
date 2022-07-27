@@ -6,62 +6,92 @@ import (
 	"github.com/browningluke/mangathrV2/internal/commands/register"
 	"github.com/browningluke/mangathrV2/internal/commands/update"
 	"github.com/browningluke/mangathrV2/internal/config"
+	"github.com/browningluke/mangathrV2/internal/config/defaults"
 	"github.com/browningluke/mangathrV2/internal/logging"
-	"github.com/browningluke/mangathrV2/internal/utils"
+	"os"
 )
 
-func main() {
+/*
+	Config
+*/
+func getConfigPath() (string, error) {
+	// Create config directory if it does not exist
+	configDir := defaults.ConfigDir()
+	err := os.MkdirAll(configDir, os.ModePerm)
+	return defaults.ConfigPath(), err
+}
+
+func loadConfig() (config.Config, error) {
 	// Load config object, returns Config struct
-	var c config.Config
-	if err := c.Load("./examples/config.yml"); err != nil {
-		utils.RaiseError(err)
+	path, err := getConfigPath()
+	if err != nil {
+		return config.Config{}, err
 	}
 
+	var c config.Config
+	err = c.Load(path)
+	return c, err
+}
+
+/*
+	Argparse
+*/
+
+func parseArgs() (argparse.Argparse, error) {
 	// Load argparse object, returns ArgParse struct
 	var a argparse.Argparse
-	if err := a.Parse(); err != nil {
-		utils.RaiseError(err)
+	err := a.Parse()
+	return a, err
+}
+
+func setLogLevel(logLevelArg, logLevelConf string) {
+	selectedLevel := logLevelArg
+	if selectedLevel == "" {
+		// Use config (or default) as second priority
+		selectedLevel = logLevelConf
 	}
 
-	// Init logging
-	logging.Init()
-	loggingLevel := logging.WARNING
-	if a.Options.LogLevel != "" {
-		switch a.Options.LogLevel {
-		case "ERROR":
-			loggingLevel = logging.ERROR
-			break
-		case "WARN":
-			loggingLevel = logging.WARNING
-			break
-		case "INFO":
-			loggingLevel = logging.INFO
-			break
-		case "DEBUG":
-			loggingLevel = logging.DEBUG
-			break
-		}
-	} else {
-		switch c.LogLevel {
-		case "ERROR":
-			loggingLevel = logging.ERROR
-			break
-		case "WARN":
-			loggingLevel = logging.WARNING
-			break
-		case "INFO":
-			loggingLevel = logging.INFO
-			break
-		case "DEBUG":
-			loggingLevel = logging.DEBUG
-			break
-		}
+	var loggingLevel logging.Level
+	switch selectedLevel {
+	case "ERROR":
+		loggingLevel = logging.ERROR
+		break
+	case "WARNING":
+		loggingLevel = logging.WARNING
+		break
+	case "INFO":
+		loggingLevel = logging.INFO
+		break
+	case "DEBUG":
+		loggingLevel = logging.DEBUG
+		break
 	}
 	logging.SetLoggingLevel(loggingLevel)
+}
 
-	logging.Debugln(c)
-	logging.Debugln(a)
+func main() {
+	/*
+		Parse config
+	*/
+	c, err := loadConfig()
 
+	// If an error, we revert to using defaults
+	if err != nil {
+		logging.Warningln(err)
+	}
+
+	/*
+		Parse args
+	*/
+	a, err := parseArgs()
+	if err != nil {
+		logging.Fatalln(err)
+	}
+
+	// Set log level
+	setLogLevel(a.Options.LogLevel, c.LogLevel)
+
+	// Prioritize dryrun arg over config setting
 	c.Downloader.DryRun = a.Options.DryRun
 
 	switch a.Command {
@@ -76,7 +106,4 @@ func main() {
 		logging.Infoln("Updating")
 		update.Run(&c)
 	}
-
-	// Merge Config & ArgParse (ArgParse priority) into ProgramOptions
-	// Call (download|register|update|manage|config).go > run(ProgramOptions po) to start program execution
 }
