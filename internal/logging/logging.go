@@ -7,12 +7,13 @@ import (
 )
 
 var (
-	loggingLevel = WARNING
+	loggingLevel = DEBUG // hardcoded default before any calls
 
 	debugLogger   *log.Logger
 	infoLogger    *log.Logger
 	warningLogger *log.Logger
 	errorLogger   *log.Logger
+	fatalLogger   *log.Logger
 )
 
 type Level int
@@ -22,9 +23,14 @@ const (
 	INFO
 	WARNING
 	ERROR
+	FATAL
 )
 
-func Init() {
+func init() {
+	createLoggers()
+}
+
+func createLoggers() {
 	debugLogger = nil
 	if loggingLevel <= DEBUG {
 		debugLogger = log.New(os.Stderr, "\u001B[36mDEBUG: \u001B[0m", log.Ldate|log.Ltime|log.Lshortfile)
@@ -44,11 +50,16 @@ func Init() {
 	if loggingLevel <= ERROR {
 		errorLogger = log.New(os.Stderr, "\u001B[31mERROR: \u001B[0m", log.Ldate|log.Ltime|log.Lshortfile)
 	}
+
+	fatalLogger = nil
+	if loggingLevel <= FATAL {
+		fatalLogger = log.New(os.Stderr, "\u001B[31mFATAL: \u001B[0m", log.Ldate|log.Ltime|log.Lshortfile)
+	}
 }
 
 func SetLoggingLevel(level Level) {
 	loggingLevel = level
-	Init()
+	createLoggers()
 }
 
 func output(logger *log.Logger, s string) {
@@ -98,4 +109,16 @@ func Errorln(a ...interface{}) {
 
 func Errorf(format string, a ...interface{}) {
 	output(errorLogger, fmt.Sprintf("%s%s%s\n", "\033[31m", fmt.Sprintf(format, a...), "\033[0m"))
+}
+
+// Fatal
+
+func Fatalln(a ...interface{}) {
+	output(fatalLogger, fmt.Sprintf("%s%s%s\n", "\033[31m", fmt.Sprint(a...), "\033[0m"))
+	os.Exit(1)
+}
+
+func Fatalf(format string, a ...interface{}) {
+	output(fatalLogger, fmt.Sprintf("%s%s%s\n", "\033[31m", fmt.Sprintf(format, a...), "\033[0m"))
+	os.Exit(1)
 }
