@@ -6,7 +6,7 @@ import (
 	"github.com/browningluke/mangathrV2/internal/database"
 	"github.com/browningluke/mangathrV2/internal/downloader"
 	"github.com/browningluke/mangathrV2/internal/sources"
-	"github.com/browningluke/mangathrV2/internal/utils/ui"
+	"github.com/browningluke/mangathrV2/internal/ui"
 	"log"
 	"strings"
 )
@@ -109,7 +109,7 @@ func promptMainMenu(args *Args, config *config.Config, driver *database.Driver) 
 
 	if exists, _ := driver.CheckMangaExistence(scraper.MangaID()); exists {
 		fmt.Printf("Title: %s\nSource: %s\n", mangaTitle, scraper.ScraperName())
-		ui.PrintlnColor(fmt.Sprint("Manga is already registered. Exiting..."), ui.Red)
+		ui.PrintlnColor(ui.Yellow, fmt.Sprint("Manga is already registered. Exiting..."))
 		return
 	}
 

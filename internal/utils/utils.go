@@ -2,18 +2,11 @@ package utils
 
 import (
 	"fmt"
-	"github.com/browningluke/mangathrV2/internal/utils/ui"
 	"github.com/schollz/progressbar/v3"
 	"regexp"
 	"strings"
-	"syscall"
 	"unicode/utf8"
 )
-
-func RaiseError(err error) {
-	ui.PrintlnColor(fmt.Sprint(err), ui.Red)
-	syscall.Exit(1)
-}
 
 func FindInSlice(list interface{}, match interface{}) (interface{}, bool) {
 	switch list.(type) {

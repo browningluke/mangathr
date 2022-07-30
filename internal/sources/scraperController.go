@@ -3,8 +3,10 @@ package sources
 import (
 	"github.com/browningluke/mangathrV2/internal/config"
 	"github.com/browningluke/mangathrV2/internal/downloader"
+	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/sources/mangadex"
 	"github.com/browningluke/mangathrV2/internal/sources/structs"
+	"github.com/browningluke/mangathrV2/internal/ui"
 	"strings"
 )
 
@@ -64,7 +66,10 @@ type Scraper interface {
 func NewScraper(name string, config *config.Config) Scraper {
 	getScraper, ok := SCRAPERS[strings.ToLower(name)]
 	if !ok {
-		panic("Passed scraper name not in map")
+		ui.Fatal("Scraper name could not be found.")
 	}
-	return getScraper(config)
+
+	scraper := getScraper(config)
+	logging.Infoln("Matched scraper: ", scraper.ScraperName())
+	return scraper
 }

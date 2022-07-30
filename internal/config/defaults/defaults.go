@@ -2,6 +2,7 @@ package defaults
 
 import (
 	"github.com/browningluke/mangathrV2/internal/logging"
+	"github.com/browningluke/mangathrV2/internal/ui"
 	"os"
 	"path/filepath"
 )
@@ -13,7 +14,8 @@ import (
 func ConfigDir() string {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		logging.Fatalln(err)
+		logging.Errorln(err)
+		ui.Fatal("Failed to find config directory.")
 	}
 
 	configDir := filepath.Join(homeDir, ".config", "mangathrv2")
@@ -34,12 +36,4 @@ func DatabaseDriver() string {
 
 func DatabaseUri() string {
 	return filepath.Join(ConfigDir(), "db.sqlite")
-}
-
-/*
-	Log level
-*/
-
-func LogLevel() string {
-	return "WARNING"
 }

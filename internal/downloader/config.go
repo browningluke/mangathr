@@ -2,6 +2,7 @@ package downloader
 
 import (
 	"github.com/browningluke/mangathrV2/internal/logging"
+	"github.com/browningluke/mangathrV2/internal/ui"
 	"os"
 	"path/filepath"
 )
@@ -49,7 +50,8 @@ func (c *Config) Default() {
 func getCWD() string {
 	path, err := os.Getwd()
 	if err != nil {
-		logging.Fatalln(err)
+		logging.Errorln(err)
+		ui.Fatal("Failed to find current working directory.")
 	}
 	return filepath.Join(path, "mangathrv2")
 }

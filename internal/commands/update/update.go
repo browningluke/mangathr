@@ -8,6 +8,7 @@ import (
 	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/sources"
 	"github.com/browningluke/mangathrV2/internal/sources/structs"
+	"github.com/browningluke/mangathrV2/internal/ui"
 	"time"
 )
 
@@ -16,17 +17,20 @@ func Run(config *config.Config) {
 	driver, err := database.GetDriver(database.SQLITE, config.Database.Uri)
 	if err != nil {
 		logging.Errorln(err)
+		ui.Fatal("Unable to open database.")
 	}
 	defer func(driver *database.Driver) {
 		err := driver.Close()
 		if err != nil {
 			logging.Errorln(err)
+			ui.Error("Unable to close database.")
 		}
 	}(driver)
 
 	allManga, err := driver.QueryAllManga()
 	if err != nil {
 		logging.Errorln(err)
+		ui.Error("An error occurred when manga from database.")
 	}
 
 	for _, manga := range allManga {
@@ -35,7 +39,8 @@ func Run(config *config.Config) {
 
 		err := scraper.SearchByID(manga.MangaID, manga.Title)
 		if err != nil {
-			logging.Errorln("Skipping ", manga.Title, " because: ", err)
+			logging.Errorln(err)
+			ui.Error("An error occurred while search for ", manga.Title)
 		}
 
 		fmt.Printf("Checking  %s", manga.Title)
@@ -75,7 +80,7 @@ func Run(config *config.Config) {
 				for _, chapter := range newChapters {
 					err := driver.CreateChapter(chapter.ID, chapter.Num, chapter.Title, manga)
 					if err != nil {
-						logging.Errorln("Failed to save chapter to db: ",
+						ui.Error("Failed to save chapter to db: ",
 							chapter.Title, " (", chapter.ID, ")")
 					}
 				}
@@ -87,7 +92,8 @@ func Run(config *config.Config) {
 		// Sleep between checks
 		dur, err := time.ParseDuration(config.Downloader.Delay.UpdateChapter)
 		if err != nil {
-			panic(err)
+			logging.Errorln(err)
+			ui.Error("Failed to parse time duration.")
 		}
 		time.Sleep(dur)
 

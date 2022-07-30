@@ -8,6 +8,7 @@ import (
 	"github.com/browningluke/mangathrV2/internal/config"
 	"github.com/browningluke/mangathrV2/internal/config/defaults"
 	"github.com/browningluke/mangathrV2/internal/logging"
+	"github.com/browningluke/mangathrV2/internal/ui"
 	"os"
 )
 
@@ -45,6 +46,11 @@ func parseArgs() (argparse.Argparse, error) {
 }
 
 func setLogLevel(logLevelArg, logLevelConf string) {
+	// If neither value is set, do nothing (level has default: logging.loggingLevel)
+	if logLevelArg == "" && logLevelConf == "" {
+		return
+	}
+
 	selectedLevel := logLevelArg
 	if selectedLevel == "" {
 		// Use config (or default) as second priority
@@ -85,7 +91,7 @@ func main() {
 	*/
 	a, err := parseArgs()
 	if err != nil {
-		logging.Fatalln(err)
+		ui.Fatalf("%s%s\n", "Invalid arguments: ", err)
 	}
 
 	// Set log level
