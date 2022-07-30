@@ -1,6 +1,6 @@
 package structs
 
 type Metadata struct {
-	Date, Link string
-	Groups     []string
+	Title, Num, Date, Link string
+	Groups                 []string
 }

@@ -37,9 +37,9 @@ type Page struct {
 }
 
 type Job struct {
-	Title, Filename, Num, ID string
-	Metadata                 structs.Metadata
-	Bar                      *progressbar.ProgressBar
+	ID, Filename string
+	Metadata     structs.Metadata
+	Bar          *progressbar.ProgressBar
 }
 
 func NewDownloader(config *Config,

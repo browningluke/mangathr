@@ -23,29 +23,31 @@ type mangaFeedResponse struct {
 	Result   string `json:"result"`
 	Response string `json:"response"`
 
-	Data []struct {
-		Id   string `json:"id"`
-		Type string `json:"type"`
-
-		Attributes struct {
-			Title              string `json:"title"`
-			Chapter            string `json:"chapter"`
-			TranslatedLanguage string `json:"translatedLanguage"`
-			CreatedAt          string `json:"createdAt"`
-		} `json:"attributes"`
-
-		Relationships []struct {
-			Id           string `json:"id"`
-			RelationType string `json:"type"`
-			Attributes   struct {
-				Name string `json:"name"`
-			} `json:"attributes"`
-		} `json:"relationships"`
-	} `json:"data"`
+	Data []mangaFeedData `json:"data"`
 
 	Limit  int `json:"limit"`
 	Offset int `json:"offset"`
 	Total  int `json:"total"`
+}
+
+type mangaFeedData struct {
+	Id   string `json:"id"`
+	Type string `json:"type"`
+
+	Attributes struct {
+		Title              string `json:"title"`
+		Chapter            string `json:"chapter"`
+		TranslatedLanguage string `json:"translatedLanguage"`
+		CreatedAt          string `json:"createdAt"`
+	} `json:"attributes"`
+
+	Relationships []struct {
+		Id           string `json:"id"`
+		RelationType string `json:"type"`
+		Attributes   struct {
+			Name string `json:"name"`
+		} `json:"attributes"`
+	} `json:"relationships"`
 }
 
 type chapterResponse struct {
