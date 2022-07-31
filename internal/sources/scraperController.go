@@ -53,7 +53,7 @@ type Scraper interface {
 
 	// Downloading
 
-	Download(downloader *downloader.Downloader, downloadType string)
+	Download(downloader *downloader.Downloader, downloadType string) (succeeded []structs.Chapter)
 
 	// Getters
 

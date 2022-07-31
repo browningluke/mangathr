@@ -77,17 +77,17 @@ func Run(config *config.Config) {
 			fmt.Printf(fmt.Sprintf("\rTitle: %s\nSource: %s\n# of new chapters: %d\n",
 				scraper.MangaTitle(), scraper.ScraperName(), len(newChapters)))
 
-			scraper.Download(downloader.NewDownloader(
+			succeeded := scraper.Download(downloader.NewDownloader(
 				&config.Downloader, true,
 				scraper.EnforceChapterDuration()), "update")
 
 			if !config.Downloader.DryRun {
-				// update in db
+				// If it's not a dry run, add new chapters to db
 				logging.Debugln("Saving chapters to db")
 
-				// todo. here we assume all downloads succeeded.
-				// todo. figure out how to determine which downloads failed
-				for _, chapter := range newChapters {
+				// Loop through successfully downloaded chapters, and add them to the db
+				// (will retry failed chapters on next run)
+				for _, chapter := range succeeded {
 					err := driver.CreateChapter(chapter.ID, chapter.Metadata.Num, chapter.Metadata.Title, manga)
 					if err != nil {
 						ui.Error("Failed to save chapter to db: ",

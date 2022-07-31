@@ -64,8 +64,8 @@ func (m *Scraper) runDownloadJob(job downloader.Job,
 	return nil
 }
 
-// Download selected chapters. Does not return an error, thus it must handle errors itself
-func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
+// Download selected chapters. Handles errors itself. Returns array of chapters that succeeded
+func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) []structs.Chapter {
 	logging.Debugln("Downloading...")
 
 	dl.SetChapterDuration(calculateDuration(len(m.selectedChapters)))
@@ -76,6 +76,7 @@ func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 	downloadQueue, maxRuneCount := buildDownloadQueue(m.selectedChapters)
 
 	// Execute download queue, potential to add workerpool here later
+	var succeededChapters []structs.Chapter
 	for _, job := range downloadQueue {
 		err := m.runDownloadJob(job, dl, path, maxRuneCount)
 
@@ -85,5 +86,9 @@ func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 			fmt.Printf("%s. Skipping chapter...", err.Message)
 			continue
 		}
+
+		succeededChapters = append(succeededChapters, job.Chapter)
 	}
+
+	return succeededChapters
 }
