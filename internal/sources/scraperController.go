@@ -34,7 +34,7 @@ type Scraper interface {
 	*/
 
 	SelectManga(name string) *logging.ScraperError
-	SelectNewChapters(chapters []structs.Chapter) ([]structs.Chapter, *logging.ScraperError)
+	SelectNewChapters(chapterIDs []string) ([]structs.Chapter, *logging.ScraperError)
 	SelectChapters(titles []string) *logging.ScraperError
 
 	/*

@@ -7,7 +7,6 @@ import (
 	"github.com/browningluke/mangathrV2/internal/downloader"
 	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/sources"
-	"github.com/browningluke/mangathrV2/internal/sources/structs"
 	"github.com/browningluke/mangathrV2/internal/ui"
 	"time"
 )
@@ -54,18 +53,12 @@ func Run(config *config.Config) {
 		fmt.Printf("Checking  %s", manga.Title)
 
 		// Convert ent chapters to chapter struct
-		var chapters []structs.Chapter
+		var chapterIDs []string
 		for _, chapter := range manga.Edges.Chapters {
-			chapters = append(chapters, structs.Chapter{
-				ID: chapter.ChapterID,
-				Metadata: structs.Metadata{
-					Title: chapter.Title,
-					Num:   chapter.Num,
-				},
-			})
+			chapterIDs = append(chapterIDs, chapter.ChapterID)
 		}
 
-		newChapters, err := scraper.SelectNewChapters(chapters)
+		newChapters, err := scraper.SelectNewChapters(chapterIDs)
 		if err != nil {
 			// Log error, abandon search, and continue (no need to exit program)
 			logging.Errorln(err)
