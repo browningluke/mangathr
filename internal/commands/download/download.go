@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/browningluke/mangathrV2/internal/config"
 	"github.com/browningluke/mangathrV2/internal/downloader"
+	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/sources"
 	"github.com/browningluke/mangathrV2/internal/ui"
 )
@@ -23,17 +24,24 @@ func Run(args *Args, config *config.Config) {
 	scraper := sources.NewScraper(args.Plugin, config)
 
 	// Search and select manga
-	titles := scraper.Search(args.Query)
-	selection := ui.SingleCheckboxes("Select Manga:", titles)
-	scraper.SelectManga(selection)
+	titles, err := scraper.Search(args.Query)
+	logging.ExitIfError(err)
 
-	chapterTitles := scraper.ChapterTitles()
+	selection := ui.SingleCheckboxes("Select Manga:", titles)
+	err = scraper.SelectManga(selection)
+	logging.ExitIfError(err)
+
+	chapterTitles, err := scraper.ChapterTitles()
+	logging.ExitIfError(err)
+
 	//fmt.Println(chapters)
 	chapterTitle := scraper.MangaTitle()
 	sourceName := scraper.ScraperName()
 	chapterSelections := SelectChapters(chapterTitles, chapterTitle, sourceName)
 	//fmt.Println(chapterSelections)
-	scraper.SelectChapters(chapterSelections)
+
+	err = scraper.SelectChapters(chapterSelections)
+	logging.ExitIfError(err)
 
 	scraper.Download(downloader.NewDownloader(
 		&config.Downloader, false,

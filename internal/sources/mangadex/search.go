@@ -2,8 +2,8 @@ package mangadex
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
+	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/rester"
 )
 
@@ -51,7 +51,7 @@ func parseSearchResults(mangaResp mangaResponse) ([]searchResult, []string) {
 }
 
 // Search for a Manga, will fill searchResults with 0 or more results
-func (m *Scraper) Search(query string) []string {
+func (m *Scraper) Search(query string) ([]string, *logging.ScraperError) {
 	// Build query params
 	queryParams := buildQueryParams(query, m.config.RatingFilter)
 
@@ -65,13 +65,15 @@ func (m *Scraper) Search(query string) []string {
 	var mangaResp mangaResponse
 	err := json.Unmarshal([]byte(jsonString), &mangaResp)
 	if err != nil {
-		panic(err)
+		return nil, &logging.ScraperError{
+			Error: err, Message: "Failed to read data when searching", Code: 0,
+		}
 	}
 
 	// Parse a list of Manga and a list of their names
 	searchResults, names := parseSearchResults(mangaResp)
 	m.searchResults = searchResults
-	return names
+	return names, nil
 }
 
 /*
@@ -79,7 +81,7 @@ func (m *Scraper) Search(query string) []string {
 */
 
 // SearchByID for a Manga, will fill searchResults with ONLY 1 result (first result)
-func (m *Scraper) SearchByID(id, title string) error {
+func (m *Scraper) SearchByID(id, title string) *logging.ScraperError {
 
 	// Test if ID is valid
 	_, resp := rester.New().Get(
@@ -88,7 +90,11 @@ func (m *Scraper) SearchByID(id, title string) error {
 		[]rester.QueryParam{}).Do(4, "100ms")
 
 	if resp.StatusCode != 200 {
-		return errors.New("SearchByID: validation status code != 200")
+		return &logging.ScraperError{
+			Error:   fmt.Errorf("searching by ID failed with status code: %d", resp.StatusCode),
+			Message: "Search for chapter returned non-200 code",
+			Code:    0,
+		}
 	}
 
 	m.manga = searchResult{title: title, id: id}
@@ -100,7 +106,7 @@ func (m *Scraper) SearchByID(id, title string) error {
 */
 
 // SelectManga from searchResults list
-func (m *Scraper) SelectManga(name string) {
+func (m *Scraper) SelectManga(name string) *logging.ScraperError {
 	found := false
 	for _, item := range m.searchResults {
 		if item.title == name {
@@ -111,9 +117,14 @@ func (m *Scraper) SelectManga(name string) {
 	}
 
 	if !found {
-		panic("Selected manga not is search result list")
+		return &logging.ScraperError{
+			Error:   fmt.Errorf("selected manga `%s`not in searchResults", name),
+			Message: "An error occurred while selected Manga",
+			Code:    0,
+		}
 	}
 
 	// Once manga has been selected, clear all search results
 	m.searchResults = []searchResult{}
+	return nil
 }

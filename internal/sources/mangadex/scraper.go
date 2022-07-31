@@ -48,9 +48,11 @@ func NewScraper(config *Config) *Scraper {
 	-- Get Chapter data --
 */
 
-func (m *Scraper) Chapters() []structs.Chapter {
+func (m *Scraper) Chapters() ([]structs.Chapter, *logging.ScraperError) {
 	if len(m.allChapters) == 0 && len(m.selectedChapters) == 0 {
-		m.scrapeChapters()
+		if err := m.scrapeChapters(); err != nil {
+			return nil, err
+		}
 	}
 
 	c := m.allChapters
@@ -64,12 +66,14 @@ func (m *Scraper) Chapters() []structs.Chapter {
 		chapters = append(chapters,
 			structs.Chapter{ID: item.id, Title: item.fullTitle, Metadata: item.metadata})
 	}
-	return chapters
+	return chapters, nil
 }
 
-func (m *Scraper) ChapterTitles() []string {
+func (m *Scraper) ChapterTitles() ([]string, *logging.ScraperError) {
 	if len(m.allChapters) == 0 && len(m.selectedChapters) == 0 {
-		m.scrapeChapters()
+		if err := m.scrapeChapters(); err != nil {
+			return nil, err
+		}
 	}
 
 	chapters := m.allChapters
@@ -82,26 +86,28 @@ func (m *Scraper) ChapterTitles() []string {
 	for _, item := range chapters {
 		titles = append(titles, item.fullTitle)
 	}
-	return titles
+	return titles, nil
 }
 
 /*
 	-- Get/Set Group data --
 */
 
-func (m *Scraper) GroupNames() []string {
+func (m *Scraper) GroupNames() ([]string, *logging.ScraperError) {
 	if len(m.groups) == 0 {
-		m.Chapters()
+		if _, err := m.Chapters(); err != nil {
+			return nil, err
+		}
 	}
 
 	var groupNames []string
 	for _, val := range m.groups {
 		groupNames = append(groupNames, val)
 	}
-	return groupNames
+	return groupNames, nil
 }
 
-func (m *Scraper) FilterGroups(groups []string) {
+func (m *Scraper) FilterGroups(groups []string) *logging.ScraperError {
 	findElemInSlice := func(slice []string, elem string) bool {
 		for _, v := range slice {
 			if elem == v {
@@ -122,6 +128,8 @@ func (m *Scraper) FilterGroups(groups []string) {
 		}
 	}
 	m.selectedChapters = selectedChapters
+
+	return nil
 }
 
 /*

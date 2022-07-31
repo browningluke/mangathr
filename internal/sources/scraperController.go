@@ -26,16 +26,16 @@ type Scraper interface {
 		-- Searching --
 	*/
 
-	Search(query string) []string
-	SearchByID(id, title string) error
+	Search(query string) ([]string, *logging.ScraperError)
+	SearchByID(id, title string) *logging.ScraperError
 
 	/*
 		-- Chapter scraping --
 	*/
 
-	SelectManga(name string)
-	SelectNewChapters(chapters []structs.Chapter) []structs.Chapter
-	SelectChapters(titles []string)
+	SelectManga(name string) *logging.ScraperError
+	SelectNewChapters(chapters []structs.Chapter) ([]structs.Chapter, *logging.ScraperError)
+	SelectChapters(titles []string) *logging.ScraperError
 
 	/*
 		-- Chapter data --
@@ -43,13 +43,13 @@ type Scraper interface {
 
 	// Getters
 
-	Chapters() []structs.Chapter
-	ChapterTitles() []string
-	GroupNames() []string
+	Chapters() ([]structs.Chapter, *logging.ScraperError)
+	ChapterTitles() ([]string, *logging.ScraperError)
+	GroupNames() ([]string, *logging.ScraperError)
 
 	// Setters
 
-	FilterGroups(groups []string)
+	FilterGroups(groups []string) *logging.ScraperError
 
 	// Downloading
 

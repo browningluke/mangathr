@@ -8,6 +8,7 @@ import (
 	"unicode/utf8"
 )
 
+// Download selected chapters. Does not return an error, thus it must handle errors itself
 func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 	logging.Debugln("Downloading...")
 
@@ -43,8 +44,11 @@ func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 		}
 	}
 
-	runJob := func(job downloader.Job) {
-		pages := m.getChapterPages(job.ID)
+	runJob := func(job downloader.Job) *logging.ScraperError {
+		pages, err := m.getChapterPages(job.ID)
+		if err != nil {
+			return err
+		}
 
 		progress := utils.CreateProgressBar(len(pages), maxRuneCount, job.Metadata.Num)
 
@@ -59,11 +63,18 @@ func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 		dl.Download(path, job.Filename, pages, progress)
 
 		fmt.Println("") // Create a new bar for each chapter
+		return nil
 	}
 
 	// Execute download queue, potential to add workerpool here later
 	for _, job := range downloadQueue {
-		runJob(job)
+		err := runJob(job)
+
+		// Print error to screen, abandon chapter, and continue
+		if err != nil {
+			logging.Errorln(err.Error)
+			fmt.Printf("%s. Skipping chapter...", err.Message)
+		}
 	}
 
 }

@@ -16,7 +16,7 @@ import (
 	-- Pages --
 */
 
-func (m *Scraper) getChapterPages(id string) []downloader.Page {
+func (m *Scraper) getChapterPages(id string) ([]downloader.Page, *logging.ScraperError) {
 	resInterface := rester.New().Get(
 		fmt.Sprintf("%s/at-home/server/%s", APIROOT, id),
 		map[string]string{},
@@ -29,11 +29,13 @@ func (m *Scraper) getChapterPages(id string) []downloader.Page {
 
 			nextRetryTimeInt := header["X-Ratelimit-Retry-After"][0]
 			nextRetryTime, err := strconv.ParseInt(nextRetryTimeInt, 10, 64)
+			now := time.Now().Unix()
+
 			if err != nil {
-				panic(err)
+				// Since we can't propagate an error (inside a helper func), we have to assume the worst case.
+				nextRetryTime = now + 10 // Wait 10 seconds
 			}
 
-			now := time.Now().Unix()
 			timeDiff := nextRetryTime - now
 			logging.Warningln(fmt.Sprintf("Time right now: %d", now))
 			logging.Warningln(fmt.Sprintf("Sleeping for: %d", timeDiff))
@@ -48,7 +50,11 @@ func (m *Scraper) getChapterPages(id string) []downloader.Page {
 
 	err := json.Unmarshal([]byte(jsonString), &chapterResp)
 	if err != nil {
-		panic(err)
+		return nil, &logging.ScraperError{
+			Error:   err,
+			Message: "An error occurred while getting chapter pages",
+			Code:    0,
+		}
 	}
 
 	length := len(chapterResp.Chapter.Data)
@@ -78,5 +84,5 @@ func (m *Scraper) getChapterPages(id string) []downloader.Page {
 		pages = getPages(chapterResp.Chapter.Data, "data")
 	}
 
-	return pages
+	return pages, nil
 }

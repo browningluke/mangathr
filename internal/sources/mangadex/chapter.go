@@ -17,11 +17,11 @@ const feedPageLimit = 500
 	-- Feed parsing --
 */
 
-func getMangaFeedPage(mangaID string, queryParams []rester.QueryParam, offset int) mangaFeedResponse {
+func getMangaFeedPage(id string, params []rester.QueryParam, offset int) (mangaFeedResponse, *logging.ScraperError) {
 	jsonResp, _ := rester.New().Get(
-		fmt.Sprintf("%s/manga/%s/feed", APIROOT, mangaID),
+		fmt.Sprintf("%s/manga/%s/feed", APIROOT, id),
 		map[string]string{},
-		append(queryParams,
+		append(params,
 			rester.QueryParam{Key: "offset", Value: strconv.Itoa(offset), Encode: true},
 			rester.QueryParam{Key: "includes[]", Value: "scanlation_group", Encode: true}),
 	).Do(4, "100ms")
@@ -31,14 +31,18 @@ func getMangaFeedPage(mangaID string, queryParams []rester.QueryParam, offset in
 
 	err := json.Unmarshal([]byte(jsonString), &mangaFeedResp)
 	if err != nil {
-		panic(err)
+		return mangaFeedResponse{}, &logging.ScraperError{
+			Error:   err,
+			Message: "An error occurred while getting Manga chapters",
+			Code:    0,
+		}
 	}
 
-	return mangaFeedResp
+	return mangaFeedResp, nil
 }
 
 // getMangaFeed: handles pagination of Feed API endpoint
-func getMangaFeed(mangaID string, languages, ratings []string) []mangaFeedResponse {
+func getMangaFeed(mangaID string, languages, ratings []string) ([]mangaFeedResponse, *logging.ScraperError) {
 	// Build query params
 	queryParams := []rester.QueryParam{
 		{Key: "limit", Value: fmt.Sprint(feedPageLimit), Encode: true},
@@ -56,14 +60,23 @@ func getMangaFeed(mangaID string, languages, ratings []string) []mangaFeedRespon
 	// Get all pages of feed
 
 	var mangaFeedRespList []mangaFeedResponse
-	initial := getMangaFeedPage(mangaID, queryParams, 0)
+	initial, err := getMangaFeedPage(mangaID, queryParams, 0)
+	if err != nil {
+		return nil, err
+	}
+
 	mangaFeedRespList = append(mangaFeedRespList, initial)
 
 	for i := 1; i <= int(math.Ceil(float64(initial.Total/feedPageLimit))); i++ {
-		mangaFeedRespList = append(mangaFeedRespList, getMangaFeedPage(mangaID, queryParams, feedPageLimit*i))
+		page, err := getMangaFeedPage(mangaID, queryParams, feedPageLimit*i)
+		if err != nil {
+			return nil, err
+		}
+
+		mangaFeedRespList = append(mangaFeedRespList, page)
 	}
 
-	return mangaFeedRespList
+	return mangaFeedRespList, nil
 }
 
 /*
@@ -71,7 +84,7 @@ func getMangaFeed(mangaID string, languages, ratings []string) []mangaFeedRespon
 */
 
 // parseChapterNum: parses chapter number as both string and float
-func parseChapterNum(chapterNum string) (string, float64) {
+func parseChapterNum(chapterNum string) (string, float64, *logging.ScraperError) {
 	var numFloat float64
 
 	if chapterNum == "" {
@@ -80,7 +93,11 @@ func parseChapterNum(chapterNum string) (string, float64) {
 		parsedFloat, err := strconv.ParseFloat(chapterNum, 64)
 		numFloat = parsedFloat
 		if err != nil {
-			panic(err)
+			return "", 0.0, &logging.ScraperError{
+				Error:   err,
+				Message: "An error occurred while parsing chapter number",
+				Code:    0,
+			}
 		}
 	}
 
@@ -90,7 +107,7 @@ func parseChapterNum(chapterNum string) (string, float64) {
 		num = "0"
 	}
 
-	return num, numFloat
+	return num, numFloat, nil
 }
 
 func (m *Scraper) parseGroups(data mangaFeedData) []string {
@@ -144,9 +161,12 @@ func (m *Scraper) generateTitle(chapterTitle, num, lang string, groups []string)
 	return fullTitle, metadataTitle
 }
 
-func (m *Scraper) scrapeChapters() {
+func (m *Scraper) scrapeChapters() *logging.ScraperError {
 	// Get entire Manga feed
-	mangaFeed := getMangaFeed(m.MangaID(), m.config.LanguageFilter, m.config.RatingFilter)
+	mangaFeed, err := getMangaFeed(m.MangaID(), m.config.LanguageFilter, m.config.RatingFilter)
+	if err != nil {
+		return err
+	}
 
 	var searchResults []chapterResult
 	// For each page
@@ -154,7 +174,10 @@ func (m *Scraper) scrapeChapters() {
 		// For each chapter in page
 		for _, item := range mangaFeedResp.Data {
 
-			numString, numFloat := parseChapterNum(item.Attributes.Chapter)
+			numString, numFloat, err := parseChapterNum(item.Attributes.Chapter)
+			if err != nil {
+				return err
+			}
 
 			groups := m.parseGroups(item)
 
@@ -184,13 +207,14 @@ func (m *Scraper) scrapeChapters() {
 	}
 
 	m.allChapters = searchResults
+	return nil
 }
 
 /*
 	-- Chapter selection --
 */
 
-func (m *Scraper) SelectChapters(titles []string) {
+func (m *Scraper) SelectChapters(titles []string) *logging.ScraperError {
 	var chapters []chapterResult
 
 	for _, chapter := range m.allChapters {
@@ -204,11 +228,15 @@ func (m *Scraper) SelectChapters(titles []string) {
 
 	// Once chapters have been selected, clear all chapters
 	m.allChapters = []chapterResult{}
+
+	return nil
 }
 
-func (m *Scraper) SelectNewChapters(chapters []structs.Chapter) []structs.Chapter {
+func (m *Scraper) SelectNewChapters(chapters []structs.Chapter) ([]structs.Chapter, *logging.ScraperError) {
 	// Populate .allChapters
-	_ = m.Chapters()
+	if _, err := m.Chapters(); err != nil {
+		return nil, err
+	}
 
 	var diffChapters []chapterResult
 	for _, newChapter := range m.allChapters {
@@ -236,5 +264,5 @@ func (m *Scraper) SelectNewChapters(chapters []structs.Chapter) []structs.Chapte
 		})
 	}
 
-	return diffStructChapters
+	return diffStructChapters, nil
 }

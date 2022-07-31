@@ -12,33 +12,41 @@ import (
 	"time"
 )
 
+// Package-wide accessible driver
+var driver *database.Driver
+
+func closeDatabase() {
+	logging.Warningln("Closing database because of error")
+	err := driver.Close()
+	if err != nil {
+		logging.Errorln(err)
+		ui.Error("Unable to close database.")
+	}
+}
+
 func Run(config *config.Config) {
 	// Open database
-	driver, err := database.GetDriver(database.SQLITE, config.Database.Uri)
+	var err error
+	driver, err = database.GetDriver(database.SQLITE, config.Database.Uri)
 	if err != nil {
 		logging.Errorln(err)
 		ui.Fatal("Unable to open database.")
 	}
-	defer func(driver *database.Driver) {
-		err := driver.Close()
-		if err != nil {
-			logging.Errorln(err)
-			ui.Error("Unable to close database.")
-		}
-	}(driver)
+	defer closeDatabase()
 
 	allManga, err := driver.QueryAllManga()
 	if err != nil {
-		logging.Errorln(err)
-		ui.Error("An error occurred when manga from database.")
+		logging.ExitIfErrorWithFunc(&logging.ScraperError{
+			Error: err, Message: "An error occurred while getting Manga from database.", Code: 0,
+		}, closeDatabase)
 	}
 
 	for _, manga := range allManga {
 		logging.Debugln("Requesting source...", manga.Source)
 		scraper := sources.NewScraper(manga.Source, config)
 
-		err := scraper.SearchByID(manga.MangaID, manga.Title)
-		if err != nil {
+		if err := scraper.SearchByID(manga.MangaID, manga.Title); err != nil {
+			// Log error, abandon search, and continue (no need to exit program)
 			logging.Errorln(err)
 			ui.Error("An error occurred while search for ", manga.Title)
 		}
@@ -60,7 +68,12 @@ func Run(config *config.Config) {
 			})
 		}
 
-		newChapters := scraper.SelectNewChapters(chapters)
+		newChapters, err := scraper.SelectNewChapters(chapters)
+		if err != nil {
+			// Log error, abandon search, and continue (no need to exit program)
+			logging.Errorln(err)
+			ui.Error("An error occurred while search for ", manga.Title)
+		}
 
 		if len(newChapters) > 0 {
 			fmt.Printf("\033[2K") // Clear line
@@ -90,9 +103,9 @@ func Run(config *config.Config) {
 		}
 
 		// Sleep between checks
-		dur, err := time.ParseDuration(config.Downloader.Delay.UpdateChapter)
-		if err != nil {
-			logging.Errorln(err)
+		dur, durErr := time.ParseDuration(config.Downloader.Delay.UpdateChapter)
+		if durErr != nil {
+			logging.Errorln(durErr)
 			ui.Error("Failed to parse time duration.")
 		}
 		time.Sleep(dur)

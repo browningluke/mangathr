@@ -5,11 +5,23 @@ import (
 	"github.com/browningluke/mangathrV2/internal/config"
 	"github.com/browningluke/mangathrV2/internal/database"
 	"github.com/browningluke/mangathrV2/internal/downloader"
+	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/sources"
 	"github.com/browningluke/mangathrV2/internal/ui"
-	"log"
 	"strings"
 )
+
+// Package-wide accessible driver
+var driver *database.Driver
+
+func closeDatabase() {
+	logging.Warningln("Closing database because of error")
+	err := driver.Close()
+	if err != nil {
+		logging.Errorln(err)
+		ui.Error("Unable to close database.")
+	}
+}
 
 type options struct {
 	title          string
@@ -19,7 +31,8 @@ type options struct {
 }
 
 func generateString(opts *options, prompt string) string {
-	chapterTitles := (*opts.scraper).ChapterTitles()
+	chapterTitles, err := (*opts.scraper).ChapterTitles()
+	logging.ExitIfErrorWithFunc(err, closeDatabase)
 	source := (*opts.scraper).ScraperName()
 
 	return fmt.Sprintf(
@@ -46,10 +59,15 @@ func handleRegisterMenu(opts *options, driver *database.Driver) bool {
 
 		manga, err := driver.CreateManga(mangaID, opts.title, source, opts.mapping, opts.filteredGroups)
 		if err != nil {
-			panic(err)
+			logging.ExitIfErrorWithFunc(&logging.ScraperError{
+				Error: err, Message: "An error occurred when adding Manga to database", Code: 0,
+			}, closeDatabase)
 		}
 
-		for _, c := range (*opts.scraper).Chapters() {
+		chapters, scraperErr := (*opts.scraper).Chapters()
+		logging.ExitIfErrorWithFunc(scraperErr, closeDatabase)
+
+		for _, c := range chapters {
 			err := driver.CreateChapter(c.ID, c.Num, c.Title, manga)
 			if err != nil {
 				panic(err)
@@ -74,10 +92,14 @@ func handleCustomizeMenu(opts *options) bool {
 		opts.mapping = downloader.CleanPath(res)
 		return true
 	case "Filter groups":
-		groups := (*opts.scraper).GroupNames()
+		groups, err := (*opts.scraper).GroupNames()
+		logging.ExitIfErrorWithFunc(err, closeDatabase)
+
 		selectedGroups := ui.Checkboxes("Select groups to filter: ", groups)
 		opts.filteredGroups = selectedGroups
-		(*opts.scraper).FilterGroups(selectedGroups)
+
+		err = (*opts.scraper).FilterGroups(selectedGroups)
+		logging.ExitIfErrorWithFunc(err, closeDatabase)
 		return true
 	case "Back":
 		return true
@@ -91,13 +113,17 @@ func handleCustomizeMenu(opts *options) bool {
 func promptMainMenu(args *Args, config *config.Config, driver *database.Driver) {
 	// Do manga scraping
 	scraper := sources.NewScraper(args.Plugin, config)
-	titles := scraper.Search(args.Query)
+	titles, err := scraper.Search(args.Query)
+	logging.ExitIfErrorWithFunc(err, closeDatabase)
 
 	selection := titles[0]
 	if len(titles) > 1 {
 		selection = ui.SingleCheckboxes("Select Manga:", titles)
 	}
-	scraper.SelectManga(selection)
+
+	err = scraper.SelectManga(selection)
+	logging.ExitIfErrorWithFunc(err, closeDatabase)
+
 	mangaTitle := scraper.MangaTitle()
 
 	opts := options{
@@ -131,16 +157,13 @@ func promptMainMenu(args *Args, config *config.Config, driver *database.Driver) 
 
 func Run(args *Args, config *config.Config) {
 	// Open database
-	driver, err := database.GetDriver(database.SQLITE, config.Database.Uri)
+	var err error
+	driver, err = database.GetDriver(database.SQLITE, config.Database.Uri)
 	if err != nil {
-		log.Fatalln(err)
+		logging.Errorln(err)
+		ui.Fatal("An error occurred while establishing a connection to the database")
 	}
-	defer func(driver *database.Driver) {
-		err := driver.Close()
-		if err != nil {
-			log.Fatalln(err)
-		}
-	}(driver)
+	defer closeDatabase()
 
 	promptMainMenu(args, config, driver)
 }
