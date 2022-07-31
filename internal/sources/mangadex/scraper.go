@@ -16,15 +16,6 @@ type searchResult struct {
 	title, id string
 }
 
-type chapterResult struct {
-	title, // The raw data from MD
-	fullTitle, // The formatted title for filename
-	id, language string
-	sortNum float64
-
-	metadata structs.Metadata
-}
-
 type Scraper struct {
 	name   string
 	config *Config
@@ -32,7 +23,7 @@ type Scraper struct {
 	searchResults []searchResult
 	manga         searchResult
 
-	allChapters, selectedChapters []chapterResult
+	allChapters, selectedChapters []structs.Chapter
 
 	// Group queries
 	groups []string
@@ -61,14 +52,10 @@ func (m *Scraper) Chapters() ([]structs.Chapter, *logging.ScraperError) {
 		c = m.selectedChapters
 	}
 
-	var chapters []structs.Chapter
-	for _, item := range c {
-		chapters = append(chapters,
-			structs.Chapter{ID: item.id, Title: item.fullTitle, Metadata: item.metadata})
-	}
-	return chapters, nil
+	return c, nil
 }
 
+// ChapterTitles Returns the full titles of chapters
 func (m *Scraper) ChapterTitles() ([]string, *logging.ScraperError) {
 	if len(m.allChapters) == 0 && len(m.selectedChapters) == 0 {
 		if err := m.scrapeChapters(); err != nil {
@@ -77,14 +64,13 @@ func (m *Scraper) ChapterTitles() ([]string, *logging.ScraperError) {
 	}
 
 	chapters := m.allChapters
-
 	if len(m.selectedChapters) != 0 {
 		chapters = m.selectedChapters
 	}
 
 	var titles []string
 	for _, item := range chapters {
-		titles = append(titles, item.fullTitle)
+		titles = append(titles, item.FullTitle)
 	}
 	return titles, nil
 }
@@ -117,10 +103,10 @@ func (m *Scraper) FilterGroups(groups []string) *logging.ScraperError {
 		return false
 	}
 
-	var selectedChapters []chapterResult
+	var selectedChapters []structs.Chapter
 	for _, chapter := range m.allChapters { // go through each chapter
 		for _, group := range groups { // go through each filtered group
-			exists := findElemInSlice(chapter.metadata.Groups, group)
+			exists := findElemInSlice(chapter.Metadata.Groups, group)
 			if exists {
 				selectedChapters = append(selectedChapters, chapter)
 				break

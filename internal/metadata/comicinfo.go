@@ -2,6 +2,7 @@ package metadata
 
 import (
 	"fmt"
+	"github.com/browningluke/mangathrV2/internal/sources/structs"
 	"strings"
 )
 
@@ -54,5 +55,15 @@ func (a *comicInfoAgent) SetWebLink(link string) Agent {
 
 func (a *comicInfoAgent) SetPageCount(count int) Agent {
 	a.template += fmt.Sprintf("<PageCount>%d</PageCount>\n", count)
+	return a
+}
+
+// SetFromStruct ingests all data from Metadata struct EXCEPT PageCount
+func (a *comicInfoAgent) SetFromStruct(metadata structs.Metadata) Agent {
+	a.SetTitle(metadata.Title).
+		SetNum(metadata.Num).
+		SetWebLink(metadata.Link).
+		SetDate(metadata.Date).
+		SetEditors(metadata.Groups)
 	return a
 }

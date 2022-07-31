@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/browningluke/mangathrV2/internal/downloader"
 	"github.com/browningluke/mangathrV2/internal/logging"
+	"github.com/browningluke/mangathrV2/internal/sources/structs"
 	"github.com/browningluke/mangathrV2/internal/utils"
 	"unicode/utf8"
 )
@@ -24,43 +25,40 @@ func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) {
 
 	// downloadType is one of ["download", "update"]
 	path := dl.CreateDirectory(m.manga.title, downloadType)
-	downloadQueue := make([]downloader.Job, len(m.selectedChapters))
 
+	var downloadQueue []downloader.Job
 	maxRuneCount := 0 // Used for padding (e.g. Chapter 10 vs Chapter 10.5)
-	for i, chapter := range m.selectedChapters {
-		language := ""
-		if len(m.config.LanguageFilter) > 1 {
-			language = fmt.Sprintf("%s", chapter.language)
-		}
-		chapterFilename := dl.GetNameFromTemplate(m.config.FilenameTemplate,
-			chapter.metadata.Num, chapter.title, language, chapter.metadata.Groups)
+	for _, chapter := range m.selectedChapters {
+		downloadQueue = append(downloadQueue, downloader.Job{Chapter: chapter})
 
-		downloadQueue[i] = downloader.Job{
-			ID: chapter.id, Filename: chapterFilename, Metadata: chapter.metadata,
-		}
-
-		if runeCount := utf8.RuneCountInString(chapter.metadata.Num); runeCount > maxRuneCount {
+		// Check if string length is max in list
+		if runeCount := utf8.RuneCountInString(chapter.Metadata.Num); runeCount > maxRuneCount {
 			maxRuneCount = runeCount
 		}
 	}
 
 	runJob := func(job downloader.Job) *logging.ScraperError {
-		pages, err := m.getChapterPages(job.ID)
+		// Get chapter pages
+		pages, err := m.getChapterPages(job.Chapter.ID)
 		if err != nil {
 			return err
 		}
 
-		progress := utils.CreateProgressBar(len(pages), maxRuneCount, job.Metadata.Num)
+		metadata := job.Chapter.Metadata
+
+		// Initialize progress bar
+		progress := utils.CreateProgressBar(len(pages), maxRuneCount, job.Chapter.Metadata.Num)
+
+		// Get chapter filename
+		// todo handle language (and user template)
+		filename := dl.GetNameFromTemplate(m.config.FilenameTemplate,
+			metadata.Num, metadata.Title, metadata.Language, metadata.Groups)
 
 		// Set MetadataAgent values
 		(*dl.MetadataAgent()).
-			SetTitle(job.Metadata.Title).
-			SetNum(job.Metadata.Num).
-			SetWebLink(job.Metadata.Link).
-			SetDate(job.Metadata.Date).
-			SetEditors(job.Metadata.Groups).
+			SetFromStruct(job.Chapter.Metadata).
 			SetPageCount(len(pages))
-		dl.Download(path, job.Filename, pages, progress)
+		dl.Download(path, filename, pages, progress)
 
 		fmt.Println("") // Create a new bar for each chapter
 		return nil

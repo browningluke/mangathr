@@ -168,7 +168,7 @@ func (m *Scraper) scrapeChapters() *logging.ScraperError {
 		return err
 	}
 
-	var searchResults []chapterResult
+	var searchResults []structs.Chapter
 	// For each page
 	for _, mangaFeedResp := range mangaFeed {
 		// For each chapter in page
@@ -185,22 +185,20 @@ func (m *Scraper) scrapeChapters() *logging.ScraperError {
 				item.Attributes.TranslatedLanguage, groups)
 
 			searchResults = append(searchResults,
-				chapterResult{
-					id: item.Id,
+				structs.Chapter{
+					ID:      item.Id,
+					SortNum: numFloat,
 
-					fullTitle: fullTitle,
-					title:     item.Attributes.Title,
+					FullTitle: fullTitle,
+					RawTitle:  item.Attributes.Title,
 
-					sortNum: numFloat,
-
-					language: item.Attributes.TranslatedLanguage,
-
-					metadata: structs.Metadata{
-						Title:  metadataTitle,
-						Num:    numString,
-						Groups: groups,
-						Link:   fmt.Sprintf("https://mangadex.org/chapter/%s", item.Id),
-						Date:   item.Attributes.CreatedAt[0:11],
+					Metadata: structs.Metadata{
+						Title:    metadataTitle,
+						Num:      numString,
+						Language: item.Attributes.TranslatedLanguage,
+						Date:     item.Attributes.CreatedAt[0:11],
+						Link:     fmt.Sprintf("https://mangadex.org/chapter/%s", item.Id),
+						Groups:   groups,
 					},
 				})
 		}
@@ -215,11 +213,11 @@ func (m *Scraper) scrapeChapters() *logging.ScraperError {
 */
 
 func (m *Scraper) SelectChapters(titles []string) *logging.ScraperError {
-	var chapters []chapterResult
+	var chapters []structs.Chapter
 
 	for _, chapter := range m.allChapters {
 		for _, promptTitle := range titles {
-			if chapter.fullTitle == promptTitle {
+			if chapter.FullTitle == promptTitle {
 				chapters = append(chapters, chapter)
 			}
 		}
@@ -227,7 +225,7 @@ func (m *Scraper) SelectChapters(titles []string) *logging.ScraperError {
 	m.selectedChapters = chapters
 
 	// Once chapters have been selected, clear all chapters
-	m.allChapters = []chapterResult{}
+	m.allChapters = []structs.Chapter{}
 
 	return nil
 }
@@ -238,11 +236,11 @@ func (m *Scraper) SelectNewChapters(chapters []structs.Chapter) ([]structs.Chapt
 		return nil, err
 	}
 
-	var diffChapters []chapterResult
+	var diffChapters []structs.Chapter
 	for _, newChapter := range m.allChapters {
 		exists := false
 		for _, oldChapter := range chapters {
-			if oldChapter.ID == newChapter.id {
+			if oldChapter.ID == newChapter.ID {
 				exists = true
 				break
 			}
@@ -252,17 +250,8 @@ func (m *Scraper) SelectNewChapters(chapters []structs.Chapter) ([]structs.Chapt
 		}
 	}
 	m.selectedChapters = diffChapters
-	m.allChapters = []chapterResult{}
+	m.allChapters = []structs.Chapter{}
 
 	logging.Debugln("SelectNewChapters: New chapters: ", diffChapters)
-	var diffStructChapters []structs.Chapter
-	for _, chapter := range diffChapters {
-		diffStructChapters = append(diffStructChapters, structs.Chapter{
-			ID:       chapter.id,
-			Title:    chapter.title,
-			Metadata: chapter.metadata,
-		})
-	}
-
-	return diffStructChapters, nil
+	return diffChapters, nil
 }

@@ -1,7 +1,9 @@
 package structs
 
 type Chapter struct {
-	ID, Num, Title string
-
-	Metadata Metadata
+	ID        string  // Unique identifier for the chapter (can be different per source)
+	SortNum   float64 // Number used for sorting chapters
+	RawTitle  string  // Title straight from source
+	FullTitle string  // Title including groups/language/etc
+	Metadata  Metadata
 }

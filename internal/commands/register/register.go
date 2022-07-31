@@ -68,7 +68,7 @@ func handleRegisterMenu(opts *options, driver *database.Driver) bool {
 		logging.ExitIfErrorWithFunc(scraperErr, closeDatabase)
 
 		for _, c := range chapters {
-			err := driver.CreateChapter(c.ID, c.Num, c.Title, manga)
+			err := driver.CreateChapter(c.ID, c.Metadata.Num, c.Metadata.Title, manga)
 			if err != nil {
 				panic(err)
 			}

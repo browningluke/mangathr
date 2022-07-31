@@ -57,13 +57,10 @@ func Run(config *config.Config) {
 		var chapters []structs.Chapter
 		for _, chapter := range manga.Edges.Chapters {
 			chapters = append(chapters, structs.Chapter{
-				ID:    chapter.ChapterID,
-				Num:   chapter.Num,
-				Title: chapter.Title,
+				ID: chapter.ChapterID,
 				Metadata: structs.Metadata{
-					Date:   "",  // These can be empty since
-					Link:   "",  // these will not be downloaded
-					Groups: nil, // and metadata is not needed.
+					Title: chapter.Title,
+					Num:   chapter.Num,
 				},
 			})
 		}
@@ -91,10 +88,10 @@ func Run(config *config.Config) {
 				// todo. here we assume all downloads succeeded.
 				// todo. figure out how to determine which downloads failed
 				for _, chapter := range newChapters {
-					err := driver.CreateChapter(chapter.ID, chapter.Num, chapter.Title, manga)
+					err := driver.CreateChapter(chapter.ID, chapter.Metadata.Num, chapter.Metadata.Title, manga)
 					if err != nil {
 						ui.Error("Failed to save chapter to db: ",
-							chapter.Title, " (", chapter.ID, ")")
+							chapter.Metadata.Title, " (", chapter.ID, ")")
 					}
 				}
 			}
