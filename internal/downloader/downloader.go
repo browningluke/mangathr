@@ -208,14 +208,17 @@ func (d *Downloader) runDownload(pages []Page, chapterPath string, bar *progress
 
 	}
 	wp.StopWait()
-	filename, body := d.agent.GenerateMetadataFile()
+	filename, body, err := d.agent.GenerateMetadataFile()
+	if err != nil {
+		panic(err)
+	}
 
 	comicInfo, err := zipWriter.Create(filename)
 	if err != nil {
 		panic(err)
 	}
 
-	reader := strings.NewReader(body)
+	reader := bytes.NewReader(body)
 	_, err = io.Copy(comicInfo, reader)
 	if err != nil {
 		panic(err)

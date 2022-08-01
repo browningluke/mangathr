@@ -3,7 +3,7 @@ package metadata
 import "github.com/browningluke/mangathrV2/internal/sources/structs"
 
 type Agent interface {
-	GenerateMetadataFile() (filename, body string)
+	GenerateMetadataFile() (filename string, body []byte, err error)
 
 	SetTitle(title string) Agent
 	SetNum(num string) Agent
