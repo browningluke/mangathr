@@ -45,6 +45,17 @@ func GetImageExtension(filename string) string {
 	return "." + regexp.MustCompile(`.*\.(jpg|jpeg|webp|png|gif)$`).FindAllStringSubmatch(filename, -1)[0][1]
 }
 
+func ExtractDate(dirtyDate string) string {
+	re := regexp.MustCompile(`(\d{4})[-_/](\d{2})[-_/](\d{2})(T|$)`)
+
+	result := re.FindAllStringSubmatch(dirtyDate, -1)
+	if result == nil {
+		return ""
+	}
+
+	return fmt.Sprintf("%s-%s-%s", result[0][1], result[0][2], result[0][3])
+}
+
 func CreateProgressBar(length, maxRunes int, chapterNum string) *progressbar.ProgressBar {
 	if rc := utf8.RuneCountInString(chapterNum); rc < maxRunes {
 		chapterNum += strings.Repeat(" ", maxRunes-rc)

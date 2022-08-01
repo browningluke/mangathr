@@ -3,7 +3,9 @@ package metadata
 import (
 	"encoding/xml"
 	"fmt"
+	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/sources/structs"
+	"github.com/browningluke/mangathrV2/internal/utils"
 	"strings"
 )
 
@@ -57,10 +59,17 @@ func (a *comicInfoAgent) SetNum(num string) Agent {
 
 // SetDate in yyyy-mm-dd format
 func (a *comicInfoAgent) SetDate(date string) Agent {
-	// TODO use a better method for extracting the date
-	a.template.Year = fmt.Sprint(date[0:4])
-	a.template.Month = fmt.Sprint(date[5:7])
-	a.template.Day = fmt.Sprint(date[8:10])
+	date = utils.ExtractDate(date)
+	if date == "" {
+		logging.Warningf("Attempted to parse garbage date string: %s\n", date)
+		return a
+	}
+
+	dateSlice := strings.Split(date, "-")
+
+	a.template.Year = dateSlice[0]
+	a.template.Month = dateSlice[1]
+	a.template.Day = dateSlice[2]
 	return a
 }
 
