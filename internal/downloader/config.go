@@ -40,8 +40,7 @@ func (c *Config) Default() {
 	c.Output.Path = getCWD()       // Use CWD
 	c.Output.UpdatePath = getCWD() // Use CWD
 	c.Output.Zip = true
-	c.Output.FilenameTemplate = "{num:3} - Chapter {num}{? - {title}}"
-	//c.Output.FilenameTemplate = "{num:3} - Chapter {num}{? - {lang}}{? - {title}}"
+	c.Output.FilenameTemplate = "{num:3} - Chapter {num}{title: - <.>}{groups: [<.>]}"
 
 	c.Metadata.Agent = "comicinfo"
 	c.Metadata.Location = "internal"

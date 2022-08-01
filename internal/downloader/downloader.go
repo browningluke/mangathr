@@ -9,7 +9,6 @@ import (
 	"github.com/browningluke/mangathrV2/internal/metadata"
 	"github.com/browningluke/mangathrV2/internal/rester"
 	"github.com/browningluke/mangathrV2/internal/sources/structs"
-	"github.com/browningluke/mangathrV2/internal/utils"
 	"github.com/gammazero/workerpool"
 	"github.com/schollz/progressbar/v3"
 	"io"
@@ -17,7 +16,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strings"
 	"sync"
 	"time"
 )
@@ -60,6 +58,12 @@ func (d *Downloader) SetChapterDuration(duration int64) {
 	d.chapterDuration = duration
 }
 
+func (d *Downloader) SetTemplate(template string) {
+	if template != "" {
+		d.config.Output.FilenameTemplate = template
+	}
+}
+
 /*
 	-- Utils --
 */
@@ -87,35 +91,12 @@ func (d *Downloader) CreateDirectory(title, downloadType string) string {
 	return newPath
 }
 
-func (d *Downloader) GetNameFromTemplate(pluginTemplate, num, title, language string, groups []string) string {
-	var template string
-	if pluginTemplate != "" {
-		template = pluginTemplate
-	} else {
-		template = d.config.Output.FilenameTemplate
+func (d *Downloader) GetNameFromTemplate(job Job) string {
+	templater := &Templater{
+		RawTitle: job.Chapter.RawTitle,
+		Metadata: job.Chapter.Metadata,
 	}
-
-	// Do template replacement here
-	_ = template
-
-	paddedNum := utils.PadString(num, 3)
-
-	conditionalLanguage := ""
-	if language != "" {
-		conditionalLanguage = fmt.Sprintf(" [%s]", language)
-	}
-
-	conditionalGroups := ""
-	if len(groups) > 0 {
-		conditionalGroups = fmt.Sprintf(" [%s]", strings.Join(groups[:], ", "))
-	}
-
-	conditionalTitle := ""
-	if title != "" {
-		conditionalTitle = fmt.Sprintf(" - %s", title)
-	}
-	return fmt.Sprintf("%s - Chapter %s%s%s%s", paddedNum, num, conditionalTitle,
-		conditionalLanguage, conditionalGroups)
+	return templater.ExecTemplate(d.config.Output.FilenameTemplate)
 }
 
 func (d *Downloader) waitChapterDuration(timeStart int64) {

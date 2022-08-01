@@ -44,15 +44,13 @@ func (m *Scraper) runDownloadJob(job downloader.Job,
 		return err
 	}
 
-	metadata := job.Chapter.Metadata
-
 	// Initialize progress bar
 	progress := utils.CreateProgressBar(len(pages), maxRuneCount, job.Chapter.Metadata.Num)
 
 	// Get chapter filename
 	// todo handle language (and user template)
-	filename := dl.GetNameFromTemplate(m.config.FilenameTemplate,
-		metadata.Num, metadata.Title, metadata.Language, metadata.Groups)
+	dl.SetTemplate(m.config.FilenameTemplate)
+	filename := dl.GetNameFromTemplate(job)
 
 	// Set MetadataAgent values
 	(*dl.MetadataAgent()).
