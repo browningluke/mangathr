@@ -57,6 +57,7 @@ jobs:
             docker.io/${{ env.IMAGE_NAME }}
             ghcr.io/${{ env.IMAGE_NAME }}
           tags: |
+            type=ref,event=branch
             type=semver,pattern={{version}}
           flavor: |
             latest=true
