@@ -9,6 +9,7 @@ import (
 	"github.com/browningluke/mangathrV2/internal/config/defaults"
 	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/ui"
+	"github.com/browningluke/mangathrV2/internal/utils"
 	"os"
 )
 
@@ -16,10 +17,14 @@ import (
 	Config
 */
 func getConfigPath() (string, error) {
-	// Create config directory if it does not exist
-	configDir := defaults.ConfigDir()
-	err := os.MkdirAll(configDir, os.ModePerm)
-	return defaults.ConfigPath(), err
+	if utils.IsRunningInContainer() {
+		return defaults.ConfigPathDocker(), nil
+	} else {
+		// Create config directory if it does not exist
+		configDir := defaults.ConfigDir()
+		err := os.MkdirAll(configDir, os.ModePerm)
+		return defaults.ConfigPath(), err
+	}
 }
 
 func loadConfig() (config.Config, error) {
@@ -30,7 +35,7 @@ func loadConfig() (config.Config, error) {
 	}
 
 	var c config.Config
-	err = c.Load(path)
+	err = c.Load(path, utils.IsRunningInContainer())
 	return c, err
 }
 

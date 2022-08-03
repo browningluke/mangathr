@@ -23,8 +23,8 @@ type Config struct {
 	LogLevel string `yaml:"logLevel"`
 }
 
-func (c *Config) Load(path string) error {
-	c.useDefaults()
+func (c *Config) Load(path string, inContainer bool) error {
+	c.useDefaults(inContainer)
 
 	yamlFile, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -40,12 +40,12 @@ func (c *Config) Load(path string) error {
 	return nil
 }
 
-func (c *Config) useDefaults() {
+func (c *Config) useDefaults(inContainer bool) {
 	c.Database.Driver = defaults.DatabaseDriver()
 	c.Database.Uri = defaults.DatabaseUri()
 
 	downloadConf := downloader.Config{}
-	downloadConf.Default()
+	downloadConf.Default(inContainer)
 	c.Downloader = downloadConf
 
 	mangadexConf := mangadex.Config{}
@@ -53,6 +53,11 @@ func (c *Config) useDefaults() {
 	c.Sources.Mangadex = mangadexConf
 
 	c.LogLevel = ""
+
+	// Overwrite defaults if we are in a container
+	if inContainer {
+		c.Database.Uri = defaults.DatabaseUriDocker()
+	}
 }
 
 func (c *Config) validate() error {

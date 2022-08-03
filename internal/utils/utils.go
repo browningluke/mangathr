@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"github.com/schollz/progressbar/v3"
+	"os"
 	"regexp"
 	"strings"
 	"unicode/utf8"
@@ -64,4 +65,11 @@ func CreateProgressBar(length, maxRunes int, chapterNum string) *progressbar.Pro
 	return progressbar.NewOptions(length,
 		progressbar.OptionSetDescription(fmt.Sprintf("Chapter %s", chapterNum)),
 	)
+}
+
+func IsRunningInContainer() bool {
+	if _, err := os.Stat("/.dockerenv"); err != nil {
+		return false
+	}
+	return true
 }

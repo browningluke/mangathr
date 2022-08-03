@@ -1,0 +1,14 @@
+version: '3.4'
+services:
+  mangathrv2:
+    image: browningluke/mangathrv2
+    container_name: mangathrv2
+    command:
+      ## By default, check for new chapters of registered manga
+      - "update"
+    volumes:
+      ## Where to store downloaded content
+      - ./data:/data
+
+      ## Where to store the database & config file
+      - ./config:/config

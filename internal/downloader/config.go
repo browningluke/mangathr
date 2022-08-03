@@ -1,6 +1,7 @@
 package downloader
 
 import (
+	"github.com/browningluke/mangathrV2/internal/config/defaults"
 	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/ui"
 	"os"
@@ -28,7 +29,7 @@ type Config struct {
 	}
 }
 
-func (c *Config) Default() {
+func (c *Config) Default(inContainer bool) {
 	c.DryRun = false
 	c.SimultaneousPages = 2
 	c.PageRetries = 5
@@ -44,6 +45,12 @@ func (c *Config) Default() {
 
 	c.Metadata.Agent = "comicinfo"
 	c.Metadata.Location = "internal"
+
+	// Overwrite defaults if we are in a container
+	if inContainer {
+		c.Output.Path = defaults.DataPathDocker()
+		c.Output.UpdatePath = defaults.DataPathDocker()
+	}
 }
 
 func getCWD() string {
