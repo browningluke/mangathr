@@ -4,7 +4,6 @@ import (
 	"archive/zip"
 	"bytes"
 	"github.com/browningluke/mangathrV2/internal/logging"
-	"github.com/gammazero/workerpool"
 	"github.com/schollz/progressbar/v3"
 	"io"
 	"os"
@@ -29,7 +28,7 @@ func writeToZip(fileBytes []byte, filename string, writer *zip.Writer, mu *sync.
 	return nil
 }
 
-func (d *Downloader) downloadZip(pages []Page, chapterPath string, bar *progressbar.ProgressBar) {
+func (d *Downloader) downloadZip(pages []Page, chapterPath string, bar *progressbar.ProgressBar) error {
 	// Create empty file
 	archive, err := os.Create(chapterPath)
 	defer func(archive *os.File) {
@@ -49,26 +48,38 @@ func (d *Downloader) downloadZip(pages []Page, chapterPath string, bar *progress
 		}
 	}(zipWriter)
 
-	wp := workerpool.New(d.config.SimultaneousPages)
+	// -- Handle writes ---
 	var mu sync.Mutex
 
-	for _, page := range pages {
-		logging.Debugln("Processing " + page.Filename)
-
-		f := buildWorkerPoolFunc(d.config, page, bar, func(page *Page) error {
-			// Write image bytes to zipfile
-			return writeToZip(page.bytes, page.Filename, zipWriter, &mu)
-		})
-		wp.Submit(f)
-	}
-	wp.StopWait()
+	// Write metadata to zip
 	filename, body, err := d.agent.GenerateMetadataFile()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	err = writeToZip(body, filename, zipWriter, &mu)
 	if err != nil {
-		panic(err)
+		return err
 	}
+
+	// Build task array
+	var tasks []func()
+	for _, page := range pages {
+		tasks = append(tasks, buildWorkerPoolFunc(d.config, page, bar, func(page *Page) error {
+			// Write image bytes to zipfile
+			return writeToZip(page.bytes, page.Filename, zipWriter, &mu)
+		}))
+	}
+
+	// Run tasks on worker pool
+	err = runWorkerPool(tasks, d.config.SimultaneousPages)
+	if err != nil {
+		if err := bar.Clear(); err != nil {
+			// If the progress bar breaks for some reason, we should panic
+			panic(err)
+		}
+		return err
+	}
+
+	return nil
 }

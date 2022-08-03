@@ -1,6 +1,8 @@
 package downloader
 
 import (
+	"fmt"
+	"github.com/alitto/pond"
 	"github.com/schollz/progressbar/v3"
 	"log"
 	"os"
@@ -36,6 +38,21 @@ func (d *Downloader) CreateDirectory(title, downloadType string) string {
 	return newPath
 }
 
+func (d *Downloader) Cleanup(path, filename string) error {
+	filename = CleanPath(filename)
+	if d.config.Output.Zip {
+		filename = fmt.Sprintf("%s.cbz", filename)
+	}
+
+	chapterPath := filepath.Join(path, filename)
+
+	err := os.RemoveAll(chapterPath)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (d *Downloader) GetNameFromTemplate(job Job) string {
 	templater := &Templater{
 		RawTitle: job.Chapter.RawTitle,
@@ -58,25 +75,52 @@ func (d *Downloader) waitChapterDuration(timeStart int64) {
 	}
 }
 
+/*
+	Worker pool
+*/
+
 func buildWorkerPoolFunc(config *Config, page Page, bar *progressbar.ProgressBar, writeBytes func(*Page) error) func() {
 	return func() {
 		// Get image bytes to write
 		pageD, err := page.download(config)
-		handleChapterError(err)
+		if err != nil {
+			panic(err)
+		}
 
 		// Write bytes to whichever output
 		err = writeBytes(pageD)
-		handleChapterError(err)
+		if err != nil {
+			panic(err)
+		}
 
 		// Add 1 to the bar
 		err = bar.Add(1)
-		handleChapterError(err)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
-func handleChapterError(err error) {
-	if err != nil {
-		log.Fatalln(err)
-		// todo if page fails more than retries, abandon entire chapter
+func runWorkerPool(tasks []func(), simultaneousPages int) error {
+	wpErr := make(chan error)
+	panicHandler := func(p interface{}) {
+		wpErr <- p.(error)
+	}
+	pool := pond.New(simultaneousPages, 0, pond.PanicHandler(panicHandler))
+
+	for _, task := range tasks {
+		pool.Submit(task)
+	}
+
+	for {
+		select {
+		case err := <-wpErr:
+			pool.Stop()
+			return err
+		default:
+			if pool.SubmittedTasks() == pool.CompletedTasks() {
+				return nil
+			}
+		}
 	}
 }

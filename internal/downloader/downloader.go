@@ -54,7 +54,7 @@ func (d *Downloader) SetTemplate(template string) {
 	-- Chapter Downloading --
 */
 
-func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *progressbar.ProgressBar) {
+func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *progressbar.ProgressBar) error {
 
 	// Ensure chapter time is correct
 	if d.enforceChapterDuration {
@@ -64,7 +64,7 @@ func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *p
 		// TODO: differentiate between Download & Update delay
 		dur, err := time.ParseDuration(d.config.Delay.Chapter)
 		if err != nil {
-			panic(err)
+			return err
 		}
 		time.Sleep(dur)
 	}
@@ -80,20 +80,22 @@ func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *p
 	if d.config.DryRun {
 		fmt.Println("DRY RUN: not downloading")
 		if err := bar.Finish(); err != nil {
+			// If the progress bar breaks for some reason, we should panic
 			panic(err)
 		}
-		return
+		return nil
 	} else if _, err := os.Stat(chapterPath); err == nil {
 		fmt.Println("Chapter already exists.")
 		if err := bar.Finish(); err != nil {
+			// If the progress bar breaks for some reason, we should panic
 			panic(err)
 		}
-		return
+		return nil
 	}
 
 	if d.config.Output.Zip {
-		d.downloadZip(pages, chapterPath, bar)
+		return d.downloadZip(pages, chapterPath, bar)
 	} else {
-		d.downloadDir(pages, chapterPath, bar)
+		return d.downloadDir(pages, chapterPath, bar)
 	}
 }

@@ -6,7 +6,7 @@ require (
 	entgo.io/ent v0.10.2-0.20220502113020-4ac82f5bb3f0
 	github.com/AlecAivazis/survey/v2 v2.3.4
 	github.com/akamensky/argparse v1.3.1
-	github.com/gammazero/workerpool v1.1.2
+	github.com/alitto/pond v1.8.0
 	github.com/schollz/progressbar/v3 v3.8.6
 	gopkg.in/yaml.v2 v2.4.0
 	modernc.org/sqlite v1.17.3
@@ -16,7 +16,6 @@ require (
 	ariga.io/atlas v0.4.1 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
-	github.com/gammazero/deque v0.1.1 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/google/uuid v1.3.0 // indirect
