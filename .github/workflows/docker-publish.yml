@@ -2,12 +2,12 @@ name: Docker-Base
 
 on:
   push:
-    branches: [ "main", "add_github_actions" ]
+    branches: [ "main" ]
     tags: [ 'v*.*.*' ]   # Publish semver tags as releases.
-#    paths-ignore:
-#      - "docs/**"
-#      - ".github/**"
-#      - "examples/**"
+    paths-ignore:
+      - "docs/**"
+      - ".github/**"
+      - "examples/**"
 
 env:
   # github.repository as <account>/<repo>
