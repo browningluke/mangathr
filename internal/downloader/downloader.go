@@ -2,11 +2,11 @@ package downloader
 
 import (
 	"fmt"
+	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/metadata"
 	"github.com/browningluke/mangathrV2/internal/sources/structs"
 	"github.com/schollz/progressbar/v3"
 	"os"
-	"path/filepath"
 	"time"
 )
 
@@ -54,7 +54,30 @@ func (d *Downloader) SetTemplate(template string) {
 	-- Chapter Downloading --
 */
 
-func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *progressbar.ProgressBar) error {
+func (d *Downloader) CanDownload(path, filename string) *logging.ScraperError {
+	chapterPath := d.GetChapterPath(path, filename)
+
+	if d.config.DryRun {
+		return &logging.ScraperError{
+			Error:   fmt.Errorf("called with dryRun set to true"),
+			Message: "DRY RUN",
+			Code:    0,
+		}
+	}
+
+	if _, err := os.Stat(chapterPath); err == nil {
+		return &logging.ScraperError{
+			Error:   fmt.Errorf("file exists at path %s", chapterPath),
+			Message: "chapter already exists",
+			Code:    0,
+		}
+	}
+
+	return nil
+}
+
+// Download chapter. Assumes CanDownload() has been called and has returned true
+func (d *Downloader) Download(path, filename string, pages []Page, bar *progressbar.ProgressBar) error {
 
 	// Ensure chapter time is correct
 	if d.enforceChapterDuration {
@@ -69,29 +92,7 @@ func (d *Downloader) Download(path, chapterFilename string, pages []Page, bar *p
 		time.Sleep(dur)
 	}
 
-	// Extract file/dir name (depends on config.output.zip)
-	filename := CleanPath(chapterFilename)
-	if d.config.Output.Zip {
-		filename = fmt.Sprintf("%s.cbz", filename)
-	}
-
-	chapterPath := filepath.Join(path, filename)
-
-	if d.config.DryRun {
-		fmt.Println("DRY RUN: not downloading")
-		if err := bar.Finish(); err != nil {
-			// If the progress bar breaks for some reason, we should panic
-			panic(err)
-		}
-		return nil
-	} else if _, err := os.Stat(chapterPath); err == nil {
-		fmt.Println("Chapter already exists.")
-		if err := bar.Finish(); err != nil {
-			// If the progress bar breaks for some reason, we should panic
-			panic(err)
-		}
-		return nil
-	}
+	chapterPath := d.GetChapterPath(path, filename)
 
 	if d.config.Output.Zip {
 		return d.downloadZip(pages, chapterPath, bar)

@@ -30,27 +30,15 @@ func (d *Downloader) CreateDirectory(title, downloadType string) string {
 	}
 
 	newPath := filepath.Join(dirname, CleanPath(title))
-	err := os.MkdirAll(newPath, os.ModePerm)
-	if err != nil {
-		log.Fatalln(err)
+
+	if !d.config.DryRun {
+		err := os.MkdirAll(newPath, os.ModePerm)
+		if err != nil {
+			log.Fatalln(err)
+		}
 	}
 
 	return newPath
-}
-
-func (d *Downloader) Cleanup(path, filename string) error {
-	filename = CleanPath(filename)
-	if d.config.Output.Zip {
-		filename = fmt.Sprintf("%s.cbz", filename)
-	}
-
-	chapterPath := filepath.Join(path, filename)
-
-	err := os.RemoveAll(chapterPath)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (d *Downloader) GetNameFromTemplate(job Job) string {
@@ -59,6 +47,26 @@ func (d *Downloader) GetNameFromTemplate(job Job) string {
 		Metadata: job.Chapter.Metadata,
 	}
 	return templater.ExecTemplate(d.config.Output.FilenameTemplate)
+}
+
+func (d *Downloader) GetChapterPath(path, filename string) string {
+	// Extract file/dir name (depends on config.output.zip)
+	filename = CleanPath(filename)
+	if d.config.Output.Zip {
+		filename = fmt.Sprintf("%s.cbz", filename)
+	}
+
+	return filepath.Join(path, filename)
+}
+
+func (d *Downloader) Cleanup(path, filename string) error {
+	chapterPath := d.GetChapterPath(path, filename)
+
+	err := os.RemoveAll(chapterPath)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 /*

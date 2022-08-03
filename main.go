@@ -97,8 +97,8 @@ func main() {
 	// Set log level
 	setLogLevel(a.Options.LogLevel, c.LogLevel)
 
-	// Prioritize dryrun arg over config setting
-	c.Downloader.DryRun = a.Options.DryRun
+	// Dry run is true is either config or arg is set
+	c.Downloader.DryRun = c.Downloader.DryRun || a.Options.DryRun
 
 	switch a.Command {
 	case "download":

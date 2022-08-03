@@ -48,7 +48,6 @@ func (m *Scraper) runDownloadJob(job downloader.Job, dl *downloader.Downloader,
 	progress := utils.CreateProgressBar(len(pages), maxRuneCount, job.Chapter.Metadata.Num)
 
 	// Get chapter filename
-	// todo handle language (and user template)
 	dl.SetTemplate(m.config.FilenameTemplate)
 	filename := dl.GetNameFromTemplate(job)
 
@@ -56,6 +55,13 @@ func (m *Scraper) runDownloadJob(job downloader.Job, dl *downloader.Downloader,
 	(*dl.MetadataAgent()).
 		SetFromStruct(job.Chapter.Metadata).
 		SetPageCount(len(pages))
+
+	// Check if download is possible
+	err = dl.CanDownload(path, filename)
+	if err != nil {
+		return err
+	}
+
 	downloadErr := dl.Download(path, filename, pages, progress)
 	if downloadErr != nil {
 		if err := dl.Cleanup(path, filename); err != nil {
