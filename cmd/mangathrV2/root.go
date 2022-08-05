@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/browningluke/mangathrV2/cmd/mangathrV2/download"
 	"github.com/browningluke/mangathrV2/cmd/mangathrV2/register"
 	"github.com/browningluke/mangathrV2/cmd/mangathrV2/update"
@@ -78,8 +77,8 @@ func initConfig() {
 }
 
 func setLogLevel(logLevelArg, logLevelConf string) {
-	fmt.Println("log level arg: ", logLevelArg)
-	fmt.Println("log level cfg: ", logLevelConf)
+	logging.Infoln("log level arg: ", logLevelArg)
+	logging.Infoln("log level cfg: ", logLevelConf)
 
 	// If neither value is set, do nothing (level has default: logging.loggingLevel)
 	if logLevelArg == "" && logLevelConf == "" {
