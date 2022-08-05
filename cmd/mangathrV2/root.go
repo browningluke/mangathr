@@ -44,6 +44,7 @@ func init() {
 		"off", "Set the logging level (\"debug\"|\"info\"|\"warn\"|\"error\"|\"off\")")
 
 	// Help func
+	rootCmd.SetUsageTemplate(usageTemplate)
 	rootCmd.SetHelpFunc(func(c *cobra.Command, s []string) {
 		err := c.Usage()
 		if err != nil {
