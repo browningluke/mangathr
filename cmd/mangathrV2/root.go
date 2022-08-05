@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/browningluke/mangathrV2/cmd/mangathrV2/download"
 	"github.com/browningluke/mangathrV2/cmd/mangathrV2/register"
+	"github.com/browningluke/mangathrV2/cmd/mangathrV2/update"
 	"github.com/browningluke/mangathrV2/internal/config"
 	"github.com/browningluke/mangathrV2/internal/config/defaults"
 	"github.com/browningluke/mangathrV2/internal/logging"
@@ -52,6 +53,7 @@ func init() {
 	//rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(download.NewCmd(cfg))
 	rootCmd.AddCommand(register.NewCmd(cfg))
+	rootCmd.AddCommand(update.NewCmd(cfg))
 
 	//cobra.Command{
 	//	Use:                        "",
