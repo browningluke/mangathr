@@ -8,7 +8,7 @@ COPY ../../go.sum ./
 RUN go mod download && go mod verify
 
 COPY ../../ .
-RUN go build -v -o /mangathrv2 .
+RUN go build -v -o /mangathrv2 ./cmd/mangathrV2
 
 ENTRYPOINT ["mangathrv2"]
 
