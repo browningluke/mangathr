@@ -116,6 +116,7 @@ func initConfig() {
 
 func setLogLevel(logLevelArg, logLevelConf string) {
 	fmt.Println("log level arg: ", logLevelArg)
+	fmt.Println("log level cfg: ", logLevelConf)
 
 	// If neither value is set, do nothing (level has default: logging.loggingLevel)
 	if logLevelArg == "" && logLevelConf == "" {
@@ -128,7 +129,7 @@ func setLogLevel(logLevelArg, logLevelConf string) {
 		selectedLevel = logLevelConf
 	}
 
-	var loggingLevel logging.Level
+	loggingLevel := logging.OFF
 	switch selectedLevel {
 	case "ERROR":
 		loggingLevel = logging.ERROR
