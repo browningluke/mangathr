@@ -9,7 +9,6 @@ import (
 	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/sources"
 	"github.com/browningluke/mangathrV2/internal/ui"
-	"time"
 )
 
 // Package-wide accessible driver
@@ -80,35 +79,5 @@ func checkMangaForNewChapters(config *config.Config, manga *ent.Manga) {
 		downloadNewChapters(config, manga, scraper, numChapters)
 	} else {
 		fmt.Printf("\rNone for  %s\n", manga.Title)
-	}
-}
-
-func Run(config *config.Config) {
-	// Open database
-	var err error
-	driver, err = database.GetDriver(database.SQLITE, config.Database.Uri)
-	if err != nil {
-		logging.Errorln(err)
-		ui.Fatal("Unable to open database.")
-	}
-	defer closeDatabase()
-
-	allManga, err := driver.QueryAllManga()
-	if err != nil {
-		logging.ExitIfErrorWithFunc(&logging.ScraperError{
-			Error: err, Message: "An error occurred while getting Manga from database.", Code: 0,
-		}, closeDatabase)
-	}
-
-	for _, manga := range allManga {
-		checkMangaForNewChapters(config, manga)
-
-		// Sleep between checks
-		dur, durErr := time.ParseDuration(config.Downloader.Delay.UpdateChapter)
-		if durErr != nil {
-			logging.Errorln(durErr)
-			ui.Error("Failed to parse time duration.")
-		}
-		time.Sleep(dur)
 	}
 }

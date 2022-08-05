@@ -110,9 +110,9 @@ func handleCustomizeMenu(opts *options) bool {
 	return false
 }
 
-func promptMainMenu(args *Args, config *config.Config, driver *database.Driver) {
+func promptMainMenu(args *registerOpts, config *config.Config, driver *database.Driver) {
 	// Do manga scraping
-	scraper := sources.NewScraper(args.Plugin, config)
+	scraper := sources.NewScraper(args.Source, config)
 	titles, err := scraper.Search(args.Query)
 	logging.ExitIfErrorWithFunc(err, closeDatabase)
 
@@ -153,17 +153,4 @@ func promptMainMenu(args *Args, config *config.Config, driver *database.Driver) 
 			}
 		}
 	}
-}
-
-func Run(args *Args, config *config.Config) {
-	// Open database
-	var err error
-	driver, err = database.GetDriver(database.SQLITE, config.Database.Uri)
-	if err != nil {
-		logging.Errorln(err)
-		ui.Fatal("An error occurred while establishing a connection to the database")
-	}
-	defer closeDatabase()
-
-	promptMainMenu(args, config, driver)
 }
