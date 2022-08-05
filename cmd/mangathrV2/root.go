@@ -19,11 +19,9 @@ var (
 	logLevel string
 
 	rootCmd = &cobra.Command{
-		Use:   "mangathrv2",
-		Short: "A generator for Cobra based Applications",
-		Long: `Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+		Use:                   "mangathrv2 [OPTIONS]",
+		Short:                 "📦 A CLI utility for downloading Manga & metadata.",
+		DisableFlagsInUseLine: true,
 	}
 )
 
