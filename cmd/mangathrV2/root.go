@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/browningluke/mangathrV2/cmd/mangathrV2/download"
 	"github.com/browningluke/mangathrV2/internal/config"
 	"github.com/browningluke/mangathrV2/internal/config/defaults"
 	"github.com/browningluke/mangathrV2/internal/logging"
@@ -48,7 +49,7 @@ func init() {
 	rootCmd.SetHelpCommand(&cobra.Command{Use: "h", Hidden: true})
 
 	//rootCmd.AddCommand(versionCmd)
-	//rootCmd.AddCommand(downloadCmd)
+	rootCmd.AddCommand(download.NewCmd(cfg))
 
 	//cobra.Command{
 	//	Use:                        "",
