@@ -13,9 +13,10 @@ func NewCmd(cfg *config.Config) *cobra.Command {
 	o := &updateOpts{}
 
 	cmd := &cobra.Command{
-		Use:   "update [OPTIONS]",
-		Short: "Check for new chapters",
-		Args:  cobra.NoArgs,
+		Use:     "update [OPTIONS]",
+		Short:   "Check for new chapters",
+		Aliases: []string{"u"},
+		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			cfg.Downloader.DryRun = cfg.Downloader.DryRun || o.DryRun
 			o.run(cfg)

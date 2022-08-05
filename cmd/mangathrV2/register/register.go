@@ -13,8 +13,9 @@ func NewCmd(cfg *config.Config) *cobra.Command {
 	o := &registerOpts{}
 
 	cmd := &cobra.Command{
-		Use:   "register [OPTIONS] -s SOURCE QUERY",
-		Short: "Register chapters to database",
+		Use:     "register [OPTIONS] -s SOURCE QUERY",
+		Short:   "Register chapters to database",
+		Aliases: []string{"r"},
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.New("requires a query to search")

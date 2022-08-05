@@ -15,8 +15,9 @@ func NewCmd(cfg *config.Config) *cobra.Command {
 	o := &downloadOpts{}
 
 	cmd := &cobra.Command{
-		Use:   "download [OPTIONS] -s SOURCE QUERY",
-		Short: "Download chapters from source",
+		Use:     "download [OPTIONS] -s SOURCE QUERY",
+		Short:   "Download chapters from source",
+		Aliases: []string{"d"},
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.New("requires a query to search")
