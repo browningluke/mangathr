@@ -33,15 +33,17 @@ func Execute() error {
 }
 
 func init() {
+	// Config
 	cfg = &config.Config{}
-
 	cobra.OnInitialize(initConfig)
 
+	// Flags
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config",
 		"", "config file (default is $XDG_CONFIG_HOME/mangathrv2/config)")
 	rootCmd.PersistentFlags().StringVarP(&logLevel, "log-level", "l",
 		"off", "Set the logging level (\"debug\"|\"info\"|\"warn\"|\"error\"|\"off\")")
 
+	// Help func
 	rootCmd.SetHelpFunc(func(c *cobra.Command, s []string) {
 		err := c.Usage()
 		if err != nil {
@@ -50,52 +52,10 @@ func init() {
 	})
 	rootCmd.SetHelpCommand(&cobra.Command{Use: "h", Hidden: true})
 
-	//rootCmd.AddCommand(versionCmd)
+	// Sub commands
 	rootCmd.AddCommand(download.NewCmd(cfg))
 	rootCmd.AddCommand(register.NewCmd(cfg))
 	rootCmd.AddCommand(update.NewCmd(cfg))
-
-	//cobra.Command{
-	//	Use:                        "",
-	//	Aliases:                    nil,
-	//	SuggestFor:                 nil,
-	//	Short:                      "",
-	//	Long:                       "",
-	//	Example:                    "",
-	//	ValidArgs:                  nil,
-	//	ValidArgsFunction:          nil,
-	//	Args:                       nil,
-	//	ArgAliases:                 nil,
-	//	BashCompletionFunction:     "",
-	//	Deprecated:                 "",
-	//	Annotations:                nil,
-	//	Version:                    "",
-	//	PersistentPreRun:           nil,
-	//	PersistentPreRunE:          nil,
-	//	PreRun:                     nil,
-	//	PreRunE:                    nil,
-	//	Run:                        nil,
-	//	RunE:                       nil,
-	//	PostRun:                    nil,
-	//	PostRunE:                   nil,
-	//	PersistentPostRun:          nil,
-	//	PersistentPostRunE:         nil,
-	//	FParseErrWhitelist:         cobra.FParseErrWhitelist{},
-	//	CompletionOptions:          cobra.CompletionOptions{},
-	//	TraverseChildren:           false,
-	//	Hidden:                     false,
-	//	SilenceErrors:              false,
-	//	SilenceUsage:               false,
-	//	DisableFlagParsing:         false,
-	//	DisableAutoGenTag:          false,
-	//	DisableFlagsInUseLine:      false,
-	//	DisableSuggestions:         false,
-	//	SuggestionsMinimumDistance: 0,
-	//}
-
-	//rootCmd.SetHelpCommand(nil)
-
-	//rootCmd.AddCommand(initCmd)
 }
 
 func initConfig() {
