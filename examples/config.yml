@@ -16,10 +16,6 @@ downloader:
     updatePath: './downloads-update'
     zip: true
     filenameTemplate: "{num:3} - Chapter {num}{lang: - <.>}{title: - <.>}{groups: [<.>]}" # Set a global template
-    # syntax is in format:
-    # {num:3} = number padded to 3 digits (e.g. 001, 010, 100, 1000)
-    # {num}   = number with no padding (e.g. 1, 10, 100, 1000)
-    # {?xx - {title} - xx}  = if title is not "", replace with xx-title-xx, else use ""
   metadata:
     agent: "comicinfo"
     location: "internal"
