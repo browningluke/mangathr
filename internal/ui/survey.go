@@ -15,8 +15,7 @@ func handleSIGINT(err error) error {
 			}
 
 			// Block execution until Goroutine kills program
-			for {
-			}
+			select {}
 		}
 	}
 	return err
