@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"github.com/schollz/progressbar/v3"
 	"os"
+	"os/signal"
 	"regexp"
 	"strings"
+	"syscall"
 	"unicode/utf8"
 )
 
@@ -72,4 +74,14 @@ func IsRunningInContainer() bool {
 		return false
 	}
 	return true
+}
+
+func CreateSigIntHandler(f func()) {
+	SIGINT := make(chan os.Signal, 1)
+	signal.Notify(SIGINT, os.Interrupt, syscall.SIGINT)
+	go func() {
+		<-SIGINT
+		f()
+		os.Exit(1)
+	}()
 }

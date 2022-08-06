@@ -49,7 +49,13 @@ func generateString(opts *options, prompt string) string {
 }
 
 func handleRegisterMenu(opts *options, driver *database.Driver) bool {
-	confirm := ui.ConfirmPrompt("Register this manga?")
+	confirm, err := ui.ConfirmPrompt("Register this manga?")
+	if err != nil {
+		logging.ExitIfErrorWithFunc(&logging.ScraperError{
+			Error: err, Message: "An error occurred while getting input", Code: 0,
+		}, closeDatabase)
+	}
+
 	if confirm {
 		// Start the registration process
 		fmt.Println("confirmed")
@@ -83,19 +89,36 @@ func handleRegisterMenu(opts *options, driver *database.Driver) bool {
 }
 
 func handleCustomizeMenu(opts *options) bool {
-	option := ui.SingleCheckboxes("Select an option",
+	option, uierr := ui.SingleCheckboxes("Select an option",
 		[]string{"Change mapping", "Filter groups", "Back"})
+	if uierr != nil {
+		logging.ExitIfErrorWithFunc(&logging.ScraperError{
+			Error: uierr, Message: "An error occurred while getting input", Code: 0,
+		}, closeDatabase)
+	}
 
 	switch option {
 	case "Change mapping":
-		res := ui.InputPrompt("Map to:")
+		res, err := ui.InputPrompt("Map to:")
+		if err != nil {
+			logging.ExitIfErrorWithFunc(&logging.ScraperError{
+				Error: err, Message: "An error occurred while getting input", Code: 0,
+			}, closeDatabase)
+		}
+
 		opts.mapping = downloader.CleanPath(res)
 		return true
 	case "Filter groups":
 		groups, err := (*opts.scraper).GroupNames()
 		logging.ExitIfErrorWithFunc(err, closeDatabase)
 
-		selectedGroups := ui.Checkboxes("Select groups to filter: ", groups)
+		selectedGroups, uierr := ui.Checkboxes("Select groups to filter: ", groups)
+		if uierr != nil {
+			logging.ExitIfErrorWithFunc(&logging.ScraperError{
+				Error: uierr, Message: "An error occurred while getting input", Code: 0,
+			}, closeDatabase)
+		}
+
 		opts.filteredGroups = selectedGroups
 
 		err = (*opts.scraper).FilterGroups(selectedGroups)
@@ -118,7 +141,13 @@ func promptMainMenu(args *registerOpts, config *config.Config, driver *database.
 
 	selection := titles[0]
 	if len(titles) > 1 {
-		selection = ui.SingleCheckboxes("Select Manga:", titles)
+		var uierr error
+		selection, uierr = ui.SingleCheckboxes("Select Manga:", titles)
+		if uierr != nil {
+			logging.ExitIfErrorWithFunc(&logging.ScraperError{
+				Error: uierr, Message: "An error occurred while getting input", Code: 0,
+			}, closeDatabase)
+		}
 	}
 
 	err = scraper.SelectManga(selection)
@@ -140,8 +169,13 @@ func promptMainMenu(args *registerOpts, config *config.Config, driver *database.
 	}
 
 	for {
-		option := ui.SingleCheckboxes(generateString(&opts, "Select an option"),
+		option, err := ui.SingleCheckboxes(generateString(&opts, "Select an option"),
 			[]string{"Register", "Customize"})
+		if err != nil {
+			logging.ExitIfErrorWithFunc(&logging.ScraperError{
+				Error: err, Message: "An error occurred while getting input", Code: 0,
+			}, closeDatabase)
+		}
 
 		if option == "Register" {
 			if loop := handleRegisterMenu(&opts, driver); !loop {

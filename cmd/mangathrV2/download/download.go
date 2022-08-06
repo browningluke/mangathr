@@ -53,7 +53,13 @@ func (o *downloadOpts) run(cfg *config.Config) {
 	titles, err := scraper.Search(o.Query)
 	logging.ExitIfError(err)
 
-	selection := ui.SingleCheckboxes("Select Manga:", titles)
+	selection, uierr := ui.SingleCheckboxes("Select Manga:", titles)
+	if uierr != nil {
+		logging.ExitIfError(&logging.ScraperError{
+			Error: uierr, Message: "An error occurred while getting input", Code: 0,
+		})
+	}
+
 	err = scraper.SelectManga(selection)
 	logging.ExitIfError(err)
 
@@ -63,8 +69,12 @@ func (o *downloadOpts) run(cfg *config.Config) {
 	//fmt.Println(chapters)
 	chapterTitle := scraper.MangaTitle()
 	sourceName := scraper.ScraperName()
-	chapterSelections := SelectChapters(chapterTitles, chapterTitle, sourceName)
-	//fmt.Println(chapterSelections)
+	chapterSelections, uierr := SelectChapters(chapterTitles, chapterTitle, sourceName)
+	if uierr != nil {
+		logging.ExitIfError(&logging.ScraperError{
+			Error: uierr, Message: "An error occurred while getting input", Code: 0,
+		})
+	}
 
 	err = scraper.SelectChapters(chapterSelections)
 	logging.ExitIfError(err)
@@ -75,13 +85,13 @@ func (o *downloadOpts) run(cfg *config.Config) {
 	), "download")
 }
 
-func SelectChapters(titles []string, mangaTitle string, sourceName string) []string {
+func SelectChapters(titles []string, mangaTitle string, sourceName string) ([]string, error) {
 
-	selections := ui.Checkboxes(
+	selections, err := ui.Checkboxes(
 		fmt.Sprintf("\rTitle: %s\nSource: %s\n# of chapters: %d\nSelect chapters",
 			mangaTitle, sourceName, len(titles)),
 		titles,
 	)
 
-	return selections
+	return selections, err
 }

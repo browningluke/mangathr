@@ -6,6 +6,7 @@ import (
 	"github.com/browningluke/mangathrV2/internal/database"
 	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/ui"
+	"github.com/browningluke/mangathrV2/internal/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -45,6 +46,8 @@ func NewCmd(cfg *config.Config) *cobra.Command {
 }
 
 func (o *registerOpts) run(cfg *config.Config) {
+	utils.CreateSigIntHandler(closeDatabase)
+
 	// Open database
 	var err error
 	driver, err = database.GetDriver(database.SQLITE, cfg.Database.Uri)

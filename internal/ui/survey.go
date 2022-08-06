@@ -1,8 +1,28 @@
 package ui
 
-import "github.com/AlecAivazis/survey/v2"
+import (
+	"github.com/AlecAivazis/survey/v2"
+	"github.com/AlecAivazis/survey/v2/terminal"
+	"syscall"
+)
 
-func Checkboxes(label string, opts []string) []string {
+func handleSIGINT(err error) error {
+	if err != nil {
+		if err == terminal.InterruptErr {
+			err := syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+			if err != nil {
+				panic(err)
+			}
+
+			// Block execution until Goroutine kills program
+			for {
+			}
+		}
+	}
+	return err
+}
+
+func Checkboxes(label string, opts []string) ([]string, error) {
 	survey.MultiSelectQuestionTemplate = `
 {{- define "option"}}
     {{- if eq .SelectedIndex .CurrentIndex }}{{color .Config.Icons.SelectFocus.Format }}{{ .Config.Icons.SelectFocus.Text }}{{color "reset"}}{{else}} {{end}}
@@ -32,14 +52,15 @@ func Checkboxes(label string, opts []string) []string {
 		icons.Question.Text = ""
 		icons.Question.Format = "yellow+hb"
 	}), survey.WithKeepFilter(true))
+	err = handleSIGINT(err)
 	if err != nil {
-		panic(err)
+		return []string{}, err
 	}
 
-	return res
+	return res, nil
 }
 
-func SingleCheckboxes(label string, opts []string) string {
+func SingleCheckboxes(label string, opts []string) (string, error) {
 	var res string
 	prompt := &survey.Select{
 		Message: label,
@@ -49,14 +70,15 @@ func SingleCheckboxes(label string, opts []string) string {
 		icons.Question.Text = ""
 		icons.Question.Format = "yellow+hb"
 	}))
+	err = handleSIGINT(err)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
-	return res
+	return res, nil
 }
 
-func ConfirmPrompt(label string) bool {
+func ConfirmPrompt(label string) (bool, error) {
 	var res bool
 
 	prompt := &survey.Confirm{
@@ -64,22 +86,24 @@ func ConfirmPrompt(label string) bool {
 	}
 
 	err := survey.AskOne(prompt, &res)
+	err = handleSIGINT(err)
 	if err != nil {
-		panic(err)
+		return false, err
 	}
 
-	return res
+	return res, nil
 }
 
-func InputPrompt(label string) string {
+func InputPrompt(label string) (string, error) {
 	res := ""
 	prompt := &survey.Input{
 		Message: label,
 	}
 	err := survey.AskOne(prompt, &res)
+	err = handleSIGINT(err)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
-	return res
+	return res, nil
 }
