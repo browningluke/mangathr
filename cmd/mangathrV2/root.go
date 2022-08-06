@@ -38,7 +38,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config",
 		"", "Path to config file (default is $XDG_CONFIG_HOME/mangathrv2/config)")
 	rootCmd.PersistentFlags().StringVarP(&logLevel, "log-level", "l",
-		"off", "Set the logging level (\"debug\"|\"info\"|\"warn\"|\"error\"|\"off\")")
+		"", "Set the logging level (\"debug\"|\"info\"|\"warn\"|\"error\"|\"off\") (default \"off\")")
 
 	// Help func
 	rootCmd.SetUsageTemplate(usageTemplate)
@@ -58,29 +58,38 @@ func init() {
 	rootCmd.AddCommand(update.NewCmd(cfg))
 }
 
-func initConfig() {
-	filePath := ""
+func getConfigPath() string {
+	if utils.IsRunningInContainer() {
+		return defaults.ConfigPathDocker()
+	}
+
 	if cfgFile != "" {
 		// Use config file from the flag.
-		filePath = cfgFile
+		return cfgFile
 	} else {
 		configDir := defaults.ConfigDir()
 		err := os.MkdirAll(configDir, os.ModePerm)
 		cobra.CheckErr(err)
 
-		filePath = defaults.ConfigPath()
+		return defaults.ConfigPath()
+	}
+}
+
+func initConfig() {
+	configPath := getConfigPath()
+
+	err := cfg.Load(configPath, utils.IsRunningInContainer())
+	if err != nil {
+		logging.Warningln(err)
 	}
 
-	err := cfg.Load(filePath, utils.IsRunningInContainer())
-	cobra.CheckErr(err)
-
 	setLogLevel(logLevel, cfg.LogLevel)
-
+	logging.Debugln("Using config path: ", configPath)
 }
 
 func setLogLevel(logLevelArg, logLevelConf string) {
-	logging.Infoln("log level arg: ", logLevelArg)
-	logging.Infoln("log level cfg: ", logLevelConf)
+	//fmt.Println("log level arg: ", logLevelArg)
+	//fmt.Println("log level cfg: ", logLevelConf)
 
 	// If neither value is set, do nothing (level has default: logging.loggingLevel)
 	if logLevelArg == "" && logLevelConf == "" {
