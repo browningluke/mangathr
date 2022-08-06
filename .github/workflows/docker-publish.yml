@@ -1,4 +1,4 @@
-name: Docker-Base
+name: docker build
 
 on:
   workflow_dispatch:
