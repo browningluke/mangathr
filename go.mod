@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	entgo.io/ent v0.10.2-0.20220502113020-4ac82f5bb3f0
-	github.com/AlecAivazis/survey/v2 v2.3.4
+	github.com/AlecAivazis/survey/v2 v2.3.5
 	github.com/alitto/pond v1.8.0
 	github.com/schollz/progressbar/v3 v3.8.6
 	github.com/spf13/cobra v1.5.0
