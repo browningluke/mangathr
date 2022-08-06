@@ -168,9 +168,9 @@ Available variables are (verbatim):
 
 ## Sources
 
-| Source   | URL                   | Scraper | Connection |
-|----------|-----------------------|---------|------------|
-| Mangadex | https://mangadex.org/ |    ✓    |            |
+| Source   | URL                   | Scraper | Account Sync |
+|----------|-----------------------|---------|--------------|
+| Mangadex | https://mangadex.org/ |    ✓    |     WIP      |
 
 
 ### Mangadex
