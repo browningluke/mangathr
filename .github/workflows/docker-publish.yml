@@ -1,6 +1,7 @@
 name: Docker-Base
 
 on:
+  workflow_dispatch:
   push:
     branches: [ "main" ]
     tags: [ 'v*.*.*' ]   # Publish semver tags as releases.
