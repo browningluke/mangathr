@@ -29,7 +29,6 @@ func GetDriver(driver int, path string) (*Driver, error) {
 	case SQLITE:
 		driverName = dialect.SQLite
 		options = fmt.Sprintf("file:%s?cache=shared", path)
-		break
 	default:
 		return nil, fmt.Errorf("%s", "Request driver not implemented")
 	}

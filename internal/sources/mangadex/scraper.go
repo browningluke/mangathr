@@ -17,7 +17,6 @@ type searchResult struct {
 }
 
 type Scraper struct {
-	name   string
 	config *Config
 
 	searchResults []searchResult
@@ -85,12 +84,7 @@ func (m *Scraper) GroupNames() ([]string, *logging.ScraperError) {
 			return nil, err
 		}
 	}
-
-	var groupNames []string
-	for _, val := range m.groups {
-		groupNames = append(groupNames, val)
-	}
-	return groupNames, nil
+	return m.groups, nil
 }
 
 func (m *Scraper) FilterGroups(groups []string) *logging.ScraperError {

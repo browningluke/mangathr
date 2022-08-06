@@ -6,7 +6,6 @@ import (
 	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/rester"
 	"github.com/browningluke/mangathrV2/internal/sources/structs"
-	"math"
 	"strconv"
 	"strings"
 )
@@ -67,7 +66,12 @@ func getMangaFeed(mangaID string, languages, ratings []string) ([]mangaFeedRespo
 
 	mangaFeedRespList = append(mangaFeedRespList, initial)
 
-	for i := 1; i <= int(math.Ceil(float64(initial.Total/feedPageLimit))); i++ {
+	// Calculate total offset pages
+	// this will be the floor of total/limit (1200/500 = 2)
+	// but since we retrieved the first page already, it becomes 1 + (1200/500 = 2) = 1500 > 1200
+	pages := initial.Total / feedPageLimit
+	
+	for i := 1; i <= pages; i++ {
 		page, err := getMangaFeedPage(mangaID, queryParams, feedPageLimit*i)
 		if err != nil {
 			return nil, err

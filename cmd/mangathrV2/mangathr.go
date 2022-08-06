@@ -1,8 +1,6 @@
 package main
 
 func main() {
-	err := Execute()
-	if err != nil {
-		//panic(err)
-	}
+	// Ignore the error, since Cobra will handle it for us
+	Execute()
 }

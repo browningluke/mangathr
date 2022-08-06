@@ -8,12 +8,6 @@ import (
 	"strings"
 )
 
-const (
-	num      = "10"
-	language = ""
-	title    = "Please end my life"
-)
-
 type Templater struct {
 	RawTitle string
 	Metadata structs.Metadata
@@ -72,16 +66,12 @@ func (t *Templater) ExecTemplate(template string) string {
 				options = match[3]
 			}
 			replace = t.handleNum(options)
-			break
 		case "lang":
 			replace = t.handleLanguage(match[3])
-			break
 		case "title":
 			replace = t.handleTitle(match[3])
-			break
 		case "groups":
 			replace = t.handleGroups(match[3])
-			break
 		}
 
 		newString = strings.Replace(newString, match[0], replace, 1)

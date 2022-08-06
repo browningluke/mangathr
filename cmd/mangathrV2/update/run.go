@@ -25,8 +25,8 @@ func closeDatabase() {
 
 func downloadNewChapters(config *config.Config, manga *ent.Manga, scraper sources.Scraper, numChapters int) {
 	fmt.Printf("\033[2K") // Clear line
-	fmt.Printf(fmt.Sprintf("\rTitle: %s\nSource: %s\n# of new chapters: %d\n",
-		scraper.MangaTitle(), scraper.ScraperName(), numChapters))
+	fmt.Printf("\rTitle: %s\nSource: %s\n# of new chapters: %d\n",
+		scraper.MangaTitle(), scraper.ScraperName(), numChapters)
 
 	succeeded := scraper.Download(downloader.NewDownloader(
 		&config.Downloader, true,
