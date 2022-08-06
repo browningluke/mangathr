@@ -95,13 +95,13 @@ func setLogLevel(logLevelArg, logLevelConf string) {
 
 	loggingLevel := logging.OFF
 	switch selectedLevel {
-	case "ERROR":
+	case "error":
 		loggingLevel = logging.ERROR
-	case "WARNING":
+	case "warn":
 		loggingLevel = logging.WARNING
-	case "INFO":
+	case "info":
 		loggingLevel = logging.INFO
-	case "DEBUG":
+	case "debug":
 		loggingLevel = logging.DEBUG
 	}
 	logging.SetLoggingLevel(loggingLevel)
