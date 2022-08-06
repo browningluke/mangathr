@@ -1,4 +1,7 @@
 # 📦 MangathrV2
+[![Go Report Card](https://goreportcard.com/badge/github.com/browningluke/mangathrV2)](https://goreportcard.com/report/github.com/browningluke/mangathrV2)
+![docker build](https://github.com/browningluke/mangathrV2/actions/workflows/docker-publish.yml/badge.svg)
+
 **mangathrV2** is a command-line program to download Manga chapters from numerous online platforms (See [Sources](#sources)). It bundles each chapter with metadata in ComicInfo format, or a number of others (see [Metadata Agents](#metadata-agents)). It supports monitoring a source for new chapters of registered Manga.
 
 It has an older version ([mangathr](https://github.com/browningluke/mangathr)), written in Typescript.
