@@ -1,6 +1,6 @@
 module github.com/browningluke/mangathrV2
 
-go 1.17
+go 1.18
 
 require (
 	entgo.io/ent v0.10.2-0.20220502113020-4ac82f5bb3f0
