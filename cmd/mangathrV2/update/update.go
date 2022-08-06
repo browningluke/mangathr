@@ -25,7 +25,7 @@ func NewCmd(cfg *config.Config) *cobra.Command {
 	}
 
 	cmd.Flags().BoolVarP(&o.DryRun, "dry-run", "",
-		false, "do not download files or update database")
+		false, "Do not download files or update database")
 
 	return cmd
 }

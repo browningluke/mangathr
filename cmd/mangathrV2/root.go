@@ -36,7 +36,7 @@ func init() {
 
 	// Flags
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config",
-		"", "config file (default is $XDG_CONFIG_HOME/mangathrv2/config)")
+		"", "Path to config file (default is $XDG_CONFIG_HOME/mangathrv2/config)")
 	rootCmd.PersistentFlags().StringVarP(&logLevel, "log-level", "l",
 		"off", "Set the logging level (\"debug\"|\"info\"|\"warn\"|\"error\"|\"off\")")
 
@@ -49,6 +49,8 @@ func init() {
 		}
 	})
 	rootCmd.SetHelpCommand(&cobra.Command{Use: "h", Hidden: true})
+	rootCmd.PersistentFlags().BoolP("help", "h",
+		false, "Print this text")
 
 	// Sub commands
 	rootCmd.AddCommand(download.NewCmd(cfg))

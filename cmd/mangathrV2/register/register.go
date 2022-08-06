@@ -34,12 +34,12 @@ func NewCmd(cfg *config.Config) *cobra.Command {
 	}
 
 	cmd.Flags().StringVarP(&o.Source, "source", "s",
-		"", "source to search")
+		"", "Source to search query on")
 	err := cmd.MarkFlagRequired("source")
 	cobra.CheckErr(err)
 
 	cmd.Flags().BoolVarP(&o.DryRun, "dry-run", "",
-		false, "do not download files or update database")
+		false, "Disables downloads & writes to the database")
 
 	return cmd
 }
