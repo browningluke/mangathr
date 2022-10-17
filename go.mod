@@ -5,7 +5,7 @@ go 1.18
 require (
 	entgo.io/ent v0.10.2-0.20220502113020-4ac82f5bb3f0
 	github.com/AlecAivazis/survey/v2 v2.3.5
-	github.com/alitto/pond v1.8.0
+	github.com/alitto/pond v1.8.2
 	github.com/schollz/progressbar/v3 v3.9.0
 	github.com/spf13/cobra v1.5.0
 	gopkg.in/yaml.v2 v2.4.0
