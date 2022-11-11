@@ -70,7 +70,7 @@ func getMangaFeed(mangaID string, languages, ratings []string) ([]mangaFeedRespo
 	// this will be the floor of total/limit (1200/500 = 2)
 	// but since we retrieved the first page already, it becomes 1 + (1200/500 = 2) = 1500 > 1200
 	pages := initial.Total / feedPageLimit
-	
+
 	for i := 1; i <= pages; i++ {
 		page, err := getMangaFeedPage(mangaID, queryParams, feedPageLimit*i)
 		if err != nil {
@@ -165,8 +165,7 @@ func (m *Scraper) generateTitle(chapterTitle, num, lang string, groups []string)
 	return fullTitle, metadataTitle
 }
 
-func (m *Scraper) scrapeChapters() *logging.ScraperError {
-	// Get entire Manga feed
+func (m *Scraper) scrapeChapters() *logging.ScraperError { // Get entire Manga feed
 	mangaFeed, err := getMangaFeed(m.MangaID(), m.config.LanguageFilter, m.config.RatingFilter)
 	if err != nil {
 		return err
@@ -208,8 +207,38 @@ func (m *Scraper) scrapeChapters() *logging.ScraperError {
 		}
 	}
 
+	searchResults = handleDuplicates(searchResults)
 	m.allChapters = searchResults
 	return nil
+}
+
+// handleDuplicates: returns a slice of structs.Chapter, with IDs appended to chapters with duplicate titles.
+// Handles the rare case where a chapter has the same number, title AND group.
+func handleDuplicates(chapters []structs.Chapter) []structs.Chapter {
+	allKeys := make(map[string][]int)
+
+	for i, item := range chapters {
+		if indexArray, exists := allKeys[item.FullTitle]; exists {
+			allKeys[item.FullTitle] = append(indexArray, i)
+		} else {
+			allKeys[item.FullTitle] = []int{i}
+		}
+	}
+
+	for _, indexArray := range allKeys {
+		if len(indexArray) > 1 {
+			// If we're here, we know that there are >1 chapters with the same title
+			for _, r := range indexArray {
+				chapter := chapters[r]
+				shortID := strings.Split(chapter.ID, "-")[0]
+				chapter.FullTitle = chapter.FullTitle + " [" + shortID + "]"
+				chapter.RawTitle = chapter.RawTitle + " [" + shortID + "]"
+				chapters[r] = chapter
+			}
+		}
+	}
+
+	return chapters
 }
 
 /*
