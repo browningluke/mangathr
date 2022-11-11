@@ -97,7 +97,14 @@ func handleMenu(args *registerOpts, config *config.Config, driver *database.Driv
 	customizePanel := ui.NewPanel().
 		SetPrompt(func() string {
 			return generateString(&opts, "Select an option")
-		})
+		}).
+		ErrorHandler(
+			func(err error) {
+				logging.ExitIfErrorWithFunc(&logging.ScraperError{
+					Error: err, Message: "An error occurred while getting input", Code: 0,
+				}, closeDatabase)
+			},
+		)
 
 	customizePanel.
 		AddOption("Change mapping").
@@ -142,7 +149,14 @@ func handleMenu(args *registerOpts, config *config.Config, driver *database.Driv
 	mainPanel := ui.NewPanel().
 		SetPrompt(func() string {
 			return generateString(&opts, "Select an option")
-		})
+		}).
+		ErrorHandler(
+			func(err error) {
+				logging.ExitIfErrorWithFunc(&logging.ScraperError{
+					Error: err, Message: "An error occurred while getting input", Code: 0,
+				}, closeDatabase)
+			},
+		)
 
 	mainPanel.
 		AddOption("Register").

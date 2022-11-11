@@ -12,6 +12,8 @@ type panel struct {
 	options []*option
 
 	prompt func() string
+
+	errorHandler func(error)
 }
 
 func NewPanel() *panel {
@@ -22,6 +24,10 @@ func NewPanel() *panel {
 
 	p.isChild = false
 	p.added = false
+
+	p.errorHandler = func(err error) {
+		panic(err)
+	}
 
 	return p
 }
@@ -35,6 +41,11 @@ func (p *panel) AddOption(n string) *option {
 
 func (p *panel) SetPrompt(g func() string) *panel {
 	p.prompt = g
+	return p
+}
+
+func (p *panel) ErrorHandler(h func(error)) *panel {
+	p.errorHandler = h
 	return p
 }
 
@@ -64,10 +75,10 @@ func (p *panel) Start() bool {
 		fmt.Print("\033[H\033[2J")
 
 		index, err := SingleCheckboxesIndex(p.prompt(), optionStrings)
-
 		if err != nil {
-			panic(err)
+			p.errorHandler(err)
 		}
+
 		selectedOpt := p.options[index]
 
 		if loop := selectedOpt.handler(selectedOpt); !loop {
