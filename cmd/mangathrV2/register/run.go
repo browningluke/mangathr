@@ -204,6 +204,4 @@ func handleMenu(args *registerOpts, config *config.Config, driver *database.Driv
 
 	// This is a blocking call
 	mainPanel.Start()
-
-	fmt.Println("Doing cleanup")
 }
