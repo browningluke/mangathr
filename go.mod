@@ -6,7 +6,7 @@ require (
 	entgo.io/ent v0.10.2-0.20220502113020-4ac82f5bb3f0
 	github.com/AlecAivazis/survey/v2 v2.3.6
 	github.com/alitto/pond v1.8.2
-	github.com/schollz/progressbar/v3 v3.9.0
+	github.com/schollz/progressbar/v3 v3.12.1
 	github.com/spf13/cobra v1.5.0
 	gopkg.in/yaml.v2 v2.4.0
 	modernc.org/sqlite v1.19.4
@@ -25,18 +25,17 @@ require (
 	github.com/kr/pretty v0.2.1 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
-	github.com/mattn/go-runewidth v0.0.13 // indirect
+	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
-	github.com/rivo/uniseg v0.2.0 // indirect
+	github.com/rivo/uniseg v0.4.2 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/zclconf/go-cty v1.10.0 // indirect
-	golang.org/x/crypto v0.0.0-20220518034528-6f7dac969898 // indirect
 	golang.org/x/mod v0.5.1 // indirect
-	golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab // indirect
-	golang.org/x/term v0.0.0-20220411215600-e5f449aeb171 // indirect
+	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/term v0.1.0 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.9-0.20211216111533-8d383106f7e7 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
