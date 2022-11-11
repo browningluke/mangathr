@@ -21,7 +21,6 @@ func closeDatabase() {
 		logging.Errorln(err)
 		ui.Error("Unable to close database.")
 	}
-	fmt.Println("Closing database")
 }
 
 type options struct {
