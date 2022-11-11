@@ -57,5 +57,5 @@ func (o *registerOpts) run(cfg *config.Config) {
 	}
 	defer closeDatabase()
 
-	promptMainMenu(o, cfg, driver)
+	handleMenu(o, cfg, driver)
 }

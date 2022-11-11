@@ -61,20 +61,37 @@ func Checkboxes(label string, opts []string) ([]string, error) {
 
 func SingleCheckboxes(label string, opts []string) (string, error) {
 	var res string
+	err := singleCheckboxes(label, opts, &res)
+
+	if err != nil {
+		return "", err
+	}
+	return res, nil
+}
+
+func SingleCheckboxesIndex(label string, opts []string) (int, error) {
+	var res int
+
+	err := singleCheckboxes(label, opts, &res)
+
+	if err != nil {
+		return -1, err
+	}
+	return res, nil
+}
+
+func singleCheckboxes(label string, opts []string, res interface{}) error {
 	prompt := &survey.Select{
 		Message: label,
 		Options: opts,
 	}
-	err := survey.AskOne(prompt, &res, survey.WithIcons(func(icons *survey.IconSet) {
+	err := survey.AskOne(prompt, res, survey.WithIcons(func(icons *survey.IconSet) {
 		icons.Question.Text = ""
 		icons.Question.Format = "yellow+hb"
 	}))
 	err = handleSIGINT(err)
-	if err != nil {
-		return "", err
-	}
 
-	return res, nil
+	return err
 }
 
 func ConfirmPrompt(label string) (bool, error) {
