@@ -10,12 +10,12 @@ type panel struct {
 	isChild bool
 	added   bool
 
-	options []Option
+	options []*option
 
 	prompt func() string
 }
 
-func CreatePanel() *panel {
+func NewPanel() *panel {
 	p := &panel{}
 	p.prompt = func() string {
 		return "Select an option"
@@ -27,9 +27,11 @@ func CreatePanel() *panel {
 	return p
 }
 
-func (p *panel) AddOption(o Option) *panel {
+func (p *panel) AddOption(n string) *option {
+	o := newOption(n)
 	p.options = append(p.options, o)
-	return p
+
+	return o
 }
 
 func (p *panel) SetPrompt(g func() string) *panel {
@@ -43,18 +45,18 @@ func (p *panel) Start() bool {
 
 	// Handle panel being sub-panel
 	if p.isChild && !p.added {
-		p.AddOption(Option{
-			Name: "Back",
-			Handler: func(o *Option) bool {
-				return false
-			},
-		})
+		p.AddOption("Back").
+			CustomHandler(
+				func(o *option) bool {
+					return false
+				},
+			)
 		p.added = true
 	}
 
 	var optionStrings []string
 	for _, o := range p.options {
-		optionStrings = append(optionStrings, o.Name)
+		optionStrings = append(optionStrings, o.name)
 	}
 
 	for {
@@ -77,9 +79,9 @@ func (p *panel) Start() bool {
 		}
 		selectedOpt := p.options[index]
 
-		if loop := selectedOpt.Handler(&selectedOpt); !loop {
+		if loop := selectedOpt.handler(selectedOpt); !loop {
 			// If command is terminating, propagate all the way up
-			return !selectedOpt.Terminate
+			return !selectedOpt.terminate
 		}
 	}
 }

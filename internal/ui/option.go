@@ -1,20 +1,34 @@
 package ui
 
-type Option struct {
-	Name      string
-	Terminate bool
-	Handler   func(o *Option) bool
+type option struct {
+	name      string
+	terminate bool
+	handler   func(o *option) bool
 }
 
-func PanelHandler(p *panel) func(o *Option) bool {
-	return func(o *Option) bool {
+func newOption(n string) *option {
+	o := &option{}
+	o.terminate = false
+	o.name = n
+	return o
+}
+
+func (o *option) Terminator() *option {
+	o.terminate = true
+	return o
+}
+
+func (o *option) PanelHandler(p *panel) *option {
+	o.handler = func(o *option) bool {
 		p.isChild = true
 		return p.Start()
 	}
+
+	return o
 }
 
-func ConfirmationHandler(prompt string, yes, no func(), error func(error)) func(o *Option) bool {
-	return func(o *Option) bool {
+func (o *option) ConfirmationHandler(prompt string, yes, no func(), error func(error)) *option {
+	o.handler = func(o *option) bool {
 		confirm, err := ConfirmPrompt(prompt)
 
 		if err != nil {
@@ -27,12 +41,14 @@ func ConfirmationHandler(prompt string, yes, no func(), error func(error)) func(
 			no()
 		}
 
-		return !o.Terminate
+		return !o.terminate
 	}
+
+	return o
 }
 
-func InputHandler(prompt string, input func(string), error func(error)) func(o *Option) bool {
-	return func(o *Option) bool {
+func (o *option) InputHandler(prompt string, input func(string), error func(error)) *option {
+	o.handler = func(o *option) bool {
 		res, err := InputPrompt(prompt)
 
 		if err != nil {
@@ -41,12 +57,14 @@ func InputHandler(prompt string, input func(string), error func(error)) func(o *
 
 		input(res)
 
-		return !o.Terminate
+		return !o.terminate
 	}
+
+	return o
 }
 
-func CheckboxHandler(prompt string, genOpts func() []string, s func([]string), e func(error)) func(o *Option) bool {
-	return func(o *Option) bool {
+func (o *option) CheckboxHandler(prompt string, genOpts func() []string, s func([]string), e func(error)) *option {
+	o.handler = func(o *option) bool {
 		checkboxOptions := genOpts()
 		sel, err := Checkboxes(prompt, checkboxOptions)
 
@@ -56,6 +74,13 @@ func CheckboxHandler(prompt string, genOpts func() []string, s func([]string), e
 
 		s(sel)
 
-		return !o.Terminate
+		return !o.terminate
 	}
+
+	return o
+}
+
+func (o *option) CustomHandler(h func(o *option) bool) *option {
+	o.handler = h
+	return o
 }
