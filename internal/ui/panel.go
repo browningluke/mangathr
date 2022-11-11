@@ -2,7 +2,6 @@ package ui
 
 import (
 	"fmt"
-	"github.com/AlecAivazis/survey/v2"
 )
 
 type panel struct {
@@ -64,15 +63,7 @@ func (p *panel) Start() bool {
 		// Clear the screen
 		fmt.Print("\033[H\033[2J")
 
-		var index int
-		prompt := &survey.Select{
-			Message: p.prompt(),
-			Options: optionStrings,
-		}
-		err := survey.AskOne(prompt, &index, survey.WithIcons(func(icons *survey.IconSet) {
-			icons.Question.Text = ""
-			icons.Question.Format = "yellow+hb"
-		}))
+		index, err := SingleCheckboxesIndex(p.prompt(), optionStrings)
 
 		if err != nil {
 			panic(err)
