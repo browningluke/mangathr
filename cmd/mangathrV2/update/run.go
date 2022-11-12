@@ -23,7 +23,9 @@ func closeDatabase() {
 	}
 }
 
-func downloadNewChapters(config *config.Config, manga *ent.Manga, scraper sources.Scraper, numChapters int) {
+func downloadNewChapters(config *config.Config, manga *ent.Manga,
+	scraper sources.Scraper, numChapters int) (downloaded, errors int) {
+
 	fmt.Printf("\033[2K") // Clear line
 	fmt.Printf("\rTitle: %s\nSource: %s\n# of new chapters: %d\n",
 		scraper.MangaTitle(), scraper.ScraperName(), numChapters)
@@ -46,9 +48,13 @@ func downloadNewChapters(config *config.Config, manga *ent.Manga, scraper source
 			}
 		}
 	}
+
+	return len(succeeded), numChapters - len(succeeded)
 }
 
-func checkMangaForNewChapters(config *config.Config, manga *ent.Manga) {
+func checkMangaForNewChapters(config *config.Config, manga *ent.Manga) seriesStats {
+	stats := seriesStats{}
+
 	logging.Debugln("Requesting source...", manga.Source)
 	scraper := sources.NewScraper(manga.Source, config)
 
@@ -75,9 +81,13 @@ func checkMangaForNewChapters(config *config.Config, manga *ent.Manga) {
 		ui.Error("An error occurred while search for ", manga.Title)
 	}
 
+	stats.found = len(newChapters)
+
 	if numChapters := len(newChapters); numChapters > 0 {
-		downloadNewChapters(config, manga, scraper, numChapters)
+		stats.downloaded, stats.errors = downloadNewChapters(config, manga, scraper, numChapters)
 	} else {
 		fmt.Printf("\rNone for  %s\n", manga.Title)
 	}
+
+	return stats
 }
