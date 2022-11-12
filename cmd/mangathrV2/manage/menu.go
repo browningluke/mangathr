@@ -22,24 +22,6 @@ func closeDatabase() {
 	}
 }
 
-func deleteFromDatabase(filter func(manga *ent.Manga) bool) {
-	allManga, err := driver.QueryAllManga()
-	if err != nil {
-		logging.ExitIfErrorWithFunc(&logging.ScraperError{
-			Error: err, Message: "An error occurred while getting manga from database", Code: 0,
-		}, closeDatabase)
-	}
-
-	for _, manga := range allManga {
-		if filter(manga) {
-			err := driver.DeleteManga(manga)
-			if err != nil {
-				panic(err)
-			}
-		}
-	}
-}
-
 func handleMenu(args *manageOpts, config *config.Config, driver *database.Driver) {
 	// Define Main panel
 	mainPanel := ui.NewPanel().
