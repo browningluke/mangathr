@@ -5,4 +5,8 @@ type manageOpts struct {
 		Source string
 		Query  []string
 	}
+
+	List struct {
+		Source string
+	}
 }

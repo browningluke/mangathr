@@ -3,7 +3,6 @@ package manage
 import (
 	"errors"
 	"fmt"
-	"github.com/browningluke/mangathrV2/ent"
 	"github.com/browningluke/mangathrV2/internal/config"
 	"github.com/browningluke/mangathrV2/internal/database"
 	"github.com/browningluke/mangathrV2/internal/logging"
@@ -27,6 +26,7 @@ func NewCmd(cfg *config.Config) *cobra.Command {
 	}
 
 	cmd.AddCommand(deleteSubcommand(cfg))
+	cmd.AddCommand(listSubcommand(cfg))
 
 	return cmd
 }
@@ -63,6 +63,38 @@ func deleteSubcommand(cfg *config.Config) *cobra.Command {
 		"", "Source for desired series")
 	err := cmd.MarkFlagRequired("source")
 	cobra.CheckErr(err)
+
+	return cmd
+}
+
+func listSubcommand(cfg *config.Config) *cobra.Command {
+	o := &manageOpts{}
+
+	cmd := &cobra.Command{
+		Use:     "list [-s SOURCE]",
+		Short:   "List series registered in database",
+		Aliases: []string{"l"},
+		Args: func(cmd *cobra.Command, args []string) error {
+			return nil
+		},
+		Run: func(cmd *cobra.Command, _ []string) {
+			if o.List.Source != "" {
+				// Validate source flag input
+				if _, exists := sources.MatchScraperTitle(o.Delete.Source); !exists {
+					logging.ExitIfError(&logging.ScraperError{
+						Error:   nil,
+						Message: fmt.Sprintf("%s is not a valid source", o.Delete.Source), Code: 0,
+					})
+				}
+			}
+
+			o.runWrapper(cfg, handleList)
+		},
+		DisableFlagsInUseLine: true,
+	}
+
+	cmd.Flags().StringVarP(&o.Delete.Source, "source", "s",
+		"", "Source for desired series")
 
 	return cmd
 }
