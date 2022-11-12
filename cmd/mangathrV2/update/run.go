@@ -27,7 +27,10 @@ func downloadNewChapters(config *config.Config, manga *ent.Manga,
 	scraper sources.Scraper, numChapters int) (downloaded, errors int) {
 
 	fmt.Printf("\033[2K") // Clear line
-	fmt.Printf("\rTitle: %s\nSource: %s\n# of new chapters: %d\n",
+	fmt.Printf(
+		"\r\u001B[1mTitle:  \u001B[0m%s\n"+
+			"\u001B[1mSource: \u001B[0m%s\n"+
+			"\u001B[1mFound:  \u001B[0m%d chapter(s)\n",
 		scraper.MangaTitle(), scraper.ScraperName(), numChapters)
 
 	succeeded := scraper.Download(downloader.NewDownloader(
