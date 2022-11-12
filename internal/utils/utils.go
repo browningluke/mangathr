@@ -17,6 +17,11 @@ func FindInSlice(list interface{}, match interface{}) (interface{}, bool) {
 
 func FindInSliceFold(list []string, match string) (string, bool) {
 	s, o := findInSlice(list, match, true)
+
+	if !o {
+		s = ""
+	}
+
 	return s.(string), o
 }
 
