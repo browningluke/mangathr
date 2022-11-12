@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"github.com/browningluke/mangathrV2/ent"
 	"github.com/browningluke/mangathrV2/ent/manga"
+	"github.com/browningluke/mangathrV2/ent/predicate"
 	"github.com/browningluke/mangathrV2/internal/logging"
 )
 
-func (d *Driver) queryManga(mangaID string, eager bool) (*ent.Manga, error) {
+func (d *Driver) queryManga(eager bool, ps ...predicate.Manga) (*ent.Manga, error) {
 	mq := d.client.Manga.Query().
-		Where(manga.MangaID(mangaID))
+		Where(ps...)
 	if eager {
 		mq.WithChapters()
 	}
@@ -23,7 +24,15 @@ func (d *Driver) queryManga(mangaID string, eager bool) (*ent.Manga, error) {
 }
 
 func (d *Driver) CheckMangaExistence(mangaID string) (bool, error) {
-	_, err := d.queryManga(mangaID, false)
+	_, err := d.queryManga(false, manga.MangaID(mangaID))
+	if err == nil {
+		return true, nil
+	}
+	return false, err
+}
+
+func (d *Driver) CheckMangaExistenceByPredicate(ps ...predicate.Manga) (bool, error) {
+	_, err := d.queryManga(false, ps...)
 	if err == nil {
 		return true, nil
 	}
@@ -31,7 +40,7 @@ func (d *Driver) CheckMangaExistence(mangaID string) (bool, error) {
 }
 
 func (d *Driver) QueryManga(mangaID string) (*ent.Manga, error) {
-	return d.queryManga(mangaID, true)
+	return d.queryManga(true, manga.MangaID(mangaID))
 }
 
 func (d *Driver) QueryAllManga() ([]*ent.Manga, error) {
