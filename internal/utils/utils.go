@@ -12,11 +12,28 @@ import (
 )
 
 func FindInSlice(list interface{}, match interface{}) (interface{}, bool) {
+	return findInSlice(list, match, false)
+}
+
+func FindInSliceFold(list []string, match string) (string, bool) {
+	s, o := findInSlice(list, match, true)
+	return s.(string), o
+}
+
+func findInSlice(list interface{}, match interface{}, stringFold bool) (interface{}, bool) {
 	switch list.(type) {
 	case []string:
 		for _, item := range list.([]string) {
-			if item == match.(string) {
-				return item, true
+			if stringFold {
+				// Check for fold match if folding
+				if strings.EqualFold(item, match.(string)) {
+					return item, true
+				}
+			} else {
+				// Check for exact match if no folding
+				if item == match.(string) {
+					return item, true
+				}
 			}
 		}
 		return nil, false
