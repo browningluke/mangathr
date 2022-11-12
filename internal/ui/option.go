@@ -80,7 +80,16 @@ func (o *option) CheckboxHandler(prompt string, genOpts func() []string, s func(
 	return o
 }
 
-func (o *option) CustomHandler(h func(o *option) bool) *option {
+func (o *option) FunctionHandler(h func()) *option {
+	o.handler = func(o *option) bool {
+		h()
+		return !o.terminate
+	}
+
+	return o
+}
+
+func (o *option) customHandler(h func(o *option) bool) *option {
 	o.handler = h
 	return o
 }

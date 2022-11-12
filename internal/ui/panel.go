@@ -56,7 +56,7 @@ func (p *panel) Start() bool {
 	// Handle panel being sub-panel
 	if p.isChild && !p.added {
 		p.AddOption("Back").
-			CustomHandler(
+			customHandler(
 				func(o *option) bool {
 					return false
 				},
