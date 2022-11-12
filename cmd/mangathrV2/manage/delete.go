@@ -12,6 +12,25 @@ import (
 	"strings"
 )
 
+func deleteFromDatabase(filter func(manga *ent.Manga) bool) {
+	// todo: use ent search, rather than querying all
+	allManga, err := driver.QueryAllManga()
+	if err != nil {
+		logging.ExitIfErrorWithFunc(&logging.ScraperError{
+			Error: err, Message: "An error occurred while getting manga from database", Code: 0,
+		}, closeDatabase)
+	}
+
+	for _, m := range allManga {
+		if filter(m) {
+			err := driver.DeleteManga(m)
+			if err != nil {
+				panic(err)
+			}
+		}
+	}
+}
+
 func promptDeletion(sourceTitle, seriesTitle string) {
 	fmt.Printf("Deleting [%s] %s\n", sourceTitle, seriesTitle)
 	confirm, err := ui.ConfirmPrompt("Delete this manga?")

@@ -81,22 +81,3 @@ func (o *manageOpts) runWrapper(cfg *config.Config, f func(*manageOpts, *config.
 
 	f(o, cfg, driver)
 }
-
-func deleteFromDatabase(filter func(manga *ent.Manga) bool) {
-	// todo: use ent search, rather than querying all
-	allManga, err := driver.QueryAllManga()
-	if err != nil {
-		logging.ExitIfErrorWithFunc(&logging.ScraperError{
-			Error: err, Message: "An error occurred while getting manga from database", Code: 0,
-		}, closeDatabase)
-	}
-
-	for _, manga := range allManga {
-		if filter(manga) {
-			err := driver.DeleteManga(manga)
-			if err != nil {
-				panic(err)
-			}
-		}
-	}
-}
