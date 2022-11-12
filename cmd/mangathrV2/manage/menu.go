@@ -2,6 +2,7 @@ package manage
 
 import (
 	"fmt"
+	"github.com/browningluke/mangathrV2/ent"
 	"github.com/browningluke/mangathrV2/internal/config"
 	"github.com/browningluke/mangathrV2/internal/database"
 	"github.com/browningluke/mangathrV2/internal/logging"
@@ -18,6 +19,24 @@ func closeDatabase() {
 	if err != nil {
 		logging.Errorln(err)
 		ui.Error("Unable to close database.")
+	}
+}
+
+func deleteFromDatabase(filter func(manga *ent.Manga) bool) {
+	allManga, err := driver.QueryAllManga()
+	if err != nil {
+		logging.ExitIfErrorWithFunc(&logging.ScraperError{
+			Error: err, Message: "An error occurred while getting manga from database", Code: 0,
+		}, closeDatabase)
+	}
+
+	for _, manga := range allManga {
+		if filter(manga) {
+			err := driver.DeleteManga(manga)
+			if err != nil {
+				panic(err)
+			}
+		}
 	}
 }
 
@@ -60,22 +79,11 @@ func handleMenu(args *manageOpts, config *config.Config, driver *database.Driver
 					return
 				}
 
-				allManga, err := driver.QueryAllManga()
-				if err != nil {
-					logging.ExitIfErrorWithFunc(&logging.ScraperError{
-						Error: err, Message: "An error occurred while getting manga from database", Code: 0,
-					}, closeDatabase)
-				}
-
-				for _, manga := range allManga {
-					if _, exists := utils.FindInSlice(strings,
-						fmt.Sprintf("[%s] %s", manga.Source, manga.Title)); exists {
-						err := driver.DeleteManga(manga)
-						if err != nil {
-							panic(err)
-						}
-					}
-				}
+				deleteFromDatabase(func(manga *ent.Manga) bool {
+					_, exists := utils.FindInSlice(strings,
+						fmt.Sprintf("[%s] %s", manga.Source, manga.Title))
+					return exists
+				})
 
 				fmt.Println("Successfully deleted selected manga")
 			},
