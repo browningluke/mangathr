@@ -15,7 +15,7 @@ func NewCmd(cfg *config.Config) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:     "manage",
-		Short:   "Manage chapters registered in database",
+		Short:   "Manage series registered in database",
 		Aliases: []string{"m"},
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
