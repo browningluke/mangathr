@@ -1,7 +1,7 @@
 package main
 
 var usageTemplate = `
-Usage:  {{if .Runnable}}{{.UseLine}}{{end}}{{if .HasAvailableSubCommands}}{{.UseLine}} COMMAND{{end}}
+Usage:  {{.UseLine}} {{if .HasAvailableSubCommands}}{{if .Runnable}}[{{end}}COMMAND{{if .Runnable}}]{{end}}{{end}}
 
 {{.Short}}{{if gt (len .Aliases) 0}}
 
