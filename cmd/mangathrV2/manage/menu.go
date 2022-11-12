@@ -85,7 +85,7 @@ func handleMenu(args *manageOpts, config *config.Config, driver *database.Driver
 		AddOption("List").
 		Terminator().
 		FunctionHandler(func() {
-			printList(driver, "")
+			printList(driver, "", []string{})
 		})
 
 	mainPanel.Start()

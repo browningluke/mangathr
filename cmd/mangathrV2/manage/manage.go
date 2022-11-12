@@ -71,13 +71,13 @@ func listSubcommand(cfg *config.Config) *cobra.Command {
 	o := &manageOpts{}
 
 	cmd := &cobra.Command{
-		Use:     "list [-s SOURCE]",
+		Use:     "list [-s SOURCE] [QUERY]...",
 		Short:   "List series registered in database",
 		Aliases: []string{"l"},
 		Args: func(cmd *cobra.Command, args []string) error {
 			return nil
 		},
-		Run: func(cmd *cobra.Command, _ []string) {
+		Run: func(cmd *cobra.Command, args []string) {
 			if o.List.Source != "" {
 				// Validate source flag input
 				if _, exists := sources.MatchScraperTitle(o.Delete.Source); !exists {
@@ -88,6 +88,7 @@ func listSubcommand(cfg *config.Config) *cobra.Command {
 				}
 			}
 
+			o.List.Query = args
 			o.runWrapper(cfg, handleList)
 		},
 		DisableFlagsInUseLine: true,

@@ -5,10 +5,11 @@ import (
 	"github.com/browningluke/mangathrV2/internal/config"
 	"github.com/browningluke/mangathrV2/internal/database"
 	"github.com/browningluke/mangathrV2/internal/logging"
+	"github.com/browningluke/mangathrV2/internal/utils"
 	"strings"
 )
 
-func printList(driver *database.Driver, sourceFilter string) {
+func printList(driver *database.Driver, sourceFilter string, titleFilter []string) {
 	allManga, err := driver.QueryAllManga()
 	if err != nil {
 		logging.ExitIfErrorWithFunc(&logging.ScraperError{
@@ -19,6 +20,12 @@ func printList(driver *database.Driver, sourceFilter string) {
 	for _, m := range allManga {
 		if sourceFilter != "" {
 			if strings.ToLower(sourceFilter) != strings.ToLower(m.Source) {
+				continue
+			}
+		}
+
+		if len(titleFilter) > 0 {
+			if _, exists := utils.FindInSliceFold(titleFilter, m.Title); !exists {
 				continue
 			}
 		}
@@ -38,5 +45,5 @@ func printList(driver *database.Driver, sourceFilter string) {
 }
 
 func handleList(args *manageOpts, config *config.Config, driver *database.Driver) {
-	printList(driver, args.List.Source)
+	printList(driver, args.List.Source, args.List.Query)
 }
