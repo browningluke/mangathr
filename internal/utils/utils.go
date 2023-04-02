@@ -44,10 +44,6 @@ func PadString(s string, length int) string {
 	return rString
 }
 
-func GetImageExtension(filename string) string {
-	return "." + regexp.MustCompile(`.*\.(jpg|jpeg|webp|png|gif)$`).FindAllStringSubmatch(filename, -1)[0][1]
-}
-
 func ExtractDate(dirtyDate string) string {
 	re := regexp.MustCompile(`(\d{4})[-_/](\d{2})[-_/](\d{2})(T|$)`)
 
