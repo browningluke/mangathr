@@ -15,7 +15,6 @@ import (
 var driver *database.Driver
 
 func closeDatabase() {
-	logging.Warningln("Closing database because of error")
 	err := driver.Close()
 	if err != nil {
 		logging.Errorln(err)
