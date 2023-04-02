@@ -3,12 +3,14 @@ package downloader
 import (
 	"fmt"
 	"github.com/alitto/pond"
+	"github.com/browningluke/mangathrV2/internal/sources/structs"
 	"github.com/schollz/progressbar/v3"
 	"log"
 	"os"
 	"path/filepath"
 	"regexp"
 	"time"
+	"unicode/utf8"
 )
 
 /*
@@ -81,6 +83,20 @@ func (d *Downloader) waitChapterDuration(timeStart int64) {
 		timeDiff := d.chapterDuration - downloadDuration
 		time.Sleep(time.Duration(timeDiff) * time.Millisecond)
 	}
+}
+
+func BuildDownloadQueue(selectedChapters []structs.Chapter) (jobs []Job, maxRuneCount int) {
+	var downloadQueue []Job
+	maxRC := 0 // Used for padding (e.g. Chapter 10 vs Chapter 10.5)
+	for _, chapter := range selectedChapters {
+		downloadQueue = append(downloadQueue, Job{Chapter: chapter})
+
+		// Check if string length is max in list
+		if runeCount := utf8.RuneCountInString(chapter.Metadata.Num); runeCount > maxRC {
+			maxRC = runeCount
+		}
+	}
+	return downloadQueue, maxRC
 }
 
 /*

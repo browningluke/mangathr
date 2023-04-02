@@ -21,20 +21,6 @@ func calculateDuration(numChapters int) int64 {
 	return duration
 }
 
-func buildDownloadQueue(selectedChapters []structs.Chapter) (jobs []downloader.Job, maxRuneCount int) {
-	var downloadQueue []downloader.Job
-	maxRC := 0 // Used for padding (e.g. Chapter 10 vs Chapter 10.5)
-	for _, chapter := range selectedChapters {
-		downloadQueue = append(downloadQueue, downloader.Job{Chapter: chapter})
-
-		// Check if string length is max in list
-		if runeCount := utf8.RuneCountInString(chapter.Metadata.Num); runeCount > maxRC {
-			maxRC = runeCount
-		}
-	}
-	return downloadQueue, maxRC
-}
-
 func (m *Scraper) runDownloadJob(job downloader.Job, dl *downloader.Downloader,
 	path string, maxRuneCount int) *logging.ScraperError {
 
@@ -88,7 +74,7 @@ func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) []str
 	// downloadType is one of ["download", "update"]
 	path := dl.CreateDirectory(m.manga.title, downloadType)
 
-	downloadQueue, maxRuneCount := buildDownloadQueue(m.selectedChapters)
+	downloadQueue, maxRuneCount := downloader.BuildDownloadQueue(m.selectedChapters)
 
 	// Execute download queue, potential to add workerpool here later
 	var succeededChapters []structs.Chapter
