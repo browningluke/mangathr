@@ -15,7 +15,6 @@ import (
 var driver *database.Driver
 
 func closeDatabase() {
-	logging.Warningln("Closing database because of error")
 	err := driver.Close()
 	if err != nil {
 		logging.Errorln(err)
@@ -33,9 +32,11 @@ func downloadNewChapters(config *config.Config, manga *ent.Manga,
 			"\u001B[1mFound:  \u001B[0m%d chapter(s)\n",
 		scraper.MangaTitle(), scraper.ScraperName(), numChapters)
 
-	succeeded := scraper.Download(downloader.NewDownloader(
-		&config.Downloader, true,
-		scraper.EnforceChapterDuration()), "update")
+	succeeded := scraper.Download(
+		downloader.NewDownloader(
+			&config.Downloader, true,
+			scraper.EnforceChapterDuration()),
+		manga.Mapping, "update")
 
 	if !config.Downloader.DryRun {
 		// If it's not a dry run, add new chapters to db
@@ -75,6 +76,9 @@ func checkMangaForNewChapters(config *config.Config, manga *ent.Manga) seriesSta
 	for _, chapter := range manga.Edges.Chapters {
 		chapterIDs = append(chapterIDs, chapter.ChapterID)
 	}
+
+	// Filter groups
+	scraper.FilterGroups(manga.FilteredGroups)
 
 	// Select new chapters in scraper, get array of them; and download if > 0
 	newChapters, err := scraper.SelectNewChapters(chapterIDs)

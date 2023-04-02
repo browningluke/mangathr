@@ -68,9 +68,7 @@ func (m *Scraper) getChapterPages(id string) ([]downloader.Page, *logging.Scrape
 			pages = append(pages, downloader.Page{
 				Url: fmt.Sprintf("%s/%s/%s/%s",
 					chapterResp.BaseUrl, key, chapterResp.Chapter.Hash, chapter),
-				Filename: fmt.Sprintf("%s%s",
-					utils.PadString(fmt.Sprintf("%d", i+1), digits),
-					utils.GetImageExtension(chapter)),
+				Name: utils.PadString(fmt.Sprintf("%d", i+1), digits),
 			})
 		}
 		return pages

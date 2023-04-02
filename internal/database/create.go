@@ -42,7 +42,7 @@ func (d *Driver) CreateChapter(chapterID, num, title string, manga *ent.Manga) e
 	// TODO Add created time here
 
 	if title != "" {
-		builder.SetTitle("")
+		builder.SetTitle(title)
 	}
 
 	err := builder.Exec(d.ctx)

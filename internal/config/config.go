@@ -6,7 +6,7 @@ import (
 	"github.com/browningluke/mangathrV2/internal/downloader"
 	"github.com/browningluke/mangathrV2/internal/sources/mangadex"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
+	"os"
 	"strings"
 )
 
@@ -26,7 +26,7 @@ type Config struct {
 func (c *Config) Load(path string, inContainer bool) error {
 	c.useDefaults(inContainer)
 
-	yamlFile, err := ioutil.ReadFile(path)
+	yamlFile, err := os.ReadFile(path)
 	if err != nil {
 		return err
 	}

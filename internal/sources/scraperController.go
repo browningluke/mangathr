@@ -58,7 +58,7 @@ type Scraper interface {
 
 	// Downloading
 
-	Download(downloader *downloader.Downloader, downloadType string) (succeeded []structs.Chapter)
+	Download(downloader *downloader.Downloader, directoryMapping, downloadType string) (succeeded []structs.Chapter)
 
 	// Getters
 
@@ -66,6 +66,7 @@ type Scraper interface {
 	MangaID() string
 	ScraperName() string
 	EnforceChapterDuration() bool
+	Registrable() bool
 }
 
 func MatchScraperTitle(query string) (string, bool) {

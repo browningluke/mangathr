@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/browningluke/mangathrV2/internal/logging"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
@@ -157,7 +156,7 @@ func (r RESTer) get(urlString string, headers map[string]string, params []QueryP
 	//}
 
 	//We Read the response body on the line below.
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return Response{}, err
 	}

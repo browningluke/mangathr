@@ -67,7 +67,7 @@ func (d *Downloader) downloadZip(pages []Page, chapterPath string, bar *progress
 	for _, page := range pages {
 		tasks = append(tasks, buildWorkerPoolFunc(d.config, page, bar, func(page *Page) error {
 			// Write image bytes to zipfile
-			return writeToZip(page.bytes, page.Filename, zipWriter, &mu)
+			return writeToZip(page.bytes, page.Filename(), zipWriter, &mu)
 		}))
 	}
 

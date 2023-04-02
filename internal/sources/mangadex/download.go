@@ -6,7 +6,6 @@ import (
 	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/sources/structs"
 	"github.com/browningluke/mangathrV2/internal/utils"
-	"unicode/utf8"
 )
 
 func calculateDuration(numChapters int) int64 {
@@ -19,20 +18,6 @@ func calculateDuration(numChapters int) int64 {
 		duration = int64(500)
 	}
 	return duration
-}
-
-func buildDownloadQueue(selectedChapters []structs.Chapter) (jobs []downloader.Job, maxRuneCount int) {
-	var downloadQueue []downloader.Job
-	maxRC := 0 // Used for padding (e.g. Chapter 10 vs Chapter 10.5)
-	for _, chapter := range selectedChapters {
-		downloadQueue = append(downloadQueue, downloader.Job{Chapter: chapter})
-
-		// Check if string length is max in list
-		if runeCount := utf8.RuneCountInString(chapter.Metadata.Num); runeCount > maxRC {
-			maxRC = runeCount
-		}
-	}
-	return downloadQueue, maxRC
 }
 
 func (m *Scraper) runDownloadJob(job downloader.Job, dl *downloader.Downloader,
@@ -80,15 +65,19 @@ func (m *Scraper) runDownloadJob(job downloader.Job, dl *downloader.Downloader,
 }
 
 // Download selected chapters. Handles errors itself. Returns array of chapters that succeeded
-func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) []structs.Chapter {
+func (m *Scraper) Download(dl *downloader.Downloader, directoryMapping, downloadType string) []structs.Chapter {
 	logging.Debugln("Downloading...")
 
 	dl.SetChapterDuration(calculateDuration(len(m.selectedChapters)))
 
+	directoryName := m.manga.title
+	if directoryMapping != "" {
+		directoryName = directoryMapping
+	}
 	// downloadType is one of ["download", "update"]
-	path := dl.CreateDirectory(m.manga.title, downloadType)
+	path := dl.CreateDirectory(directoryName, downloadType)
 
-	downloadQueue, maxRuneCount := buildDownloadQueue(m.selectedChapters)
+	downloadQueue, maxRuneCount := downloader.BuildDownloadQueue(m.selectedChapters)
 
 	// Execute download queue, potential to add workerpool here later
 	var succeededChapters []structs.Chapter
