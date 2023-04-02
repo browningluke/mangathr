@@ -53,6 +53,12 @@ func findManga(args *registerOpts, config *config.Config) (options, bool) {
 	titles, err := scraper.Search(args.Query)
 	logging.ExitIfErrorWithFunc(err, closeDatabase)
 
+	// Check if scraper supports registering
+	if !scraper.Registrable() {
+		ui.PrintlnColor(ui.Yellow, "Selected scraper does not support registering to database. Exiting...")
+		return options{}, true
+	}
+
 	selection := titles[0]
 	if len(titles) > 1 {
 		var uierr error
