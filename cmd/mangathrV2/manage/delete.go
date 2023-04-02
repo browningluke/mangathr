@@ -9,25 +9,30 @@ import (
 	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/sources"
 	"github.com/browningluke/mangathrV2/internal/ui"
-	"strings"
 )
 
-func deleteFromDatabase(filter func(manga *ent.Manga) bool) {
-	// todo: use ent search, rather than querying all
-	allManga, err := driver.QueryAllManga()
+// deleteFromDatabase removes manga by source + query
+func deleteFromDatabase(source, query string, isTitle bool) {
+	var queriedManga *ent.Manga
+	var err error
+
+	if isTitle {
+		queriedManga, err = driver.QueryMangaByTitle(query, source)
+	} else {
+		queriedManga, err = driver.QueryMangaByID(query, source)
+	}
+
 	if err != nil {
 		logging.ExitIfErrorWithFunc(&logging.ScraperError{
 			Error: err, Message: "An error occurred while getting manga from database", Code: 0,
 		}, closeDatabase)
 	}
 
-	for _, m := range allManga {
-		if filter(m) {
-			err := driver.DeleteManga(m)
-			if err != nil {
-				panic(err)
-			}
-		}
+	err = driver.DeleteManga(queriedManga)
+	if err != nil {
+		logging.ExitIfErrorWithFunc(&logging.ScraperError{
+			Error: err, Message: "An error occurred while deleting manga from database", Code: 0,
+		}, closeDatabase)
 	}
 }
 
@@ -42,11 +47,7 @@ func promptDeletion(sourceTitle, seriesTitle string) {
 
 	if confirm {
 		fmt.Println("Deleting series")
-		deleteFromDatabase(func(manga *ent.Manga) bool {
-			return strings.ToLower(manga.Title) == strings.ToLower(seriesTitle) &&
-				manga.Source == sourceTitle
-		})
-
+		deleteFromDatabase(sourceTitle, seriesTitle, true)
 	} else {
 		fmt.Println("Skipping deletion...")
 	}

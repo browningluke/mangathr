@@ -2,12 +2,11 @@ package manage
 
 import (
 	"fmt"
-	"github.com/browningluke/mangathrV2/ent"
 	"github.com/browningluke/mangathrV2/internal/config"
 	"github.com/browningluke/mangathrV2/internal/database"
 	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/ui"
-	"github.com/browningluke/mangathrV2/internal/utils"
+	"regexp"
 )
 
 // Package-wide accessible driver
@@ -61,11 +60,11 @@ func handleMenu(args *manageOpts, config *config.Config, driver *database.Driver
 					return
 				}
 
-				deleteFromDatabase(func(manga *ent.Manga) bool {
-					_, exists := utils.FindInSlice(strings,
-						fmt.Sprintf("[%s] %s", manga.Source, manga.Title))
-					return exists
-				})
+				for _, selection := range strings {
+					re := regexp.MustCompile(`\[(.*?)\] (.*?)$`)
+					match := re.FindStringSubmatch(selection)
+					deleteFromDatabase(match[1], match[2], true)
+				}
 
 				fmt.Println("Successfully deleted selected manga")
 			},
