@@ -32,9 +32,11 @@ func downloadNewChapters(config *config.Config, manga *ent.Manga,
 			"\u001B[1mFound:  \u001B[0m%d chapter(s)\n",
 		scraper.MangaTitle(), scraper.ScraperName(), numChapters)
 
-	succeeded := scraper.Download(downloader.NewDownloader(
-		&config.Downloader, true,
-		scraper.EnforceChapterDuration()), "update")
+	succeeded := scraper.Download(
+		downloader.NewDownloader(
+			&config.Downloader, true,
+			scraper.EnforceChapterDuration()),
+		manga.Mapping, "update")
 
 	if !config.Downloader.DryRun {
 		// If it's not a dry run, add new chapters to db

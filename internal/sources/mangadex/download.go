@@ -6,7 +6,6 @@ import (
 	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/sources/structs"
 	"github.com/browningluke/mangathrV2/internal/utils"
-	"unicode/utf8"
 )
 
 func calculateDuration(numChapters int) int64 {
@@ -66,13 +65,17 @@ func (m *Scraper) runDownloadJob(job downloader.Job, dl *downloader.Downloader,
 }
 
 // Download selected chapters. Handles errors itself. Returns array of chapters that succeeded
-func (m *Scraper) Download(dl *downloader.Downloader, downloadType string) []structs.Chapter {
+func (m *Scraper) Download(dl *downloader.Downloader, directoryMapping, downloadType string) []structs.Chapter {
 	logging.Debugln("Downloading...")
 
 	dl.SetChapterDuration(calculateDuration(len(m.selectedChapters)))
 
+	directoryName := m.manga.title
+	if directoryMapping != "" {
+		directoryName = directoryMapping
+	}
 	// downloadType is one of ["download", "update"]
-	path := dl.CreateDirectory(m.manga.title, downloadType)
+	path := dl.CreateDirectory(directoryName, downloadType)
 
 	downloadQueue, maxRuneCount := downloader.BuildDownloadQueue(m.selectedChapters)
 
