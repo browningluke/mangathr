@@ -39,8 +39,12 @@ func (d *Driver) CheckMangaExistenceByPredicate(ps ...predicate.Manga) (bool, er
 	return false, err
 }
 
-func (d *Driver) QueryManga(mangaID string) (*ent.Manga, error) {
-	return d.queryManga(true, manga.MangaID(mangaID))
+func (d *Driver) QueryMangaByID(mangaID, source string) (*ent.Manga, error) {
+	return d.queryManga(true, manga.MangaID(mangaID), manga.Source(source))
+}
+
+func (d *Driver) QueryMangaByTitle(title, source string) (*ent.Manga, error) {
+	return d.queryManga(true, manga.TitleEqualFold(title), manga.Source(source))
 }
 
 func (d *Driver) QueryAllManga() ([]*ent.Manga, error) {
