@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/browningluke/mangathrV2/cmd/mangathrV2/download"
+	"github.com/browningluke/mangathrV2/cmd/mangathrV2/manage"
 	"github.com/browningluke/mangathrV2/cmd/mangathrV2/register"
 	"github.com/browningluke/mangathrV2/cmd/mangathrV2/update"
 	"github.com/browningluke/mangathrV2/internal/config"
@@ -56,6 +57,7 @@ func init() {
 	rootCmd.AddCommand(download.NewCmd(cfg))
 	rootCmd.AddCommand(register.NewCmd(cfg))
 	rootCmd.AddCommand(update.NewCmd(cfg))
+	rootCmd.AddCommand(manage.NewCmd(cfg))
 }
 
 func getConfigPath() string {

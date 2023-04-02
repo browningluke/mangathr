@@ -22,6 +22,11 @@ var SCRAPERS = map[string]func(c *config.Config) Scraper{
 	},
 }
 
+var SCRAPER_TITLES = map[string]string{
+	// Mangadex
+	strings.ToLower(mangadex.SCRAPERNAME): mangadex.SCRAPERNAME,
+}
+
 type Scraper interface {
 	/*
 		-- Searching --
@@ -63,6 +68,11 @@ type Scraper interface {
 	ScraperName() string
 	EnforceChapterDuration() bool
 	Registrable() bool
+}
+
+func MatchScraperTitle(query string) (string, bool) {
+	matchedTitle, ok := SCRAPER_TITLES[strings.ToLower(query)]
+	return matchedTitle, ok
 }
 
 func NewScraper(name string, config *config.Config) Scraper {
