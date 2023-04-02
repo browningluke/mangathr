@@ -25,6 +25,8 @@ var SCRAPERS = map[string]func(c *config.Config) Scraper{
 var SCRAPER_TITLES = map[string]string{
 	// Mangadex
 	strings.ToLower(mangadex.SCRAPERNAME): mangadex.SCRAPERNAME,
+	// Cubari
+	strings.ToLower(cubari.SCRAPERNAME): cubari.SCRAPERNAME,
 }
 
 type Scraper interface {
