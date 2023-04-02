@@ -4,6 +4,7 @@ import (
 	"github.com/browningluke/mangathrV2/internal/config"
 	"github.com/browningluke/mangathrV2/internal/downloader"
 	"github.com/browningluke/mangathrV2/internal/logging"
+	"github.com/browningluke/mangathrV2/internal/sources/cubari"
 	"github.com/browningluke/mangathrV2/internal/sources/mangadex"
 	"github.com/browningluke/mangathrV2/internal/sources/structs"
 	"github.com/browningluke/mangathrV2/internal/ui"
@@ -16,9 +17,9 @@ var SCRAPERS = map[string]func(c *config.Config) Scraper{
 		return mangadex.NewScraper(&c.Sources.Mangadex)
 	},
 	// Cubari
-	//strings.ToLower(cubari.SCRAPERNAME): func(c *config.Config) Scraper {
-	//	return cubari.NewScraper(&c.Sources.Cubari)
-	//},
+	strings.ToLower(cubari.SCRAPERNAME): func(c *config.Config) Scraper {
+		return cubari.NewScraper(&c.Sources.Cubari)
+	},
 }
 
 type Scraper interface {
