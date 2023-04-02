@@ -3,7 +3,6 @@ name: docker build
 on:
   workflow_dispatch:
   push:
-    branches: []
     tags: [ 'v*.*.*' ]   # Publish semver tags as releases.
     paths-ignore:
       - "docs/**"
