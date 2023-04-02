@@ -165,10 +165,10 @@ func (m *Scraper) generateTitle(chapterTitle, num, lang string, groups []string)
 	return fullTitle, metadataTitle
 }
 
-func (m *Scraper) scrapeChapters() *logging.ScraperError { // Get entire Manga feed
+func (m *Scraper) scrapeChapters() ([]structs.Chapter, *logging.ScraperError) { // Get entire Manga feed
 	mangaFeed, err := getMangaFeed(m.MangaID(), m.config.LanguageFilter, m.config.RatingFilter)
 	if err != nil {
-		return err
+		return []structs.Chapter{}, err
 	}
 
 	var searchResults []structs.Chapter
@@ -179,7 +179,7 @@ func (m *Scraper) scrapeChapters() *logging.ScraperError { // Get entire Manga f
 
 			numString, numFloat, err := parseChapterNum(item.Attributes.Chapter)
 			if err != nil {
-				return err
+				return []structs.Chapter{}, err
 			}
 
 			groups := m.parseGroups(item)
@@ -208,8 +208,7 @@ func (m *Scraper) scrapeChapters() *logging.ScraperError { // Get entire Manga f
 	}
 
 	searchResults = handleDuplicates(searchResults)
-	m.allChapters = searchResults
-	return nil
+	return searchResults, nil
 }
 
 // handleDuplicates: returns a slice of structs.Chapter, with IDs appended to chapters with duplicate titles.
