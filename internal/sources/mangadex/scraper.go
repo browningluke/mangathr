@@ -10,6 +10,7 @@ const (
 	APIROOT                = "https://api.mangadex.org"
 	CHAPTERSPERMIN         = 40 // set from API docs
 	ENFORCECHAPTERDURATION = true
+	REGISTRABLE            = true
 )
 
 type searchResult struct {
@@ -130,4 +131,8 @@ func (m *Scraper) ScraperName() string {
 
 func (m *Scraper) EnforceChapterDuration() bool {
 	return ENFORCECHAPTERDURATION
+}
+
+func (m *Scraper) Registrable() bool {
+	return REGISTRABLE
 }
