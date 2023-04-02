@@ -23,7 +23,8 @@ type Scraper struct {
 	searchResults []searchResult
 	manga         searchResult
 
-	allChapters, selectedChapters []structs.Chapter
+	allChapters, selectedChapters,
+	filteredChapters []structs.Chapter
 
 	// Group queries
 	groups []string
@@ -40,39 +41,36 @@ func NewScraper(config *Config) *Scraper {
 */
 
 func (m *Scraper) Chapters() ([]structs.Chapter, *logging.ScraperError) {
-	if len(m.allChapters) == 0 && len(m.selectedChapters) == 0 {
-		if err := m.scrapeChapters(); err != nil {
-			return nil, err
-		}
+	// If chapters have been filtered, only show the filtered chapters
+	if len(m.filteredChapters) != 0 {
+		return m.filteredChapters, nil
 	}
 
-	c := m.allChapters
-
-	if len(m.selectedChapters) != 0 {
-		c = m.selectedChapters
+	// If parsing has already been done, skip repeating it
+	if len(m.allChapters) != 0 {
+		return m.allChapters, nil
 	}
 
-	return c, nil
+	// Otherwise, parse chapters and return
+	var err *logging.ScraperError
+	m.allChapters, err = m.scrapeChapters()
+	return m.allChapters, err
 }
 
 // ChapterTitles Returns the full titles of chapters
 func (m *Scraper) ChapterTitles() ([]string, *logging.ScraperError) {
-	if len(m.allChapters) == 0 && len(m.selectedChapters) == 0 {
-		if err := m.scrapeChapters(); err != nil {
-			return nil, err
-		}
+	// Parse chapters if not already done
+	chapters, err := m.Chapters()
+	if err != nil {
+		return []string{}, err
 	}
 
-	chapters := m.allChapters
-	if len(m.selectedChapters) != 0 {
-		chapters = m.selectedChapters
+	var chapterTitles []string
+	for _, c := range chapters {
+		chapterTitles = append(chapterTitles, c.FullTitle)
 	}
 
-	var titles []string
-	for _, item := range chapters {
-		titles = append(titles, item.FullTitle)
-	}
-	return titles, nil
+	return chapterTitles, nil
 }
 
 /*
@@ -89,6 +87,9 @@ func (m *Scraper) GroupNames() ([]string, *logging.ScraperError) {
 }
 
 func (m *Scraper) FilterGroups(groups []string) *logging.ScraperError {
+	// Ensure chapters are parsed
+	m.Chapters()
+
 	findElemInSlice := func(slice []string, elem string) bool {
 		for _, v := range slice {
 			if elem == v {
@@ -98,17 +99,18 @@ func (m *Scraper) FilterGroups(groups []string) *logging.ScraperError {
 		return false
 	}
 
-	var selectedChapters []structs.Chapter
+	var filteredChapters []structs.Chapter
 	for _, chapter := range m.allChapters { // go through each chapter
 		for _, group := range groups { // go through each filtered group
 			exists := findElemInSlice(chapter.Metadata.Groups, group)
 			if exists {
-				selectedChapters = append(selectedChapters, chapter)
+				filteredChapters = append(filteredChapters, chapter)
 				break
 			}
 		}
 	}
-	m.selectedChapters = selectedChapters
+
+	m.filteredChapters = filteredChapters
 
 	return nil
 }

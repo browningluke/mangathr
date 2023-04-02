@@ -263,13 +263,14 @@ func (m *Scraper) SelectChapters(titles []string) *logging.ScraperError {
 }
 
 func (m *Scraper) SelectNewChapters(chapterIDs []string) ([]structs.Chapter, *logging.ScraperError) {
-	// Populate .allChapters
-	if _, err := m.Chapters(); err != nil {
-		return nil, err
+	// Parse chapters if not already done
+	chapters, err := m.Chapters()
+	if err != nil {
+		return []structs.Chapter{}, err
 	}
 
 	var diffChapters []structs.Chapter
-	for _, newChapter := range m.allChapters {
+	for _, newChapter := range chapters {
 		exists := false
 		for _, oldChapterID := range chapterIDs {
 			if oldChapterID == newChapter.ID {
@@ -282,7 +283,6 @@ func (m *Scraper) SelectNewChapters(chapterIDs []string) ([]structs.Chapter, *lo
 		}
 	}
 	m.selectedChapters = diffChapters
-	m.allChapters = []structs.Chapter{}
 
 	logging.Debugln("SelectNewChapters: New chapters: ", diffChapters)
 	return diffChapters, nil
