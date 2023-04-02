@@ -25,7 +25,7 @@ func (d *Driver) createManga(mangaID, title, source, mapping string, groups []st
 }
 
 func (d *Driver) CreateManga(mangaID, title, source, mapping string, groups []string) (*ent.Manga, error) {
-	manga, err := d.QueryManga(mangaID)
+	manga, err := d.QueryMangaByID(mangaID, source)
 	if err != nil {
 		return d.createManga(mangaID, title, source, mapping, groups)
 	}
