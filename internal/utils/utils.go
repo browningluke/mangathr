@@ -21,7 +21,7 @@ func FindInSlice(list interface{}, match interface{}) (interface{}, bool) {
 		}
 		return nil, false
 	default:
-		fmt.Println("unknown")
+		fmt.Println("FindInSlice: unknown type")
 	}
 	return nil, false
 }
