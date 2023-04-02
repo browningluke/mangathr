@@ -54,7 +54,7 @@ func (d *Downloader) downloadDir(pages []Page, chapterPath string, bar *progress
 	for _, page := range pages {
 		tasks = append(tasks, buildWorkerPoolFunc(d.config, page, bar, func(page *Page) error {
 			// Write image bytes to img file
-			return writeToFile(page.bytes, path.Join(chapterPath, page.Filename))
+			return writeToFile(page.bytes, path.Join(chapterPath, page.Filename()))
 		}))
 	}
 
