@@ -4,7 +4,7 @@
 
 **mangathr** is a command-line program to download Manga chapters from numerous online platforms (See [Sources](#sources)). It bundles each chapter with metadata in ComicInfo format, or a number of others (see [Metadata Agents](#metadata-agents)). It supports monitoring a source for new chapters of registered Manga.
 
-It has an older version ([mangathr](https://github.com/browningluke/mangathr)), written in Typescript.
+It has an older version ([mangathr-legacy](https://github.com/browningluke/mangathr-legacy)), written in Typescript.
 
 ```
 $ mangathr <COMMAND> -s SOURCE QUERY
