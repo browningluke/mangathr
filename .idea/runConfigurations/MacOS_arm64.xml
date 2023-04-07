@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="MacOS arm64" type="GoApplicationRunConfiguration" factoryName="Go Application">
-    <module name="mangathrV2" />
+    <module name="mangathr" />
     <working_directory value="$PROJECT_DIR$" />
     <go_parameters value="-o $ProjectFileDir$/build/$ModuleName$_mac_arm64" />
     <envs>
