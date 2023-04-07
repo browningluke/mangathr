@@ -3,6 +3,7 @@ package downloader
 import (
 	"fmt"
 	"github.com/alitto/pond"
+	"github.com/browningluke/mangathrV2/internal/downloader/templater"
 	"github.com/browningluke/mangathrV2/internal/sources/structs"
 	"github.com/schollz/progressbar/v3"
 	"log"
@@ -44,11 +45,7 @@ func (d *Downloader) CreateDirectory(title, downloadType string) string {
 }
 
 func (d *Downloader) GetNameFromTemplate(job Job) string {
-	templater := &Templater{
-		RawTitle: job.Chapter.RawTitle,
-		Metadata: job.Chapter.Metadata,
-	}
-	return templater.ExecTemplate(config.Output.FilenameTemplate)
+	return templater.New(&job.Chapter).ExecTemplate(config.Output.FilenameTemplate)
 }
 
 func (d *Downloader) GetChapterPath(path, filename string) string {
