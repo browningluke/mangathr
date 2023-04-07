@@ -18,7 +18,7 @@ func ConfigDir() string {
 		ui.Fatal("Failed to find config directory.")
 	}
 
-	configDir := filepath.Join(homeDir, ".config", "mangathrv2")
+	configDir := filepath.Join(homeDir, ".config", "mangathr")
 	return configDir
 }
 

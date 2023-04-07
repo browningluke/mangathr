@@ -20,7 +20,7 @@ var (
 	logLevel string
 
 	rootCmd = &cobra.Command{
-		Use:                   "mangathrv2 [OPTIONS]",
+		Use:                   "mangathr [OPTIONS]",
 		Short:                 "📦 A CLI utility for downloading Manga & metadata.",
 		DisableFlagsInUseLine: true,
 	}
@@ -38,7 +38,7 @@ func init() {
 
 	// Flags
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config",
-		"", "Path to config file (default is $XDG_CONFIG_HOME/mangathrv2/config)")
+		"", "Path to config file (default is $XDG_CONFIG_HOME/mangathr/config)")
 	rootCmd.PersistentFlags().StringVarP(&logLevel, "log-level", "l",
 		"", "Set the logging level (\"debug\"|\"info\"|\"warn\"|\"error\"|\"off\") (default \"off\")")
 
