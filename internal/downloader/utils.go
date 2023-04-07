@@ -2,10 +2,8 @@ package downloader
 
 import (
 	"fmt"
-	"github.com/alitto/pond"
 	"github.com/browningluke/mangathrV2/internal/downloader/templater"
 	"github.com/browningluke/mangathrV2/internal/manga"
-	"github.com/schollz/progressbar/v3"
 	"log"
 	"os"
 	"path/filepath"
@@ -78,55 +76,5 @@ func (d *Downloader) waitChapterDuration(timeStart int64) {
 	if downloadDuration < d.chapterDuration {
 		timeDiff := d.chapterDuration - downloadDuration
 		time.Sleep(time.Duration(timeDiff) * time.Millisecond)
-	}
-}
-
-/*
-	Worker pool
-*/
-
-func buildWorkerPoolFunc(page manga.Page, bar *progressbar.ProgressBar, writeBytes func(*manga.Page) error) func() {
-	return func() {
-		// Get image bytes to write
-		pageD, err := page.Download(config.Delay.Page, config.PageRetries)
-		if err != nil {
-			panic(err)
-		}
-
-		// Write bytes to whichever output
-		err = writeBytes(pageD)
-		if err != nil {
-			panic(err)
-		}
-
-		// Add 1 to the bar
-		err = bar.Add(1)
-		if err != nil {
-			panic(err)
-		}
-	}
-}
-
-func runWorkerPool(tasks []func(), simultaneousPages int) error {
-	wpErr := make(chan error)
-	panicHandler := func(p interface{}) {
-		wpErr <- p.(error)
-	}
-	pool := pond.New(simultaneousPages, 0, pond.PanicHandler(panicHandler))
-
-	for _, task := range tasks {
-		pool.Submit(task)
-	}
-
-	for {
-		select {
-		case err := <-wpErr:
-			pool.Stop()
-			return err
-		default:
-			if pool.SubmittedTasks() == pool.CompletedTasks() {
-				return nil
-			}
-		}
 	}
 }

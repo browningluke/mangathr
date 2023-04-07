@@ -2,12 +2,14 @@ package downloader
 
 import (
 	"fmt"
+	"github.com/browningluke/mangathrV2/internal/downloader/workerpool"
 	"github.com/browningluke/mangathrV2/internal/downloader/writer"
 	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/manga"
 	"github.com/browningluke/mangathrV2/internal/metadata"
 	"github.com/browningluke/mangathrV2/internal/utils"
 	"os"
+	"path"
 	"time"
 	"unicode/utf8"
 )
@@ -130,16 +132,31 @@ func (d *Downloader) Download(chapter *manga.Chapter) error {
 	}
 
 	// Build task array
-	var tasks []func()
-	for _, page := range chapter.Pages() {
-		tasks = append(tasks, buildWorkerPoolFunc(page, bar, func(page *manga.Page) error {
-			// Write image bytes to zipfile
-			return chapterWriter.Write(page.Bytes, page.Filename())
-		}))
+	pool := workerpool.New(config.SimultaneousPages)
+	for _, p := range chapter.Pages() {
+		pool.AddTask(func() {
+			// Get image bytes to write
+			_, err := p.Download(config.Delay.Page, config.PageRetries)
+			if err != nil {
+				panic(err)
+			}
+
+			// Write bytes to whichever output
+			err = chapterWriter.Write(p.Bytes, path.Join(chapterPath, p.Filename()))
+			if err != nil {
+				panic(err)
+			}
+
+			// Add 1 to the bar
+			err = bar.Add(1)
+			if err != nil {
+				panic(err)
+			}
+		})
 	}
 
 	// Run tasks on worker pool
-	err = runWorkerPool(tasks, config.SimultaneousPages)
+	err = pool.Run()
 	if err != nil {
 		if err := bar.Clear(); err != nil {
 			// If the progress bar breaks for some reason, we should panic
@@ -148,7 +165,7 @@ func (d *Downloader) Download(chapter *manga.Chapter) error {
 		return err
 	}
 
-	fmt.Println("") // Create a new bar for each chapter
+	fmt.Println("") // Terminate progress bar (creates a new bar for each chapter)
 
 	return nil
 }
