@@ -51,7 +51,7 @@ func (d *Downloader) SetTemplate(template string) *Downloader {
 	return d
 }
 
-func (d *Downloader) SetMaxRuneCount(chapters []manga.Chapter) {
+func (d *Downloader) SetMaxRuneCount(chapters []manga.Chapter) *Downloader {
 	maxRC := 0 // Used for padding (e.g. Chapter 10 vs Chapter 10.5)
 	for _, chapter := range chapters {
 		// Check if string length is max in list
@@ -60,10 +60,12 @@ func (d *Downloader) SetMaxRuneCount(chapters []manga.Chapter) {
 		}
 	}
 	d.maxRuneCount = maxRC
+	return d
 }
 
-func (d *Downloader) SetPath(path string) {
+func (d *Downloader) SetPath(path string) *Downloader {
 	d.destinationPath = path
+	return d
 }
 
 /*
