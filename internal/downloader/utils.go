@@ -100,10 +100,10 @@ func BuildDownloadQueue(selectedChapters []manga.Chapter) (jobs []Job, maxRuneCo
 	Worker pool
 */
 
-func buildWorkerPoolFunc(page Page, bar *progressbar.ProgressBar, writeBytes func(*Page) error) func() {
+func buildWorkerPoolFunc(page manga.Page, bar *progressbar.ProgressBar, writeBytes func(*manga.Page) error) func() {
 	return func() {
 		// Get image bytes to write
-		pageD, err := page.download()
+		pageD, err := page.Download(config.Delay.Page, config.PageRetries)
 		if err != nil {
 			panic(err)
 		}

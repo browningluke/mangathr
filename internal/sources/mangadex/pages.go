@@ -3,8 +3,8 @@ package mangadex
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/browningluke/mangathrV2/internal/downloader"
 	"github.com/browningluke/mangathrV2/internal/logging"
+	"github.com/browningluke/mangathrV2/internal/manga"
 	"github.com/browningluke/mangathrV2/internal/rester"
 	"github.com/browningluke/mangathrV2/internal/utils"
 	"math"
@@ -16,7 +16,7 @@ import (
 	-- Pages --
 */
 
-func (m *Scraper) getChapterPages(id string) ([]downloader.Page, *logging.ScraperError) {
+func (m *Scraper) getChapterPages(id string) ([]manga.Page, *logging.ScraperError) {
 	resInterface := rester.New().Get(
 		fmt.Sprintf("%s/at-home/server/%s", APIROOT, id),
 		map[string]string{},
@@ -62,10 +62,10 @@ func (m *Scraper) getChapterPages(id string) ([]downloader.Page, *logging.Scrape
 
 	logging.Debugln("Chapter pages: ", jsonString)
 
-	getPages := func(slice []string, key string) []downloader.Page {
-		var pages []downloader.Page
+	getPages := func(slice []string, key string) []manga.Page {
+		var pages []manga.Page
 		for i, chapter := range slice {
-			pages = append(pages, downloader.Page{
+			pages = append(pages, manga.Page{
 				Url: fmt.Sprintf("%s/%s/%s/%s",
 					chapterResp.BaseUrl, key, chapterResp.Chapter.Hash, chapter),
 				Name: utils.PadString(fmt.Sprintf("%d", i+1), digits),
@@ -74,7 +74,7 @@ func (m *Scraper) getChapterPages(id string) ([]downloader.Page, *logging.Scrape
 		return pages
 	}
 
-	var pages []downloader.Page
+	var pages []manga.Page
 
 	if config.DataSaver {
 		pages = getPages(chapterResp.Chapter.DataSaver, "data-saver")
