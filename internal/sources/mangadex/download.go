@@ -20,8 +20,7 @@ func calculateDuration(numChapters int) int64 {
 	return duration
 }
 
-func (m *Scraper) runDownloadJob(job downloader.Job, dl *downloader.Downloader,
-	path string, maxRuneCount int) *logging.ScraperError {
+func (m *Scraper) runDownloadJob(job downloader.Job, dl *downloader.Downloader, maxRuneCount int) *logging.ScraperError {
 
 	// Get chapter pages
 	err := m.addPagesToChapter(&job.Chapter)
@@ -42,14 +41,14 @@ func (m *Scraper) runDownloadJob(job downloader.Job, dl *downloader.Downloader,
 		SetPageCount(len(job.Chapter.Pages()))
 
 	// Check if download is possible
-	err = dl.CanDownload(path, filename)
+	err = dl.CanDownload(filename)
 	if err != nil {
 		return err
 	}
 
-	downloadErr := dl.Download(path, filename, job.Chapter.Pages(), progress)
+	downloadErr := dl.Download(filename, job.Chapter.Pages(), progress)
 	if downloadErr != nil {
-		if err := dl.Cleanup(path, filename); err != nil {
+		if err := dl.Cleanup(filename); err != nil {
 			logging.Errorln(err)
 			fmt.Printf("An error occurred when deleting failed chapter: %s", filename)
 		}
@@ -74,15 +73,16 @@ func (m *Scraper) Download(dl *downloader.Downloader, directoryMapping, download
 	if directoryMapping != "" {
 		directoryName = directoryMapping
 	}
-	// downloadType is one of ["download", "update"]
-	path := dl.CreateDirectory(directoryName, downloadType)
+
+	// Configure downloader (downloadType is one of ["download", "update"])
+	dl.SetPath(dl.CreateDirectory(directoryName, downloadType))
 
 	downloadQueue, maxRuneCount := downloader.BuildDownloadQueue(m.selectedChapters)
 
 	// Execute download queue, potential to add workerpool here later
 	var succeededChapters []manga.Chapter
 	for _, job := range downloadQueue {
-		err := m.runDownloadJob(job, dl, path, maxRuneCount)
+		err := m.runDownloadJob(job, dl, maxRuneCount)
 
 		// Print error to screen, abandon chapter, and continue
 		if err != nil {

@@ -48,18 +48,18 @@ func (d *Downloader) GetNameFromTemplate(job Job) string {
 	return templater.New(&job.Chapter).ExecTemplate(config.Output.FilenameTemplate)
 }
 
-func (d *Downloader) GetChapterPath(path, filename string) string {
+func (d *Downloader) GetChapterPath(filename string) string {
 	// Extract file/dir name (depends on config.output.zip)
 	filename = CleanPath(filename)
 	if config.Output.Zip {
 		filename = fmt.Sprintf("%s.cbz", filename)
 	}
 
-	return filepath.Join(path, filename)
+	return filepath.Join(d.destinationPath, filename)
 }
 
-func (d *Downloader) Cleanup(path, filename string) error {
-	chapterPath := d.GetChapterPath(path, filename)
+func (d *Downloader) Cleanup(filename string) error {
+	chapterPath := d.GetChapterPath(filename)
 
 	err := os.RemoveAll(chapterPath)
 	if err != nil {

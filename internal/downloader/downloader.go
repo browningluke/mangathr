@@ -14,7 +14,8 @@ import (
 type Downloader struct {
 	agent metadata.Agent
 
-	updateMode bool
+	updateMode      bool
+	destinationPath string
 
 	enforceChapterDuration bool
 	chapterDuration        int64
@@ -48,12 +49,16 @@ func (d *Downloader) SetTemplate(template string) {
 	}
 }
 
+func (d *Downloader) SetPath(path string) {
+	d.destinationPath = path
+}
+
 /*
 	-- Chapter Downloading --
 */
 
-func (d *Downloader) CanDownload(path, filename string) *logging.ScraperError {
-	chapterPath := d.GetChapterPath(path, filename)
+func (d *Downloader) CanDownload(filename string) *logging.ScraperError {
+	chapterPath := d.GetChapterPath(filename)
 
 	if config.DryRun {
 		return &logging.ScraperError{
@@ -75,7 +80,7 @@ func (d *Downloader) CanDownload(path, filename string) *logging.ScraperError {
 }
 
 // Download chapter. Assumes CanDownload() has been called and has returned true
-func (d *Downloader) Download(path, filename string, pages []manga.Page, bar *progressbar.ProgressBar) error {
+func (d *Downloader) Download(filename string, pages []manga.Page, bar *progressbar.ProgressBar) error {
 
 	// Ensure chapter time is correct
 	if d.enforceChapterDuration {
@@ -90,7 +95,7 @@ func (d *Downloader) Download(path, filename string, pages []manga.Page, bar *pr
 		time.Sleep(dur)
 	}
 
-	chapterPath := d.GetChapterPath(path, filename)
+	chapterPath := d.GetChapterPath(filename)
 
 	// Set up writer
 	var chapterWriter writer.Writer
