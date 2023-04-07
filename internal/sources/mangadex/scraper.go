@@ -18,8 +18,6 @@ type searchResult struct {
 }
 
 type Scraper struct {
-	config *Config
-
 	searchResults []searchResult
 	manga         searchResult
 
@@ -30,9 +28,9 @@ type Scraper struct {
 	groups []string
 }
 
-func NewScraper(config *Config) *Scraper {
+func NewScraper() *Scraper {
 	logging.Debugln("Created a Mangadex scraper")
-	s := &Scraper{config: config}
+	s := &Scraper{}
 	return s
 }
 

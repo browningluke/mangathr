@@ -47,8 +47,10 @@ func NewCmd(cfg *config.Config) *cobra.Command {
 }
 
 func (o *downloadOpts) run(cfg *config.Config) {
-	scraper := sources.NewScraper(o.Source, cfg)
+	// Propagate config to all sub-configs
 	cfg.Propagate()
+
+	scraper := sources.NewScraper(o.Source)
 
 	// Search and select manga
 	titles, err := scraper.Search(o.Query)

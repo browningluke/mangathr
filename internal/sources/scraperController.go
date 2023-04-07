@@ -1,7 +1,6 @@
 package sources
 
 import (
-	"github.com/browningluke/mangathrV2/internal/config"
 	"github.com/browningluke/mangathrV2/internal/downloader"
 	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/sources/mangadex"
@@ -10,10 +9,10 @@ import (
 	"strings"
 )
 
-var SCRAPERS = map[string]func(c *config.Config) Scraper{
+var SCRAPERS = map[string]func() Scraper{
 	// Mangadex
-	strings.ToLower(mangadex.SCRAPERNAME): func(c *config.Config) Scraper {
-		return mangadex.NewScraper(&c.Sources.Mangadex)
+	strings.ToLower(mangadex.SCRAPERNAME): func() Scraper {
+		return mangadex.NewScraper()
 	},
 	// Cubari
 	//strings.ToLower(cubari.SCRAPERNAME): func(c *config.Config) Scraper {
@@ -74,13 +73,13 @@ func MatchScraperTitle(query string) (string, bool) {
 	return matchedTitle, ok
 }
 
-func NewScraper(name string, config *config.Config) Scraper {
+func NewScraper(name string) Scraper {
 	getScraper, ok := SCRAPERS[strings.ToLower(name)]
 	if !ok {
 		ui.Fatal("Scraper name could not be found.")
 	}
 
-	scraper := getScraper(config)
+	scraper := getScraper()
 	logging.Infoln("Matched scraper: ", scraper.ScraperName())
 	return scraper
 }

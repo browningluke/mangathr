@@ -60,5 +60,5 @@ func (o *registerOpts) run(cfg *config.Config) {
 	}
 	defer closeDatabase()
 
-	handleMenu(o, cfg, driver)
+	handleMenu(o, driver)
 }

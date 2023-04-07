@@ -2,7 +2,6 @@ package register
 
 import (
 	"fmt"
-	"github.com/browningluke/mangathrV2/internal/config"
 	"github.com/browningluke/mangathrV2/internal/database"
 	"github.com/browningluke/mangathrV2/internal/downloader"
 	"github.com/browningluke/mangathrV2/internal/logging"
@@ -47,9 +46,9 @@ func generateString(opts *options, prompt string) string {
 		chapterTitles[len(chapterTitles)-1], opts.mapping, strings.Join(opts.filteredGroups, ", "), prompt)
 }
 
-func findManga(args *registerOpts, config *config.Config) (options, bool) {
+func findManga(args *registerOpts) (options, bool) {
 	// Do manga scraping
-	scraper := sources.NewScraper(args.Source, config)
+	scraper := sources.NewScraper(args.Source)
 	titles, err := scraper.Search(args.Query)
 	logging.ExitIfErrorWithFunc(err, closeDatabase)
 
@@ -91,8 +90,8 @@ func findManga(args *registerOpts, config *config.Config) (options, bool) {
 	return opts, false
 }
 
-func handleMenu(args *registerOpts, config *config.Config, driver *database.Driver) {
-	opts, exists := findManga(args, config)
+func handleMenu(args *registerOpts, driver *database.Driver) {
+	opts, exists := findManga(args)
 	if exists {
 		return
 	}

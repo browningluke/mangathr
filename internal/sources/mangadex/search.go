@@ -53,7 +53,7 @@ func parseSearchResults(mangaResp mangaResponse) ([]searchResult, []string) {
 // Search for a Manga, will fill searchResults with 0 or more results
 func (m *Scraper) Search(query string) ([]string, *logging.ScraperError) {
 	// Build query params
-	queryParams := buildQueryParams(query, m.config.RatingFilter)
+	queryParams := buildQueryParams(query, config.RatingFilter)
 
 	// Search for list of Manga
 	jsonResp, _ := rester.New().Get(

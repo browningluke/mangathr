@@ -3,7 +3,6 @@ package update
 import (
 	"fmt"
 	"github.com/browningluke/mangathrV2/ent"
-	"github.com/browningluke/mangathrV2/internal/config"
 	"github.com/browningluke/mangathrV2/internal/database"
 	"github.com/browningluke/mangathrV2/internal/downloader"
 	"github.com/browningluke/mangathrV2/internal/logging"
@@ -54,11 +53,11 @@ func downloadNewChapters(manga *ent.Manga,
 	return len(succeeded), numChapters - len(succeeded)
 }
 
-func checkMangaForNewChapters(config *config.Config, manga *ent.Manga) seriesStats {
+func checkMangaForNewChapters(manga *ent.Manga) seriesStats {
 	stats := seriesStats{}
 
 	logging.Debugln("Requesting source...", manga.Source)
-	scraper := sources.NewScraper(manga.Source, config)
+	scraper := sources.NewScraper(manga.Source)
 
 	// Directly search for chapter by ID
 	if err := scraper.SearchByID(manga.MangaID, manga.Title); err != nil {
