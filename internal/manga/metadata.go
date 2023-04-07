@@ -1,4 +1,4 @@
-package structs
+package manga
 
 type Metadata struct {
 	Title    string   // Title seen by user in reader (not filename)

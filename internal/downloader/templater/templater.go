@@ -1,7 +1,7 @@
 package templater
 
 import (
-	"github.com/browningluke/mangathrV2/internal/sources/structs"
+	"github.com/browningluke/mangathrV2/internal/manga"
 	"github.com/browningluke/mangathrV2/internal/utils"
 	"regexp"
 	"strconv"
@@ -10,10 +10,10 @@ import (
 
 type Templater struct {
 	RawTitle string
-	Metadata structs.Metadata
+	Metadata manga.Metadata
 }
 
-func New(chapter *structs.Chapter) *Templater {
+func New(chapter *manga.Chapter) *Templater {
 	return &Templater{
 		RawTitle: chapter.RawTitle,
 		Metadata: chapter.Metadata,

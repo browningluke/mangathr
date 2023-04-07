@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/browningluke/mangathrV2/internal/downloader"
 	"github.com/browningluke/mangathrV2/internal/logging"
-	"github.com/browningluke/mangathrV2/internal/sources/structs"
+	"github.com/browningluke/mangathrV2/internal/manga"
 	"github.com/browningluke/mangathrV2/internal/utils"
 )
 
@@ -65,7 +65,7 @@ func (m *Scraper) runDownloadJob(job downloader.Job, dl *downloader.Downloader,
 }
 
 // Download selected chapters. Handles errors itself. Returns array of chapters that succeeded
-func (m *Scraper) Download(dl *downloader.Downloader, directoryMapping, downloadType string) []structs.Chapter {
+func (m *Scraper) Download(dl *downloader.Downloader, directoryMapping, downloadType string) []manga.Chapter {
 	logging.Debugln("Downloading...")
 
 	dl.SetChapterDuration(calculateDuration(len(m.selectedChapters)))
@@ -80,7 +80,7 @@ func (m *Scraper) Download(dl *downloader.Downloader, directoryMapping, download
 	downloadQueue, maxRuneCount := downloader.BuildDownloadQueue(m.selectedChapters)
 
 	// Execute download queue, potential to add workerpool here later
-	var succeededChapters []structs.Chapter
+	var succeededChapters []manga.Chapter
 	for _, job := range downloadQueue {
 		err := m.runDownloadJob(job, dl, path, maxRuneCount)
 

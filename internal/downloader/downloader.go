@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/browningluke/mangathrV2/internal/downloader/writer"
 	"github.com/browningluke/mangathrV2/internal/logging"
+	"github.com/browningluke/mangathrV2/internal/manga"
 	"github.com/browningluke/mangathrV2/internal/metadata"
-	"github.com/browningluke/mangathrV2/internal/sources/structs"
 	"github.com/schollz/progressbar/v3"
 	"os"
 	"time"
@@ -21,7 +21,7 @@ type Downloader struct {
 }
 
 type Job struct {
-	Chapter structs.Chapter
+	Chapter manga.Chapter
 	Bar     *progressbar.ProgressBar
 }
 
