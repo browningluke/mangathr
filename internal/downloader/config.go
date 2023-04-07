@@ -69,5 +69,5 @@ func getCWD() string {
 		logging.Errorln(err)
 		ui.Fatal("Failed to find current working directory.")
 	}
-	return filepath.Join(path, "mangathrv2")
+	return filepath.Join(path, "mangathr")
 }
