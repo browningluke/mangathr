@@ -10,7 +10,6 @@ import (
 	"github.com/browningluke/mangathrV2/internal/rester"
 	"github.com/browningluke/mangathrV2/internal/utils"
 	"os"
-	"path"
 	"time"
 	"unicode/utf8"
 )
@@ -95,7 +94,7 @@ func (d *Downloader) CanDownload(chapter *manga.Chapter) *logging.ScraperError {
 }
 
 func (d *Downloader) DownloadPage(page *manga.Page) ([]byte, error) {
-	logging.Debugln("Starting download of page: ", page.Filename)
+	logging.Debugln("Starting download of page: ", page.Filename())
 
 	// Parse page time delay
 	dur, err := time.ParseDuration(config.Delay.Page)
@@ -162,16 +161,17 @@ func (d *Downloader) Download(chapter *manga.Chapter) error {
 
 	// Build task array
 	pool := workerpool.New(config.SimultaneousPages)
-	for _, p := range chapter.Pages() {
+	for i, _ := range chapter.Pages() {
+		p := &chapter.Pages()[i]
 		pool.AddTask(func() {
 			// Get image bytes to write
-			pageBytes, err := d.DownloadPage(&p)
+			pageBytes, err := d.DownloadPage(p)
 			if err != nil {
 				panic(err)
 			}
 
 			// Write bytes to whichever output
-			err = chapterWriter.Write(pageBytes, path.Join(chapterPath, p.Filename()))
+			err = chapterWriter.Write(pageBytes, p.Filename())
 			if err != nil {
 				panic(err)
 			}
