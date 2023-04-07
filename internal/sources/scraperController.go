@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-var SCRAPERS = map[string]func() Scraper{
+var scrapers = map[string]func() Scraper{
 	// Mangadex
 	strings.ToLower(mangadex.SCRAPERNAME): func() Scraper {
 		return mangadex.NewScraper()
@@ -20,7 +20,7 @@ var SCRAPERS = map[string]func() Scraper{
 	//},
 }
 
-var SCRAPER_TITLES = map[string]string{
+var scraperTitles = map[string]string{
 	// Mangadex
 	strings.ToLower(mangadex.SCRAPERNAME): mangadex.SCRAPERNAME,
 }
@@ -69,12 +69,12 @@ type Scraper interface {
 }
 
 func MatchScraperTitle(query string) (string, bool) {
-	matchedTitle, ok := SCRAPER_TITLES[strings.ToLower(query)]
+	matchedTitle, ok := scraperTitles[strings.ToLower(query)]
 	return matchedTitle, ok
 }
 
 func NewScraper(name string) Scraper {
-	getScraper, ok := SCRAPERS[strings.ToLower(name)]
+	getScraper, ok := scrapers[strings.ToLower(name)]
 	if !ok {
 		ui.Fatal("Scraper name could not be found.")
 	}
