@@ -19,32 +19,32 @@ func calculateDuration(numChapters int) int64 {
 	return duration
 }
 
-func (m *Scraper) runDownloadJob(job downloader.Job, dl *downloader.Downloader) *logging.ScraperError {
+func (m *Scraper) runDownloadJob(dl *downloader.Downloader, chapter *manga.Chapter) *logging.ScraperError {
 
 	// Get chapter pages
-	err := m.addPagesToChapter(&job.Chapter)
+	err := m.addPagesToChapter(chapter)
 	if err != nil {
 		return err
 	}
 
 	// Get chapter filename
 	dl.SetTemplate(config.FilenameTemplate)
-	filename := dl.GetNameFromTemplate(job)
+	filename := dl.GetNameFromTemplate(chapter)
 
 	// Set MetadataAgent values
 	(*dl.MetadataAgent()).
-		SetFromStruct(job.Chapter.Metadata).
-		SetPageCount(len(job.Chapter.Pages()))
+		SetFromStruct(chapter.Metadata).
+		SetPageCount(len(chapter.Pages()))
 
 	// Check if download is possible
-	err = dl.CanDownload(filename)
+	err = dl.CanDownload(chapter)
 	if err != nil {
 		return err
 	}
 
-	downloadErr := dl.Download(filename, job.Chapter.Pages(), &job.Chapter.Metadata)
+	downloadErr := dl.Download(chapter)
 	if downloadErr != nil {
-		if err := dl.Cleanup(filename); err != nil {
+		if err := dl.Cleanup(chapter); err != nil {
 			logging.Errorln(err)
 			fmt.Printf("An error occurred when deleting failed chapter: %s", filename)
 		}
@@ -73,21 +73,19 @@ func (m *Scraper) Download(dl *downloader.Downloader, directoryMapping, download
 	dl.SetPath(dl.CreateDirectory(directoryName, downloadType))
 	dl.SetMaxRuneCount(m.selectedChapters)
 
-	downloadQueue, _ := downloader.BuildDownloadQueue(m.selectedChapters)
-
 	// Execute download queue, potential to add workerpool here later
 	var succeededChapters []manga.Chapter
-	for _, job := range downloadQueue {
-		err := m.runDownloadJob(job, dl)
+	for _, chapter := range m.selectedChapters {
+		err := m.runDownloadJob(dl, &chapter)
 
 		// Print error to screen, abandon chapter, and continue
 		if err != nil {
 			logging.Errorln(err.Error)
-			fmt.Printf("Chapter %s skipping... reason: %s\n", job.Chapter.Metadata.Num, err.Message)
+			fmt.Printf("Chapter %s skipping... reason: %s\n", chapter.Metadata.Num, err.Message)
 			continue
 		}
 
-		succeededChapters = append(succeededChapters, job.Chapter)
+		succeededChapters = append(succeededChapters, chapter)
 	}
 
 	return succeededChapters

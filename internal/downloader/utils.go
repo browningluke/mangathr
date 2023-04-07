@@ -11,7 +11,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"time"
-	"unicode/utf8"
 )
 
 /*
@@ -44,8 +43,8 @@ func (d *Downloader) CreateDirectory(title, downloadType string) string {
 	return newPath
 }
 
-func (d *Downloader) GetNameFromTemplate(job Job) string {
-	return templater.New(&job.Chapter).ExecTemplate(config.Output.FilenameTemplate)
+func (d *Downloader) GetNameFromTemplate(chapter *manga.Chapter) string {
+	return templater.New(chapter).ExecTemplate(config.Output.FilenameTemplate)
 }
 
 func (d *Downloader) GetChapterPath(filename string) string {
@@ -58,8 +57,8 @@ func (d *Downloader) GetChapterPath(filename string) string {
 	return filepath.Join(d.destinationPath, filename)
 }
 
-func (d *Downloader) Cleanup(filename string) error {
-	chapterPath := d.GetChapterPath(filename)
+func (d *Downloader) Cleanup(chapter *manga.Chapter) error {
+	chapterPath := d.GetChapterPath(chapter.Filename())
 
 	err := os.RemoveAll(chapterPath)
 	if err != nil {
@@ -80,20 +79,6 @@ func (d *Downloader) waitChapterDuration(timeStart int64) {
 		timeDiff := d.chapterDuration - downloadDuration
 		time.Sleep(time.Duration(timeDiff) * time.Millisecond)
 	}
-}
-
-func BuildDownloadQueue(selectedChapters []manga.Chapter) (jobs []Job, maxRuneCount int) {
-	var downloadQueue []Job
-	maxRC := 0 // Used for padding (e.g. Chapter 10 vs Chapter 10.5)
-	for _, chapter := range selectedChapters {
-		downloadQueue = append(downloadQueue, Job{Chapter: chapter})
-
-		// Check if string length is max in list
-		if runeCount := utf8.RuneCountInString(chapter.Metadata.Num); runeCount > maxRC {
-			maxRC = runeCount
-		}
-	}
-	return downloadQueue, maxRC
 }
 
 /*
