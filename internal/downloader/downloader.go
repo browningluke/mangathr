@@ -6,23 +6,21 @@ import (
 	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/manga"
 	"github.com/browningluke/mangathrV2/internal/metadata"
-	"github.com/schollz/progressbar/v3"
+	"github.com/browningluke/mangathrV2/internal/utils"
 	"os"
 	"time"
+	"unicode/utf8"
 )
 
 type Downloader struct {
 	agent metadata.Agent
 
-	updateMode bool
+	updateMode      bool
+	destinationPath string
 
 	enforceChapterDuration bool
 	chapterDuration        int64
-}
-
-type Job struct {
-	Chapter manga.Chapter
-	Bar     *progressbar.ProgressBar
+	maxRuneCount           int
 }
 
 func NewDownloader(updateMode bool,
@@ -38,22 +36,39 @@ func (d *Downloader) MetadataAgent() *metadata.Agent {
 	return &d.agent
 }
 
-func (d *Downloader) SetChapterDuration(duration int64) {
+func (d *Downloader) SetChapterDuration(duration int64) *Downloader {
 	d.chapterDuration = duration
+	return d
 }
 
-func (d *Downloader) SetTemplate(template string) {
+func (d *Downloader) SetTemplate(template string) *Downloader {
 	if template != "" {
 		config.Output.FilenameTemplate = template
 	}
+	return d
+}
+
+func (d *Downloader) SetMaxRuneCount(chapters []manga.Chapter) {
+	maxRC := 0 // Used for padding (e.g. Chapter 10 vs Chapter 10.5)
+	for _, chapter := range chapters {
+		// Check if string length is max in list
+		if runeCount := utf8.RuneCountInString(chapter.Metadata.Num); runeCount > maxRC {
+			maxRC = runeCount
+		}
+	}
+	d.maxRuneCount = maxRC
+}
+
+func (d *Downloader) SetPath(path string) {
+	d.destinationPath = path
 }
 
 /*
 	-- Chapter Downloading --
 */
 
-func (d *Downloader) CanDownload(path, filename string) *logging.ScraperError {
-	chapterPath := d.GetChapterPath(path, filename)
+func (d *Downloader) CanDownload(chapter *manga.Chapter) *logging.ScraperError {
+	chapterPath := d.GetChapterPath(chapter.Filename())
 
 	if config.DryRun {
 		return &logging.ScraperError{
@@ -75,7 +90,10 @@ func (d *Downloader) CanDownload(path, filename string) *logging.ScraperError {
 }
 
 // Download chapter. Assumes CanDownload() has been called and has returned true
-func (d *Downloader) Download(path, filename string, pages []manga.Page, bar *progressbar.ProgressBar) error {
+func (d *Downloader) Download(chapter *manga.Chapter) error {
+
+	// Initialize progress bar
+	bar := utils.CreateProgressBar(len(chapter.Pages()), d.maxRuneCount, chapter.Metadata.Num)
 
 	// Ensure chapter time is correct
 	if d.enforceChapterDuration {
@@ -90,7 +108,7 @@ func (d *Downloader) Download(path, filename string, pages []manga.Page, bar *pr
 		time.Sleep(dur)
 	}
 
-	chapterPath := d.GetChapterPath(path, filename)
+	chapterPath := d.GetChapterPath(chapter.Filename())
 
 	// Set up writer
 	var chapterWriter writer.Writer
@@ -113,7 +131,7 @@ func (d *Downloader) Download(path, filename string, pages []manga.Page, bar *pr
 
 	// Build task array
 	var tasks []func()
-	for _, page := range pages {
+	for _, page := range chapter.Pages() {
 		tasks = append(tasks, buildWorkerPoolFunc(page, bar, func(page *manga.Page) error {
 			// Write image bytes to zipfile
 			return chapterWriter.Write(page.Bytes, page.Filename())
@@ -129,6 +147,8 @@ func (d *Downloader) Download(path, filename string, pages []manga.Page, bar *pr
 		}
 		return err
 	}
+
+	fmt.Println("") // Create a new bar for each chapter
 
 	return nil
 }

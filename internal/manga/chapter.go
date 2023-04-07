@@ -23,3 +23,13 @@ func (c *Chapter) AddPage(url, name string) {
 func (c *Chapter) Pages() []Page {
 	return c.pages
 }
+
+// Filename
+
+func (c *Chapter) SetFilename(name string) {
+	c.filename = name
+}
+
+func (c *Chapter) Filename() string {
+	return c.filename
+}
