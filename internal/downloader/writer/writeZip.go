@@ -50,9 +50,9 @@ func (z *zipWriter) Write(fileBytes []byte, filename string) error {
 	return nil
 }
 
-func (z *zipWriter) close() error {
+func (z *zipWriter) Close() error {
 	var err error
-	err = z.file.Close()
 	err = z.writer.Close()
+	err = z.file.Close()
 	return err
 }

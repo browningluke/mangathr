@@ -184,8 +184,18 @@ func (d *Downloader) Download(chapter *manga.Chapter) error {
 		})
 	}
 
-	// Run tasks on worker pool
+	// Run tasks on worker pool (blocking call)
 	err = pool.Run()
+
+	// Attempt to close writer
+	closeErr := chapterWriter.Close()
+
+	// Propagate close error only if pool ran without errors
+	if err == nil && closeErr != nil {
+		return closeErr
+	}
+
+	// Handle pool errors
 	if err != nil {
 		if err := bar.Clear(); err != nil {
 			// If the progress bar breaks for some reason, we should panic

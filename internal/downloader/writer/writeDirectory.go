@@ -41,3 +41,7 @@ func (d *dirWriter) Write(fileBytes []byte, filename string) error {
 
 	return nil
 }
+
+func (d *dirWriter) Close() error {
+	return nil
+}
