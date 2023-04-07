@@ -16,8 +16,8 @@ var scrapers = map[string]func() Scraper{
 		return mangadex.NewScraper()
 	},
 	// Cubari
-	strings.ToLower(cubari.SCRAPERNAME): func(c *config.Config) Scraper {
-		return cubari.NewScraper(&c.Sources.Cubari)
+	strings.ToLower(cubari.SCRAPERNAME): func() Scraper {
+		return cubari.NewScraper()
 	},
 }
 

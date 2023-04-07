@@ -16,8 +16,6 @@ const (
 )
 
 type Scraper struct {
-	config *Config
-
 	allChapters, selectedChapters,
 	filteredChapters []structs.Chapter
 
@@ -28,11 +26,10 @@ type Scraper struct {
 	provider Provider
 }
 
-func NewScraper(config *Config) *Scraper {
+func NewScraper() *Scraper {
 	logging.Debugln("Created a Cubari scraper")
 	s := &Scraper{
-		config: config,
-		pages:  make(map[string][]string),
+		pages: make(map[string][]string),
 	}
 	return s
 }

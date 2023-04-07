@@ -29,7 +29,7 @@ func (c *Config) Propagate() {
 
 	// Sources
 	mangadex.SetConfig(c.Sources.Mangadex)
-	// cubari.SetConfig(c.Sources.Cubari)
+	cubari.SetConfig(c.Sources.Cubari)
 }
 
 func (c *Config) Load(path string, inContainer bool) error {
