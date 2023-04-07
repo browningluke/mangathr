@@ -11,8 +11,7 @@ import (
 )
 
 type Downloader struct {
-	config *Config
-	agent  metadata.Agent
+	agent metadata.Agent
 
 	updateMode bool
 
@@ -25,18 +24,16 @@ type Job struct {
 	Bar     *progressbar.ProgressBar
 }
 
-func NewDownloader(config *Config,
-	updateMode bool,
+func NewDownloader(updateMode bool,
 	enforceChapterDuration bool) *Downloader {
 	return &Downloader{
-		config:                 config,
 		updateMode:             updateMode,
 		enforceChapterDuration: enforceChapterDuration,
 	}
 }
 
 func (d *Downloader) MetadataAgent() *metadata.Agent {
-	d.agent = metadata.NewAgent(d.config.Metadata.Agent)
+	d.agent = metadata.NewAgent(config.Metadata.Agent)
 	return &d.agent
 }
 
@@ -46,7 +43,7 @@ func (d *Downloader) SetChapterDuration(duration int64) {
 
 func (d *Downloader) SetTemplate(template string) {
 	if template != "" {
-		d.config.Output.FilenameTemplate = template
+		config.Output.FilenameTemplate = template
 	}
 }
 
@@ -57,7 +54,7 @@ func (d *Downloader) SetTemplate(template string) {
 func (d *Downloader) CanDownload(path, filename string) *logging.ScraperError {
 	chapterPath := d.GetChapterPath(path, filename)
 
-	if d.config.DryRun {
+	if config.DryRun {
 		return &logging.ScraperError{
 			Error:   fmt.Errorf("called with dryRun set to true"),
 			Message: "DRY RUN",
@@ -85,7 +82,7 @@ func (d *Downloader) Download(path, filename string, pages []Page, bar *progress
 		defer d.waitChapterDuration(timeStart)
 	} else {
 		// TODO: differentiate between Download & Update delay
-		dur, err := time.ParseDuration(d.config.Delay.Chapter)
+		dur, err := time.ParseDuration(config.Delay.Chapter)
 		if err != nil {
 			return err
 		}
@@ -94,7 +91,7 @@ func (d *Downloader) Download(path, filename string, pages []Page, bar *progress
 
 	chapterPath := d.GetChapterPath(path, filename)
 
-	if d.config.Output.Zip {
+	if config.Output.Zip {
 		return d.downloadZip(pages, chapterPath, bar)
 	} else {
 		return d.downloadDir(pages, chapterPath, bar)

@@ -33,7 +33,7 @@ func (m *Scraper) runDownloadJob(job downloader.Job, dl *downloader.Downloader,
 	progress := utils.CreateProgressBar(len(pages), maxRuneCount, job.Chapter.Metadata.Num)
 
 	// Get chapter filename
-	dl.SetTemplate(m.config.FilenameTemplate)
+	dl.SetTemplate(config.FilenameTemplate)
 	filename := dl.GetNameFromTemplate(job)
 
 	// Set MetadataAgent values

@@ -59,12 +59,15 @@ func printStats(stats updateStats) {
 	)
 }
 
-func (o *updateOpts) run(config *config.Config) {
+func (o *updateOpts) run(cfg *config.Config) {
+	// Propagate config to all sub-configs
+	cfg.Propagate()
+
 	utils.CreateSigIntHandler(closeDatabase)
 
 	// Open database
 	var err error
-	driver, err = database.GetDriver(database.SQLITE, config.Database.Uri)
+	driver, err = database.GetDriver(database.SQLITE, cfg.Database.Uri)
 	if err != nil {
 		logging.Errorln(err)
 		ui.Fatal("Unable to open database.")
@@ -81,7 +84,7 @@ func (o *updateOpts) run(config *config.Config) {
 	stats := updateStats{}
 
 	for _, manga := range allManga {
-		s := checkMangaForNewChapters(config, manga)
+		s := checkMangaForNewChapters(manga)
 
 		// Update stats
 		stats.checked++
@@ -93,7 +96,7 @@ func (o *updateOpts) run(config *config.Config) {
 		}
 
 		// Sleep between checks
-		dur, durErr := time.ParseDuration(config.Downloader.Delay.UpdateChapter)
+		dur, durErr := time.ParseDuration(cfg.Downloader.Delay.UpdateChapter)
 		if durErr != nil {
 			logging.Errorln(durErr)
 			ui.Error("Failed to parse time duration.")

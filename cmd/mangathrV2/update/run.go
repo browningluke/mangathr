@@ -3,7 +3,6 @@ package update
 import (
 	"fmt"
 	"github.com/browningluke/mangathrV2/ent"
-	"github.com/browningluke/mangathrV2/internal/config"
 	"github.com/browningluke/mangathrV2/internal/database"
 	"github.com/browningluke/mangathrV2/internal/downloader"
 	"github.com/browningluke/mangathrV2/internal/logging"
@@ -22,7 +21,7 @@ func closeDatabase() {
 	}
 }
 
-func downloadNewChapters(config *config.Config, manga *ent.Manga,
+func downloadNewChapters(manga *ent.Manga,
 	scraper sources.Scraper, numChapters int) (downloaded, errors int) {
 
 	fmt.Printf("\033[2K") // Clear line
@@ -33,12 +32,10 @@ func downloadNewChapters(config *config.Config, manga *ent.Manga,
 		scraper.MangaTitle(), scraper.ScraperName(), numChapters)
 
 	succeeded := scraper.Download(
-		downloader.NewDownloader(
-			&config.Downloader, true,
-			scraper.EnforceChapterDuration()),
+		downloader.NewDownloader(true, scraper.EnforceChapterDuration()),
 		manga.Mapping, "update")
 
-	if !config.Downloader.DryRun {
+	if !downloader.DryRun() {
 		// If it's not a dry run, add new chapters to db
 		logging.Debugln("Saving chapters to db")
 
@@ -56,11 +53,11 @@ func downloadNewChapters(config *config.Config, manga *ent.Manga,
 	return len(succeeded), numChapters - len(succeeded)
 }
 
-func checkMangaForNewChapters(config *config.Config, manga *ent.Manga) seriesStats {
+func checkMangaForNewChapters(manga *ent.Manga) seriesStats {
 	stats := seriesStats{}
 
 	logging.Debugln("Requesting source...", manga.Source)
-	scraper := sources.NewScraper(manga.Source, config)
+	scraper := sources.NewScraper(manga.Source)
 
 	// Directly search for chapter by ID
 	if err := scraper.SearchByID(manga.MangaID, manga.Title); err != nil {
@@ -91,7 +88,7 @@ func checkMangaForNewChapters(config *config.Config, manga *ent.Manga) seriesSta
 	stats.found = len(newChapters)
 
 	if numChapters := len(newChapters); numChapters > 0 {
-		stats.downloaded, stats.errors = downloadNewChapters(config, manga, scraper, numChapters)
+		stats.downloaded, stats.errors = downloadNewChapters(manga, scraper, numChapters)
 	} else {
 		fmt.Printf("\rNone for  %s\n", manga.Title)
 	}

@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 )
 
+var config Config
+
 type Config struct {
 	DryRun            bool `yaml:"dryRun"`
 	SimultaneousPages int  `yaml:"simultaneousPages"`
@@ -27,6 +29,14 @@ type Config struct {
 		Agent    string
 		Location string
 	}
+}
+
+func SetConfig(cfg Config) {
+	config = cfg
+}
+
+func DryRun() bool {
+	return config.DryRun
 }
 
 func (c *Config) Default(inContainer bool) {

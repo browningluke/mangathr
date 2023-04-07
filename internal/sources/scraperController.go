@@ -1,7 +1,6 @@
 package sources
 
 import (
-	"github.com/browningluke/mangathrV2/internal/config"
 	"github.com/browningluke/mangathrV2/internal/downloader"
 	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/sources/cubari"
@@ -11,10 +10,10 @@ import (
 	"strings"
 )
 
-var SCRAPERS = map[string]func(c *config.Config) Scraper{
+var scrapers = map[string]func() Scraper{
 	// Mangadex
-	strings.ToLower(mangadex.SCRAPERNAME): func(c *config.Config) Scraper {
-		return mangadex.NewScraper(&c.Sources.Mangadex)
+	strings.ToLower(mangadex.SCRAPERNAME): func() Scraper {
+		return mangadex.NewScraper()
 	},
 	// Cubari
 	strings.ToLower(cubari.SCRAPERNAME): func(c *config.Config) Scraper {
@@ -22,7 +21,7 @@ var SCRAPERS = map[string]func(c *config.Config) Scraper{
 	},
 }
 
-var SCRAPER_TITLES = map[string]string{
+var scraperTitles = map[string]string{
 	// Mangadex
 	strings.ToLower(mangadex.SCRAPERNAME): mangadex.SCRAPERNAME,
 	// Cubari
@@ -73,17 +72,17 @@ type Scraper interface {
 }
 
 func MatchScraperTitle(query string) (string, bool) {
-	matchedTitle, ok := SCRAPER_TITLES[strings.ToLower(query)]
+	matchedTitle, ok := scraperTitles[strings.ToLower(query)]
 	return matchedTitle, ok
 }
 
-func NewScraper(name string, config *config.Config) Scraper {
-	getScraper, ok := SCRAPERS[strings.ToLower(name)]
+func NewScraper(name string) Scraper {
+	getScraper, ok := scrapers[strings.ToLower(name)]
 	if !ok {
 		ui.Fatal("Scraper name could not be found.")
 	}
 
-	scraper := getScraper(config)
+	scraper := getScraper()
 	logging.Infoln("Matched scraper: ", scraper.ScraperName())
 	return scraper
 }
