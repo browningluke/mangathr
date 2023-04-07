@@ -8,9 +8,9 @@ COPY ../../go.sum ./
 RUN go mod download && go mod verify
 
 COPY ../../ .
-RUN go build -v -o /mangathrv2 ./cmd/mangathrV2
+RUN go build -v -o /mangathr ./cmd/mangathr
 
-ENTRYPOINT ["mangathrv2"]
+ENTRYPOINT ["mangathr"]
 
 ## Production
 FROM alpine:latest
@@ -19,6 +19,6 @@ WORKDIR /
 
 RUN mkdir config data
 
-COPY --from=build /mangathrv2 /mangathrv2
+COPY --from=build /mangathr /mangathr
 
-ENTRYPOINT ["/mangathrv2"]
+ENTRYPOINT ["/mangathr"]
