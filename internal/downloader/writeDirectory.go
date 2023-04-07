@@ -52,14 +52,14 @@ func (d *Downloader) downloadDir(pages []Page, chapterPath string, bar *progress
 	// Build task array
 	var tasks []func()
 	for _, page := range pages {
-		tasks = append(tasks, buildWorkerPoolFunc(d.config, page, bar, func(page *Page) error {
+		tasks = append(tasks, buildWorkerPoolFunc(page, bar, func(page *Page) error {
 			// Write image bytes to img file
 			return writeToFile(page.bytes, path.Join(chapterPath, page.Filename()))
 		}))
 	}
 
 	// Run tasks on worker pool
-	err = runWorkerPool(tasks, d.config.SimultaneousPages)
+	err = runWorkerPool(tasks, config.SimultaneousPages)
 	if err != nil {
 		if err := bar.Clear(); err != nil {
 			// If the progress bar breaks for some reason, we should panic

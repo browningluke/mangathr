@@ -26,14 +26,14 @@ func (d *Downloader) CreateDirectory(title, downloadType string) string {
 	var dirname string
 
 	if downloadType == "download" {
-		dirname = d.config.Output.Path
+		dirname = config.Output.Path
 	} else {
-		dirname = d.config.Output.UpdatePath
+		dirname = config.Output.UpdatePath
 	}
 
 	newPath := filepath.Join(dirname, CleanPath(title))
 
-	if !d.config.DryRun {
+	if !config.DryRun {
 		err := os.MkdirAll(newPath, os.ModePerm)
 		if err != nil {
 			log.Fatalln(err)
@@ -48,13 +48,13 @@ func (d *Downloader) GetNameFromTemplate(job Job) string {
 		RawTitle: job.Chapter.RawTitle,
 		Metadata: job.Chapter.Metadata,
 	}
-	return templater.ExecTemplate(d.config.Output.FilenameTemplate)
+	return templater.ExecTemplate(config.Output.FilenameTemplate)
 }
 
 func (d *Downloader) GetChapterPath(path, filename string) string {
 	// Extract file/dir name (depends on config.output.zip)
 	filename = CleanPath(filename)
-	if d.config.Output.Zip {
+	if config.Output.Zip {
 		filename = fmt.Sprintf("%s.cbz", filename)
 	}
 
@@ -103,10 +103,10 @@ func BuildDownloadQueue(selectedChapters []structs.Chapter) (jobs []Job, maxRune
 	Worker pool
 */
 
-func buildWorkerPoolFunc(config *Config, page Page, bar *progressbar.ProgressBar, writeBytes func(*Page) error) func() {
+func buildWorkerPoolFunc(page Page, bar *progressbar.ProgressBar, writeBytes func(*Page) error) func() {
 	return func() {
 		// Get image bytes to write
-		pageD, err := page.download(config)
+		pageD, err := page.download()
 		if err != nil {
 			panic(err)
 		}

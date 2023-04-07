@@ -46,6 +46,9 @@ func NewCmd(cfg *config.Config) *cobra.Command {
 }
 
 func (o *registerOpts) run(cfg *config.Config) {
+	// Propagate config to all sub-configs
+	cfg.Propagate()
+
 	utils.CreateSigIntHandler(closeDatabase)
 
 	// Open database

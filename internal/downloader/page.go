@@ -15,7 +15,7 @@ type Page struct {
 	bytes     []byte
 }
 
-func (p *Page) download(config *Config) (*Page, error) {
+func (p *Page) download() (*Page, error) {
 	logging.Debugln("Starting download of page: ", p.Filename)
 
 	dur, err := time.ParseDuration(config.Delay.Page)
