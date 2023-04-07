@@ -2,6 +2,7 @@ package downloader
 
 import (
 	"fmt"
+	"github.com/browningluke/mangathrV2/internal/downloader/writer"
 	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/metadata"
 	"github.com/browningluke/mangathrV2/internal/sources/structs"
@@ -91,9 +92,43 @@ func (d *Downloader) Download(path, filename string, pages []Page, bar *progress
 
 	chapterPath := d.GetChapterPath(path, filename)
 
+	// Set up writer
+	var chapterWriter writer.Writer
 	if config.Output.Zip {
-		return d.downloadZip(pages, chapterPath, bar)
+		chapterWriter = writer.NewZipWriter(chapterPath)
 	} else {
-		return d.downloadDir(pages, chapterPath, bar)
+		chapterWriter = writer.NewDirWriter(chapterPath)
 	}
+
+	// Write metadata to destination
+	filename, body, err := d.agent.GenerateMetadataFile()
+	if err != nil {
+		return err
+	}
+
+	err = chapterWriter.Write(body, filename)
+	if err != nil {
+		return err
+	}
+
+	// Build task array
+	var tasks []func()
+	for _, page := range pages {
+		tasks = append(tasks, buildWorkerPoolFunc(page, bar, func(page *Page) error {
+			// Write image bytes to zipfile
+			return chapterWriter.Write(page.bytes, page.Filename())
+		}))
+	}
+
+	// Run tasks on worker pool
+	err = runWorkerPool(tasks, config.SimultaneousPages)
+	if err != nil {
+		if err := bar.Clear(); err != nil {
+			// If the progress bar breaks for some reason, we should panic
+			panic(err)
+		}
+		return err
+	}
+
+	return nil
 }
