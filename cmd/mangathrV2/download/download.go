@@ -48,6 +48,7 @@ func NewCmd(cfg *config.Config) *cobra.Command {
 
 func (o *downloadOpts) run(cfg *config.Config) {
 	scraper := sources.NewScraper(o.Source, cfg)
+	cfg.Propagate()
 
 	// Search and select manga
 	titles, err := scraper.Search(o.Query)
@@ -80,9 +81,7 @@ func (o *downloadOpts) run(cfg *config.Config) {
 	logging.ExitIfError(err)
 
 	scraper.Download(
-		downloader.NewDownloader(
-			&cfg.Downloader, false,
-			scraper.EnforceChapterDuration()),
+		downloader.NewDownloader(false, scraper.EnforceChapterDuration()),
 		"", "download")
 }
 

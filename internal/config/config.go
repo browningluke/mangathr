@@ -23,6 +23,9 @@ type Config struct {
 	LogLevel string `yaml:"logLevel"`
 }
 
+func (c *Config) Propagate() {
+	downloader.SetConfig(c.Downloader)
+}
 func (c *Config) Load(path string, inContainer bool) error {
 	c.useDefaults(inContainer)
 

@@ -22,7 +22,7 @@ func closeDatabase() {
 	}
 }
 
-func downloadNewChapters(config *config.Config, manga *ent.Manga,
+func downloadNewChapters(manga *ent.Manga,
 	scraper sources.Scraper, numChapters int) (downloaded, errors int) {
 
 	fmt.Printf("\033[2K") // Clear line
@@ -33,12 +33,10 @@ func downloadNewChapters(config *config.Config, manga *ent.Manga,
 		scraper.MangaTitle(), scraper.ScraperName(), numChapters)
 
 	succeeded := scraper.Download(
-		downloader.NewDownloader(
-			&config.Downloader, true,
-			scraper.EnforceChapterDuration()),
+		downloader.NewDownloader(true, scraper.EnforceChapterDuration()),
 		manga.Mapping, "update")
 
-	if !config.Downloader.DryRun {
+	if !downloader.DryRun() {
 		// If it's not a dry run, add new chapters to db
 		logging.Debugln("Saving chapters to db")
 
@@ -91,7 +89,7 @@ func checkMangaForNewChapters(config *config.Config, manga *ent.Manga) seriesSta
 	stats.found = len(newChapters)
 
 	if numChapters := len(newChapters); numChapters > 0 {
-		stats.downloaded, stats.errors = downloadNewChapters(config, manga, scraper, numChapters)
+		stats.downloaded, stats.errors = downloadNewChapters(manga, scraper, numChapters)
 	} else {
 		fmt.Printf("\rNone for  %s\n", manga.Title)
 	}
