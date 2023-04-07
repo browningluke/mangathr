@@ -24,13 +24,13 @@ func (m *Scraper) runDownloadJob(job downloader.Job, dl *downloader.Downloader,
 	path string, maxRuneCount int) *logging.ScraperError {
 
 	// Get chapter pages
-	pages, err := m.getChapterPages(job.Chapter.ID)
+	err := m.addPagesToChapter(&job.Chapter)
 	if err != nil {
 		return err
 	}
 
 	// Initialize progress bar
-	progress := utils.CreateProgressBar(len(pages), maxRuneCount, job.Chapter.Metadata.Num)
+	progress := utils.CreateProgressBar(len(job.Chapter.Pages()), maxRuneCount, job.Chapter.Metadata.Num)
 
 	// Get chapter filename
 	dl.SetTemplate(config.FilenameTemplate)
@@ -39,7 +39,7 @@ func (m *Scraper) runDownloadJob(job downloader.Job, dl *downloader.Downloader,
 	// Set MetadataAgent values
 	(*dl.MetadataAgent()).
 		SetFromStruct(job.Chapter.Metadata).
-		SetPageCount(len(pages))
+		SetPageCount(len(job.Chapter.Pages()))
 
 	// Check if download is possible
 	err = dl.CanDownload(path, filename)
@@ -47,7 +47,7 @@ func (m *Scraper) runDownloadJob(job downloader.Job, dl *downloader.Downloader,
 		return err
 	}
 
-	downloadErr := dl.Download(path, filename, pages, progress)
+	downloadErr := dl.Download(path, filename, job.Chapter.Pages(), progress)
 	if downloadErr != nil {
 		if err := dl.Cleanup(path, filename); err != nil {
 			logging.Errorln(err)
