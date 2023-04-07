@@ -5,7 +5,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"github.com/browningluke/mangathrV2/internal/logging"
+	"github.com/browningluke/mangathr/internal/logging"
 	"io"
 	"net"
 	"net/http"

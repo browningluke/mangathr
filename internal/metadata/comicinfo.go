@@ -3,9 +3,9 @@ package metadata
 import (
 	"encoding/xml"
 	"fmt"
-	"github.com/browningluke/mangathrV2/internal/logging"
-	"github.com/browningluke/mangathrV2/internal/manga"
-	"github.com/browningluke/mangathrV2/internal/utils"
+	"github.com/browningluke/mangathr/internal/logging"
+	"github.com/browningluke/mangathr/internal/manga"
+	"github.com/browningluke/mangathr/internal/utils"
 	"strings"
 )
 

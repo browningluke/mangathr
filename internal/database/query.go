@@ -2,10 +2,10 @@ package database
 
 import (
 	"fmt"
-	"github.com/browningluke/mangathrV2/ent"
-	"github.com/browningluke/mangathrV2/ent/manga"
-	"github.com/browningluke/mangathrV2/ent/predicate"
-	"github.com/browningluke/mangathrV2/internal/logging"
+	"github.com/browningluke/mangathr/ent"
+	"github.com/browningluke/mangathr/ent/manga"
+	"github.com/browningluke/mangathr/ent/predicate"
+	"github.com/browningluke/mangathr/internal/logging"
 )
 
 func (d *Driver) queryManga(eager bool, ps ...predicate.Manga) (*ent.Manga, error) {

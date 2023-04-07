@@ -2,9 +2,9 @@ package mangadex
 
 import (
 	"fmt"
-	"github.com/browningluke/mangathrV2/internal/downloader"
-	"github.com/browningluke/mangathrV2/internal/logging"
-	"github.com/browningluke/mangathrV2/internal/manga"
+	"github.com/browningluke/mangathr/internal/downloader"
+	"github.com/browningluke/mangathr/internal/logging"
+	"github.com/browningluke/mangathr/internal/manga"
 )
 
 func calculateDuration(numChapters int) int64 {

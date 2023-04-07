@@ -4,7 +4,7 @@ import (
 	"archive/zip"
 	"bytes"
 	"fmt"
-	"github.com/browningluke/mangathrV2/internal/logging"
+	"github.com/browningluke/mangathr/internal/logging"
 	"io"
 	"os"
 	"sync"
