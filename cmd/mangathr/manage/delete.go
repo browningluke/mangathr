@@ -2,13 +2,13 @@ package manage
 
 import (
 	"fmt"
-	"github.com/browningluke/mangathrV2/ent"
-	"github.com/browningluke/mangathrV2/ent/manga"
-	"github.com/browningluke/mangathrV2/internal/config"
-	"github.com/browningluke/mangathrV2/internal/database"
-	"github.com/browningluke/mangathrV2/internal/logging"
-	"github.com/browningluke/mangathrV2/internal/sources"
-	"github.com/browningluke/mangathrV2/internal/ui"
+	"github.com/browningluke/mangathr/ent"
+	"github.com/browningluke/mangathr/ent/manga"
+	"github.com/browningluke/mangathr/internal/config"
+	"github.com/browningluke/mangathr/internal/database"
+	"github.com/browningluke/mangathr/internal/logging"
+	"github.com/browningluke/mangathr/internal/sources"
+	"github.com/browningluke/mangathr/internal/ui"
 )
 
 // deleteFromDatabase removes manga by source + query
