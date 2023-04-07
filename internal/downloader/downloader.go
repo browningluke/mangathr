@@ -6,9 +6,11 @@ import (
 	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/manga"
 	"github.com/browningluke/mangathrV2/internal/metadata"
+	"github.com/browningluke/mangathrV2/internal/utils"
 	"github.com/schollz/progressbar/v3"
 	"os"
 	"time"
+	"unicode/utf8"
 )
 
 type Downloader struct {
@@ -19,6 +21,7 @@ type Downloader struct {
 
 	enforceChapterDuration bool
 	chapterDuration        int64
+	maxRuneCount           int
 }
 
 type Job struct {
@@ -47,6 +50,17 @@ func (d *Downloader) SetTemplate(template string) {
 	if template != "" {
 		config.Output.FilenameTemplate = template
 	}
+}
+
+func (d *Downloader) SetMaxRuneCount(chapters []manga.Chapter) {
+	maxRC := 0 // Used for padding (e.g. Chapter 10 vs Chapter 10.5)
+	for _, chapter := range chapters {
+		// Check if string length is max in list
+		if runeCount := utf8.RuneCountInString(chapter.Metadata.Num); runeCount > maxRC {
+			maxRC = runeCount
+		}
+	}
+	d.maxRuneCount = maxRC
 }
 
 func (d *Downloader) SetPath(path string) {
@@ -80,7 +94,10 @@ func (d *Downloader) CanDownload(filename string) *logging.ScraperError {
 }
 
 // Download chapter. Assumes CanDownload() has been called and has returned true
-func (d *Downloader) Download(filename string, pages []manga.Page, bar *progressbar.ProgressBar) error {
+func (d *Downloader) Download(filename string, pages []manga.Page, metadata *manga.Metadata) error {
+
+	// Initialize progress bar
+	bar := utils.CreateProgressBar(len(pages), d.maxRuneCount, metadata.Num)
 
 	// Ensure chapter time is correct
 	if d.enforceChapterDuration {
@@ -134,6 +151,8 @@ func (d *Downloader) Download(filename string, pages []manga.Page, bar *progress
 		}
 		return err
 	}
+
+	fmt.Println("") // Create a new bar for each chapter
 
 	return nil
 }

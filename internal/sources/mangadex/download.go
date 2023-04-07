@@ -5,7 +5,6 @@ import (
 	"github.com/browningluke/mangathrV2/internal/downloader"
 	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/manga"
-	"github.com/browningluke/mangathrV2/internal/utils"
 )
 
 func calculateDuration(numChapters int) int64 {
@@ -20,16 +19,13 @@ func calculateDuration(numChapters int) int64 {
 	return duration
 }
 
-func (m *Scraper) runDownloadJob(job downloader.Job, dl *downloader.Downloader, maxRuneCount int) *logging.ScraperError {
+func (m *Scraper) runDownloadJob(job downloader.Job, dl *downloader.Downloader) *logging.ScraperError {
 
 	// Get chapter pages
 	err := m.addPagesToChapter(&job.Chapter)
 	if err != nil {
 		return err
 	}
-
-	// Initialize progress bar
-	progress := utils.CreateProgressBar(len(job.Chapter.Pages()), maxRuneCount, job.Chapter.Metadata.Num)
 
 	// Get chapter filename
 	dl.SetTemplate(config.FilenameTemplate)
@@ -46,7 +42,7 @@ func (m *Scraper) runDownloadJob(job downloader.Job, dl *downloader.Downloader, 
 		return err
 	}
 
-	downloadErr := dl.Download(filename, job.Chapter.Pages(), progress)
+	downloadErr := dl.Download(filename, job.Chapter.Pages(), &job.Chapter.Metadata)
 	if downloadErr != nil {
 		if err := dl.Cleanup(filename); err != nil {
 			logging.Errorln(err)
@@ -59,7 +55,6 @@ func (m *Scraper) runDownloadJob(job downloader.Job, dl *downloader.Downloader, 
 		}
 	}
 
-	fmt.Println("") // Create a new bar for each chapter
 	return nil
 }
 
@@ -76,13 +71,14 @@ func (m *Scraper) Download(dl *downloader.Downloader, directoryMapping, download
 
 	// Configure downloader (downloadType is one of ["download", "update"])
 	dl.SetPath(dl.CreateDirectory(directoryName, downloadType))
+	dl.SetMaxRuneCount(m.selectedChapters)
 
-	downloadQueue, maxRuneCount := downloader.BuildDownloadQueue(m.selectedChapters)
+	downloadQueue, _ := downloader.BuildDownloadQueue(m.selectedChapters)
 
 	// Execute download queue, potential to add workerpool here later
 	var succeededChapters []manga.Chapter
 	for _, job := range downloadQueue {
-		err := m.runDownloadJob(job, dl, maxRuneCount)
+		err := m.runDownloadJob(job, dl)
 
 		// Print error to screen, abandon chapter, and continue
 		if err != nil {
