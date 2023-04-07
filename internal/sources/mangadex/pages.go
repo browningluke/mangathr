@@ -16,9 +16,9 @@ import (
 	-- Pages --
 */
 
-func (m *Scraper) getChapterPages(id string) ([]manga.Page, *logging.ScraperError) {
+func (m *Scraper) addPagesToChapter(chapter *manga.Chapter) *logging.ScraperError {
 	resInterface := rester.New().Get(
-		fmt.Sprintf("%s/at-home/server/%s", APIROOT, id),
+		fmt.Sprintf("%s/at-home/server/%s", APIROOT, chapter.ID),
 		map[string]string{},
 		[]rester.QueryParam{},
 	).DoWithHelperFunc(4, "200ms", func(res rester.Response, err error) {
@@ -50,7 +50,7 @@ func (m *Scraper) getChapterPages(id string) ([]manga.Page, *logging.ScraperErro
 
 	err := json.Unmarshal([]byte(jsonString), &chapterResp)
 	if err != nil {
-		return nil, &logging.ScraperError{
+		return &logging.ScraperError{
 			Error:   err,
 			Message: "An error occurred while getting chapter pages",
 			Code:    0,
@@ -62,25 +62,21 @@ func (m *Scraper) getChapterPages(id string) ([]manga.Page, *logging.ScraperErro
 
 	logging.Debugln("Chapter pages: ", jsonString)
 
-	getPages := func(slice []string, key string) []manga.Page {
-		var pages []manga.Page
-		for i, chapter := range slice {
-			pages = append(pages, manga.Page{
-				Url: fmt.Sprintf("%s/%s/%s/%s",
-					chapterResp.BaseUrl, key, chapterResp.Chapter.Hash, chapter),
-				Name: utils.PadString(fmt.Sprintf("%d", i+1), digits),
-			})
+	addPages := func(slice []string, key string) {
+		for i, p := range slice {
+			chapter.AddPage(
+				fmt.Sprintf("%s/%s/%s/%s",
+					chapterResp.BaseUrl, key, chapterResp.Chapter.Hash, p),
+				utils.PadString(fmt.Sprintf("%d", i+1), digits),
+			)
 		}
-		return pages
 	}
-
-	var pages []manga.Page
 
 	if config.DataSaver {
-		pages = getPages(chapterResp.Chapter.DataSaver, "data-saver")
+		addPages(chapterResp.Chapter.DataSaver, "data-saver")
 	} else {
-		pages = getPages(chapterResp.Chapter.Data, "data")
+		addPages(chapterResp.Chapter.Data, "data")
 	}
 
-	return pages, nil
+	return nil
 }

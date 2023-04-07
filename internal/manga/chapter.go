@@ -6,4 +6,20 @@ type Chapter struct {
 	RawTitle  string  // Title straight from source (without Chapter xx)
 	FullTitle string  // Title including groups/language/etc
 	Metadata  Metadata
+
+	pages    []Page
+	filename string
+}
+
+// Pages
+
+func (c *Chapter) AddPage(url, name string) {
+	c.pages = append(c.pages, Page{
+		Url:  url,
+		Name: name,
+	})
+}
+
+func (c *Chapter) Pages() []Page {
+	return c.pages
 }
