@@ -7,6 +7,7 @@ import (
 	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/manga"
 	"github.com/browningluke/mangathrV2/internal/metadata"
+	"github.com/browningluke/mangathrV2/internal/rester"
 	"github.com/browningluke/mangathrV2/internal/utils"
 	"os"
 	"path"
@@ -91,6 +92,32 @@ func (d *Downloader) CanDownload(chapter *manga.Chapter) *logging.ScraperError {
 	return nil
 }
 
+func (d *Downloader) DownloadPage(page *manga.Page) ([]byte, error) {
+	logging.Debugln("Starting download of page: ", page.Filename)
+
+	// Parse page time delay
+	dur, err := time.ParseDuration(config.Delay.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	time.Sleep(dur)
+
+	imageBytesResp, _ := rester.New().GetBytes(page.Url,
+		map[string]string{},
+		[]rester.QueryParam{}).Do(config.PageRetries, "100ms")
+	pageBytes := imageBytesResp.([]byte)
+
+	err = page.GetExtFromBytes(pageBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	logging.Debugln("Downloaded page. Byte length: ", len(pageBytes))
+
+	return pageBytes, nil
+}
+
 // Download chapter. Assumes CanDownload() has been called and has returned true
 func (d *Downloader) Download(chapter *manga.Chapter) error {
 
@@ -136,13 +163,13 @@ func (d *Downloader) Download(chapter *manga.Chapter) error {
 	for _, p := range chapter.Pages() {
 		pool.AddTask(func() {
 			// Get image bytes to write
-			_, err := p.Download(config.Delay.Page, config.PageRetries)
+			pageBytes, err := d.DownloadPage(&p)
 			if err != nil {
 				panic(err)
 			}
 
 			// Write bytes to whichever output
-			err = chapterWriter.Write(p.Bytes, path.Join(chapterPath, p.Filename()))
+			err = chapterWriter.Write(pageBytes, path.Join(chapterPath, p.Filename()))
 			if err != nil {
 				panic(err)
 			}
