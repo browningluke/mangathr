@@ -1,5 +1,7 @@
 package mangadex
 
+var config Config
+
 type Config struct {
 	// Scraper
 	FilenameTemplate string   `yaml:"filenameTemplate"`
@@ -9,6 +11,10 @@ type Config struct {
 
 	// Connection
 	SyncDeletions bool `yaml:"syncDeletions"`
+}
+
+func SetConfig(cfg Config) {
+	config = cfg
 }
 
 func (c *Config) Default() {

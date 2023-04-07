@@ -76,7 +76,7 @@ func (m *Scraper) getChapterPages(id string) ([]downloader.Page, *logging.Scrape
 
 	var pages []downloader.Page
 
-	if m.config.DataSaver {
+	if config.DataSaver {
 		pages = getPages(chapterResp.Chapter.DataSaver, "data-saver")
 	} else {
 		pages = getPages(chapterResp.Chapter.Data, "data")

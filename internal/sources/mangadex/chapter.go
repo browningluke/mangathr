@@ -147,7 +147,7 @@ func (m *Scraper) generateTitle(chapterTitle, num, lang string, groups []string)
 	// Generate title padding
 	titlePadding := ""
 
-	if len(m.config.LanguageFilter) > 1 {
+	if len(config.LanguageFilter) > 1 {
 		titlePadding += fmt.Sprintf(" - %s", lang)
 	}
 
@@ -166,7 +166,7 @@ func (m *Scraper) generateTitle(chapterTitle, num, lang string, groups []string)
 }
 
 func (m *Scraper) scrapeChapters() ([]structs.Chapter, *logging.ScraperError) { // Get entire Manga feed
-	mangaFeed, err := getMangaFeed(m.MangaID(), m.config.LanguageFilter, m.config.RatingFilter)
+	mangaFeed, err := getMangaFeed(m.MangaID(), config.LanguageFilter, config.RatingFilter)
 	if err != nil {
 		return []structs.Chapter{}, err
 	}

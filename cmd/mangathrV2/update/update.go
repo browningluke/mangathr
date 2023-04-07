@@ -84,7 +84,7 @@ func (o *updateOpts) run(cfg *config.Config) {
 	stats := updateStats{}
 
 	for _, manga := range allManga {
-		s := checkMangaForNewChapters(cfg, manga)
+		s := checkMangaForNewChapters(manga)
 
 		// Update stats
 		stats.checked++
