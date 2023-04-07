@@ -1,8 +1,8 @@
 package defaults
 
 import (
-	"github.com/browningluke/mangathrV2/internal/logging"
-	"github.com/browningluke/mangathrV2/internal/ui"
+	"github.com/browningluke/mangathr/internal/logging"
+	"github.com/browningluke/mangathr/internal/ui"
 	"os"
 	"path/filepath"
 )
@@ -18,7 +18,7 @@ func ConfigDir() string {
 		ui.Fatal("Failed to find config directory.")
 	}
 
-	configDir := filepath.Join(homeDir, ".config", "mangathrv2")
+	configDir := filepath.Join(homeDir, ".config", "mangathr")
 	return configDir
 }
 

@@ -1,8 +1,8 @@
 package templater
 
 import (
-	"github.com/browningluke/mangathrV2/internal/manga"
-	"github.com/browningluke/mangathrV2/internal/utils"
+	"github.com/browningluke/mangathr/internal/manga"
+	"github.com/browningluke/mangathr/internal/utils"
 	"regexp"
 	"strconv"
 	"strings"

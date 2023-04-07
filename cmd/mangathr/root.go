@@ -1,14 +1,15 @@
 package main
 
 import (
-	"github.com/browningluke/mangathrV2/cmd/mangathrV2/download"
-	"github.com/browningluke/mangathrV2/cmd/mangathrV2/manage"
-	"github.com/browningluke/mangathrV2/cmd/mangathrV2/register"
-	"github.com/browningluke/mangathrV2/cmd/mangathrV2/update"
-	"github.com/browningluke/mangathrV2/internal/config"
-	"github.com/browningluke/mangathrV2/internal/config/defaults"
-	"github.com/browningluke/mangathrV2/internal/logging"
-	"github.com/browningluke/mangathrV2/internal/utils"
+	"github.com/browningluke/mangathr/cmd/mangathr/download"
+	"github.com/browningluke/mangathr/cmd/mangathr/manage"
+	"github.com/browningluke/mangathr/cmd/mangathr/register"
+	"github.com/browningluke/mangathr/cmd/mangathr/update"
+	"github.com/browningluke/mangathr/cmd/mangathr/version"
+	"github.com/browningluke/mangathr/internal/config"
+	"github.com/browningluke/mangathr/internal/config/defaults"
+	"github.com/browningluke/mangathr/internal/logging"
+	"github.com/browningluke/mangathr/internal/utils"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -19,7 +20,7 @@ var (
 	logLevel string
 
 	rootCmd = &cobra.Command{
-		Use:                   "mangathrv2 [OPTIONS]",
+		Use:                   "mangathr [OPTIONS]",
 		Short:                 "📦 A CLI utility for downloading Manga & metadata.",
 		DisableFlagsInUseLine: true,
 	}
@@ -37,7 +38,7 @@ func init() {
 
 	// Flags
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config",
-		"", "Path to config file (default is $XDG_CONFIG_HOME/mangathrv2/config)")
+		"", "Path to config file (default is $XDG_CONFIG_HOME/mangathr/config)")
 	rootCmd.PersistentFlags().StringVarP(&logLevel, "log-level", "l",
 		"", "Set the logging level (\"debug\"|\"info\"|\"warn\"|\"error\"|\"off\") (default \"off\")")
 
@@ -58,6 +59,7 @@ func init() {
 	rootCmd.AddCommand(register.NewCmd(cfg))
 	rootCmd.AddCommand(update.NewCmd(cfg))
 	rootCmd.AddCommand(manage.NewCmd(cfg))
+	rootCmd.AddCommand(version.NewCmd(cfg))
 }
 
 func getConfigPath() string {

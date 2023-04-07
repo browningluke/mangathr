@@ -1,8 +1,8 @@
 package mangadex
 
 import (
-	"github.com/browningluke/mangathrV2/internal/logging"
-	"github.com/browningluke/mangathrV2/internal/manga"
+	"github.com/browningluke/mangathr/internal/logging"
+	"github.com/browningluke/mangathr/internal/manga"
 )
 
 const (

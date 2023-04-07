@@ -1,11 +1,11 @@
 package sources
 
 import (
-	"github.com/browningluke/mangathrV2/internal/downloader"
-	"github.com/browningluke/mangathrV2/internal/logging"
-	"github.com/browningluke/mangathrV2/internal/manga"
-	"github.com/browningluke/mangathrV2/internal/sources/mangadex"
-	"github.com/browningluke/mangathrV2/internal/ui"
+	"github.com/browningluke/mangathr/internal/downloader"
+	"github.com/browningluke/mangathr/internal/logging"
+	"github.com/browningluke/mangathr/internal/manga"
+	"github.com/browningluke/mangathr/internal/sources/mangadex"
+	"github.com/browningluke/mangathr/internal/ui"
 	"strings"
 )
 
