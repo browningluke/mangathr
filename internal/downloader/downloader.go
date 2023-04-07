@@ -75,7 +75,7 @@ func (d *Downloader) CanDownload(path, filename string) *logging.ScraperError {
 }
 
 // Download chapter. Assumes CanDownload() has been called and has returned true
-func (d *Downloader) Download(path, filename string, pages []Page, bar *progressbar.ProgressBar) error {
+func (d *Downloader) Download(path, filename string, pages []manga.Page, bar *progressbar.ProgressBar) error {
 
 	// Ensure chapter time is correct
 	if d.enforceChapterDuration {
@@ -114,9 +114,9 @@ func (d *Downloader) Download(path, filename string, pages []Page, bar *progress
 	// Build task array
 	var tasks []func()
 	for _, page := range pages {
-		tasks = append(tasks, buildWorkerPoolFunc(page, bar, func(page *Page) error {
+		tasks = append(tasks, buildWorkerPoolFunc(page, bar, func(page *manga.Page) error {
 			// Write image bytes to zipfile
-			return chapterWriter.Write(page.bytes, page.Filename())
+			return chapterWriter.Write(page.Bytes, page.Filename())
 		}))
 	}
 
