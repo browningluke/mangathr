@@ -61,16 +61,15 @@ func (m *Scraper) runDownloadJob(dl *downloader.Downloader, chapter *manga.Chapt
 func (m *Scraper) Download(dl *downloader.Downloader, directoryMapping, downloadType string) []manga.Chapter {
 	logging.Debugln("Downloading...")
 
-	dl.SetChapterDuration(calculateDuration(len(m.selectedChapters)))
-
 	directoryName := m.manga.title
 	if directoryMapping != "" {
 		directoryName = directoryMapping
 	}
 
 	// Configure downloader (downloadType is one of ["download", "update"])
-	dl.SetPath(dl.CreateDirectory(directoryName, downloadType))
-	dl.SetMaxRuneCount(m.selectedChapters)
+	dl.SetChapterDuration(calculateDuration(len(m.selectedChapters))).
+		SetPath(dl.CreateDirectory(directoryName, downloadType)).
+		SetMaxRuneCount(m.selectedChapters)
 
 	// Execute download queue, potential to add workerpool here later
 	var succeededChapters []manga.Chapter

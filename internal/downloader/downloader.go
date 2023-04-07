@@ -2,12 +2,15 @@ package downloader
 
 import (
 	"fmt"
+	"github.com/browningluke/mangathrV2/internal/downloader/workerpool"
 	"github.com/browningluke/mangathrV2/internal/downloader/writer"
 	"github.com/browningluke/mangathrV2/internal/logging"
 	"github.com/browningluke/mangathrV2/internal/manga"
 	"github.com/browningluke/mangathrV2/internal/metadata"
+	"github.com/browningluke/mangathrV2/internal/rester"
 	"github.com/browningluke/mangathrV2/internal/utils"
 	"os"
+	"path"
 	"time"
 	"unicode/utf8"
 )
@@ -48,7 +51,7 @@ func (d *Downloader) SetTemplate(template string) *Downloader {
 	return d
 }
 
-func (d *Downloader) SetMaxRuneCount(chapters []manga.Chapter) {
+func (d *Downloader) SetMaxRuneCount(chapters []manga.Chapter) *Downloader {
 	maxRC := 0 // Used for padding (e.g. Chapter 10 vs Chapter 10.5)
 	for _, chapter := range chapters {
 		// Check if string length is max in list
@@ -57,10 +60,12 @@ func (d *Downloader) SetMaxRuneCount(chapters []manga.Chapter) {
 		}
 	}
 	d.maxRuneCount = maxRC
+	return d
 }
 
-func (d *Downloader) SetPath(path string) {
+func (d *Downloader) SetPath(path string) *Downloader {
 	d.destinationPath = path
+	return d
 }
 
 /*
@@ -87,6 +92,32 @@ func (d *Downloader) CanDownload(chapter *manga.Chapter) *logging.ScraperError {
 	}
 
 	return nil
+}
+
+func (d *Downloader) DownloadPage(page *manga.Page) ([]byte, error) {
+	logging.Debugln("Starting download of page: ", page.Filename)
+
+	// Parse page time delay
+	dur, err := time.ParseDuration(config.Delay.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	time.Sleep(dur)
+
+	imageBytesResp, _ := rester.New().GetBytes(page.Url,
+		map[string]string{},
+		[]rester.QueryParam{}).Do(config.PageRetries, "100ms")
+	pageBytes := imageBytesResp.([]byte)
+
+	err = page.GetExtFromBytes(pageBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	logging.Debugln("Downloaded page. Byte length: ", len(pageBytes))
+
+	return pageBytes, nil
 }
 
 // Download chapter. Assumes CanDownload() has been called and has returned true
@@ -130,16 +161,31 @@ func (d *Downloader) Download(chapter *manga.Chapter) error {
 	}
 
 	// Build task array
-	var tasks []func()
-	for _, page := range chapter.Pages() {
-		tasks = append(tasks, buildWorkerPoolFunc(page, bar, func(page *manga.Page) error {
-			// Write image bytes to zipfile
-			return chapterWriter.Write(page.Bytes, page.Filename())
-		}))
+	pool := workerpool.New(config.SimultaneousPages)
+	for _, p := range chapter.Pages() {
+		pool.AddTask(func() {
+			// Get image bytes to write
+			pageBytes, err := d.DownloadPage(&p)
+			if err != nil {
+				panic(err)
+			}
+
+			// Write bytes to whichever output
+			err = chapterWriter.Write(pageBytes, path.Join(chapterPath, p.Filename()))
+			if err != nil {
+				panic(err)
+			}
+
+			// Add 1 to the bar
+			err = bar.Add(1)
+			if err != nil {
+				panic(err)
+			}
+		})
 	}
 
 	// Run tasks on worker pool
-	err = runWorkerPool(tasks, config.SimultaneousPages)
+	err = pool.Run()
 	if err != nil {
 		if err := bar.Clear(); err != nil {
 			// If the progress bar breaks for some reason, we should panic
@@ -148,7 +194,7 @@ func (d *Downloader) Download(chapter *manga.Chapter) error {
 		return err
 	}
 
-	fmt.Println("") // Create a new bar for each chapter
+	fmt.Println("") // Terminate progress bar (creates a new bar for each chapter)
 
 	return nil
 }
