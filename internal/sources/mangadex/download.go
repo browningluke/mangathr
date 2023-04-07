@@ -20,16 +20,15 @@ func calculateDuration(numChapters int) int64 {
 }
 
 func (m *Scraper) runDownloadJob(dl *downloader.Downloader, chapter *manga.Chapter) *logging.ScraperError {
-
-	// Get chapter pages
+	// Load chapter pages from API
 	err := m.addPagesToChapter(chapter)
 	if err != nil {
 		return err
 	}
 
-	// Get chapter filename
+	// Set chapter filename from template
 	dl.SetTemplate(config.FilenameTemplate)
-	filename := dl.GetNameFromTemplate(chapter)
+	chapter.SetFilename(dl.GetNameFromTemplate(chapter))
 
 	// Set MetadataAgent values
 	(*dl.MetadataAgent()).
@@ -46,7 +45,7 @@ func (m *Scraper) runDownloadJob(dl *downloader.Downloader, chapter *manga.Chapt
 	if downloadErr != nil {
 		if err := dl.Cleanup(chapter); err != nil {
 			logging.Errorln(err)
-			fmt.Printf("An error occurred when deleting failed chapter: %s", filename)
+			fmt.Printf("An error occurred when deleting failed chapter: %s", chapter.Filename())
 		}
 		return &logging.ScraperError{
 			Error:   downloadErr,
