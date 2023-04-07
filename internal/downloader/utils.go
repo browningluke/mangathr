@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/alitto/pond"
 	"github.com/browningluke/mangathrV2/internal/downloader/templater"
-	"github.com/browningluke/mangathrV2/internal/sources/structs"
+	"github.com/browningluke/mangathrV2/internal/manga"
 	"github.com/schollz/progressbar/v3"
 	"log"
 	"os"
@@ -82,7 +82,7 @@ func (d *Downloader) waitChapterDuration(timeStart int64) {
 	}
 }
 
-func BuildDownloadQueue(selectedChapters []structs.Chapter) (jobs []Job, maxRuneCount int) {
+func BuildDownloadQueue(selectedChapters []manga.Chapter) (jobs []Job, maxRuneCount int) {
 	var downloadQueue []Job
 	maxRC := 0 // Used for padding (e.g. Chapter 10 vs Chapter 10.5)
 	for _, chapter := range selectedChapters {

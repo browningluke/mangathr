@@ -1,6 +1,6 @@
 package metadata
 
-import "github.com/browningluke/mangathrV2/internal/sources/structs"
+import "github.com/browningluke/mangathrV2/internal/manga"
 
 type Agent interface {
 	GenerateMetadataFile() (filename string, body []byte, err error)
@@ -12,7 +12,7 @@ type Agent interface {
 	SetWebLink(link string) Agent
 	SetPageCount(count int) Agent
 
-	SetFromStruct(metadata structs.Metadata) Agent
+	SetFromStruct(metadata manga.Metadata) Agent
 }
 
 func NewAgent(name string) Agent {

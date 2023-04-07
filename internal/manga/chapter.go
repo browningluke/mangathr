@@ -1,4 +1,4 @@
-package structs
+package manga
 
 type Chapter struct {
 	ID        string  // Unique identifier for the chapter (can be different per source)

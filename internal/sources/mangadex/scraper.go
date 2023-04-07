@@ -2,7 +2,7 @@ package mangadex
 
 import (
 	"github.com/browningluke/mangathrV2/internal/logging"
-	"github.com/browningluke/mangathrV2/internal/sources/structs"
+	"github.com/browningluke/mangathrV2/internal/manga"
 )
 
 const (
@@ -22,7 +22,7 @@ type Scraper struct {
 	manga         searchResult
 
 	allChapters, selectedChapters,
-	filteredChapters []structs.Chapter
+	filteredChapters []manga.Chapter
 
 	// Group queries
 	groups []string
@@ -38,7 +38,7 @@ func NewScraper() *Scraper {
 	-- Get Chapter data --
 */
 
-func (m *Scraper) Chapters() ([]structs.Chapter, *logging.ScraperError) {
+func (m *Scraper) Chapters() ([]manga.Chapter, *logging.ScraperError) {
 	// If chapters have been filtered, only show the filtered chapters
 	if len(m.filteredChapters) != 0 {
 		return m.filteredChapters, nil
@@ -97,7 +97,7 @@ func (m *Scraper) FilterGroups(groups []string) *logging.ScraperError {
 		return false
 	}
 
-	var filteredChapters []structs.Chapter
+	var filteredChapters []manga.Chapter
 	for _, chapter := range m.allChapters { // go through each chapter
 		for _, group := range groups { // go through each filtered group
 			exists := findElemInSlice(chapter.Metadata.Groups, group)
