@@ -1,4 +1,4 @@
-# 📦 Mangathr
+# 📦 mangathr
 [![Go Report Card](https://goreportcard.com/badge/github.com/browningluke/mangathr)](https://goreportcard.com/report/github.com/browningluke/mangathr)
 ![docker build](https://github.com/browningluke/mangathr/actions/workflows/docker-publish.yml/badge.svg)
 
