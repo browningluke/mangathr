@@ -1,7 +1,6 @@
 package downloader
 
 import (
-	"fmt"
 	"github.com/browningluke/mangathr/internal/downloader/templater"
 	"github.com/browningluke/mangathr/internal/manga"
 	"log"
@@ -48,16 +47,6 @@ func (d *Downloader) GetNameFromTemplate(chapter *manga.Chapter) string {
 func (d *Downloader) GetChapterPath(filename string) string {
 	// Extract file/dir name (depends on config.output.zip)
 	return filepath.Join(d.destinationPath, CleanPath(filename))
-}
-
-func (d *Downloader) Cleanup(chapter *manga.Chapter) error {
-	chapterPath := fmt.Sprintf("%s.part", d.GetChapterPath(chapter.Filename()))
-
-	err := os.RemoveAll(chapterPath)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 /*

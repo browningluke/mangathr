@@ -59,6 +59,11 @@ func (z *zipWriter) MarkComplete() error {
 	return os.Rename(getPartPath(z.filePath), z.filePath)
 }
 
+// Cleanup runs any post-processing any error occurred
+func (z *zipWriter) Cleanup() error {
+	return os.RemoveAll(getPartPath(z.filePath))
+}
+
 func (z *zipWriter) Close() error {
 	var err error
 	err = z.writer.Close()

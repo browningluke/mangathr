@@ -52,6 +52,11 @@ func (d *dirWriter) MarkComplete() error {
 	return os.Rename(getPartPath(d.dirPath), d.dirPath)
 }
 
+// Cleanup runs any post-processing any error occurred
+func (d *dirWriter) Cleanup() error {
+	return os.RemoveAll(getPartPath(d.dirPath))
+}
+
 func (d *dirWriter) Close() error {
 	return nil
 }

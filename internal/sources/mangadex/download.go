@@ -43,10 +43,6 @@ func (m *Scraper) runDownloadJob(dl *downloader.Downloader, chapter *manga.Chapt
 
 	downloadErr := dl.Download(chapter)
 	if downloadErr != nil {
-		if err := dl.Cleanup(chapter); err != nil {
-			logging.Errorln(err)
-			fmt.Printf("An error occurred when deleting failed chapter: %s", chapter.Filename())
-		}
 		return &logging.ScraperError{
 			Error:   downloadErr,
 			Message: "An error occurred while downloading a page",

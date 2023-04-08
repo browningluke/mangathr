@@ -11,5 +11,6 @@ func getPartPath(path string) string {
 type Writer interface {
 	Write(bytes []byte, filename string) error
 	MarkComplete() error
+	Cleanup() error
 	Close() error
 }
