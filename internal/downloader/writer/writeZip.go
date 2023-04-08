@@ -20,7 +20,7 @@ type zipWriter struct {
 
 func NewZipWriter(chapterPath string) Writer {
 	// Create empty partial file
-	path := fmt.Sprintf("%s", chapterPath)
+	path := fmt.Sprintf("%s.cbz", chapterPath)
 	archive, err := os.Create(getPartPath(path))
 	if err != nil {
 		panic(err)

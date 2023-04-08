@@ -47,12 +47,7 @@ func (d *Downloader) GetNameFromTemplate(chapter *manga.Chapter) string {
 
 func (d *Downloader) GetChapterPath(filename string) string {
 	// Extract file/dir name (depends on config.output.zip)
-	filename = CleanPath(filename)
-	if config.Output.Zip {
-		filename = fmt.Sprintf("%s.cbz", filename)
-	}
-
-	return filepath.Join(d.destinationPath, filename)
+	return filepath.Join(d.destinationPath, CleanPath(filename))
 }
 
 func (d *Downloader) Cleanup(chapter *manga.Chapter) error {
