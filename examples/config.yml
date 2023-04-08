@@ -5,6 +5,7 @@ database:
   uri: "examples/db.sqlite"
 downloader:
   dryRun: false
+  cleanupOnError: true
   simultaneousPages: 2
   pageRetries: 5
   delay:

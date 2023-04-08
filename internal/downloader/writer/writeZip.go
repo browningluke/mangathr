@@ -11,6 +11,8 @@ import (
 )
 
 type zipWriter struct {
+	filePath string
+
 	mu     sync.Mutex
 	writer *zip.Writer
 	file   *os.File
@@ -18,15 +20,17 @@ type zipWriter struct {
 
 func NewZipWriter(chapterPath string) Writer {
 	// Create empty partial file
-	archive, err := os.Create(fmt.Sprintf("%s", chapterPath))
+	path := fmt.Sprintf("%s.cbz", chapterPath)
+	archive, err := os.Create(getPartPath(path))
 	if err != nil {
 		panic(err)
 	}
 
 	zipper := &zipWriter{
-		mu:     sync.Mutex{},
-		writer: zip.NewWriter(archive),
-		file:   archive,
+		filePath: path,
+		mu:       sync.Mutex{},
+		writer:   zip.NewWriter(archive),
+		file:     archive,
 	}
 
 	return zipper
@@ -48,6 +52,16 @@ func (z *zipWriter) Write(fileBytes []byte, filename string) error {
 	}
 
 	return nil
+}
+
+// MarkComplete runs any post-processing if everything else (including close) ran without errors
+func (z *zipWriter) MarkComplete() error {
+	return os.Rename(getPartPath(z.filePath), z.filePath)
+}
+
+// Cleanup runs any post-processing any error occurred
+func (z *zipWriter) Cleanup() error {
+	return os.RemoveAll(getPartPath(z.filePath))
 }
 
 func (z *zipWriter) Close() error {
