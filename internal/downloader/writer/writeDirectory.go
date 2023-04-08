@@ -4,26 +4,31 @@ import (
 	"fmt"
 	"github.com/browningluke/mangathr/internal/logging"
 	"os"
+	"path/filepath"
 )
 
 type dirWriter struct {
+	chapterPath string
 }
 
 func NewDirWriter(chapterPath string) Writer {
 	// Create directory at chapter path
-	err := os.MkdirAll(fmt.Sprintf("%s", chapterPath), os.ModePerm)
+	path := fmt.Sprintf("%s", chapterPath)
+	err := os.MkdirAll(path, os.ModePerm)
 	if err != nil {
 		panic(err)
 	}
 
-	return &dirWriter{}
+	return &dirWriter{
+		chapterPath: path,
+	}
 }
 
 func (d *dirWriter) Write(fileBytes []byte, filename string) error {
 	logging.Debugln("Writing ", filename, " to directory.")
 
 	// Create empty file
-	file, err := os.Create(filename)
+	file, err := os.Create(filepath.Join(d.chapterPath, filename))
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
