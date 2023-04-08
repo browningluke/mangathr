@@ -194,33 +194,42 @@ func (d *Downloader) Download(chapter *manga.Chapter) error {
 		})
 	}
 
+	// --- Run pool ---
+	var poolErr error
+
+	// Handle pool errors if an error occurred
+	defer func(err error) {
+		if err != nil {
+			// If there were errors, cleanup the writer
+			if err := chapterWriter.Cleanup(); err != nil {
+				logging.Errorln("Unable to cleanup file. Reason: ", err)
+				fmt.Printf("An error occurred when deleting failed chapter: %s", chapter.Filename())
+			}
+
+			// Try to clear progressbar
+			if err := bar.Clear(); err != nil {
+				logging.Errorln("Unable to clear progress bar. Reason: ", err)
+			}
+		} else {
+			// If there were no errors, mark the writer as complete
+			if err := chapterWriter.MarkComplete(); err != nil {
+				logging.Errorln("Unable to mark file as complete. Reason: ", err)
+			}
+		}
+	}(poolErr)
+
 	// Run tasks on worker pool (blocking call)
-	err = pool.Run()
+	poolErr = pool.Run()
 
 	// Attempt to close writer
 	closeErr := chapterWriter.Close()
 
 	// Propagate close error only if pool ran without errors
-	if err == nil && closeErr != nil {
-		return closeErr
-	}
-
-	// Handle pool errors
-	if err != nil {
-		if err := bar.Clear(); err != nil {
-			// If the progress bar breaks for some reason, we should panic
-			panic(err)
-		}
-		return err
-	} else {
-		// If there were no errors, mark the writer as complete
-		err = chapterWriter.MarkComplete()
-		if err != nil {
-			return err
-		}
+	if poolErr == nil && closeErr != nil {
+		poolErr = closeErr // Ensures cleanup func is run correctly
 	}
 
 	fmt.Println("") // Terminate progress bar (creates a new bar for each chapter)
 
-	return nil
+	return poolErr
 }
