@@ -58,7 +58,7 @@ func (m *Scraper) runDownloadJob(dl *downloader.Downloader, chapter *manga.Chapt
 }
 
 // Download selected chapters. Handles errors itself. Returns array of chapters that succeeded
-func (m *Scraper) Download(dl *downloader.Downloader, directoryMapping, downloadType string) []manga.Chapter {
+func (m *Scraper) Download(dl *downloader.Downloader, directoryMapping string) []manga.Chapter {
 	logging.Debugln("Downloading...")
 
 	directoryName := m.manga.title
@@ -68,7 +68,7 @@ func (m *Scraper) Download(dl *downloader.Downloader, directoryMapping, download
 
 	// Configure downloader (downloadType is one of ["download", "update"])
 	dl.SetChapterDuration(calculateDuration(len(m.selectedChapters))).
-		SetPath(dl.CreateDirectory(directoryName, downloadType)).
+		SetPath(dl.CreateDirectory(directoryName)).
 		SetMaxRuneCount(m.selectedChapters)
 
 	// Execute download queue, potential to add workerpool here later
