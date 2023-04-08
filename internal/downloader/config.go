@@ -12,6 +12,7 @@ var config Config
 
 type Config struct {
 	DryRun            bool `yaml:"dryRun"`
+	CleanupOnError    bool `yaml:"cleanupOnError"`
 	SimultaneousPages int  `yaml:"simultaneousPages"`
 	PageRetries       int  `yaml:"pageRetries"`
 	Delay             struct {
@@ -41,6 +42,7 @@ func DryRun() bool {
 
 func (c *Config) Default(inContainer bool) {
 	c.DryRun = false
+	c.CleanupOnError = true
 	c.SimultaneousPages = 2
 	c.PageRetries = 5
 

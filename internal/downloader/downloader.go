@@ -200,10 +200,12 @@ func (d *Downloader) Download(chapter *manga.Chapter) error {
 	// Handle pool errors if an error occurred
 	defer func(err error) {
 		if err != nil {
-			// If there were errors, cleanup the writer
-			if err := chapterWriter.Cleanup(); err != nil {
-				logging.Errorln("Unable to cleanup file. Reason: ", err)
-				fmt.Printf("An error occurred when deleting failed chapter: %s", chapter.Filename())
+			// If there were errors, cleanup the writer (only if enabled in config)
+			if config.CleanupOnError {
+				if err := chapterWriter.Cleanup(); err != nil {
+					logging.Errorln("Unable to cleanup file. Reason: ", err)
+					fmt.Printf("An error occurred when deleting failed chapter: %s", chapter.Filename())
+				}
 			}
 
 			// Try to clear progressbar
