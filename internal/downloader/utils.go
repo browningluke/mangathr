@@ -56,7 +56,7 @@ func (d *Downloader) GetChapterPath(filename string) string {
 }
 
 func (d *Downloader) Cleanup(chapter *manga.Chapter) error {
-	chapterPath := d.GetChapterPath(chapter.Filename())
+	chapterPath := fmt.Sprintf("%s.part", d.GetChapterPath(chapter.Filename()))
 
 	err := os.RemoveAll(chapterPath)
 	if err != nil {
