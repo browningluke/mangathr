@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/browningluke/mangathr/internal/logging"
-	"github.com/browningluke/mangathr/internal/sources/structs"
+	"github.com/browningluke/mangathr/internal/manga"
 	"github.com/browningluke/mangathr/internal/utils"
 	"sort"
 	"strconv"
@@ -14,14 +14,14 @@ import (
 )
 
 // SelectNewChapters from allChapters that are not in the DB
-func (m *Scraper) SelectNewChapters(chapterIDs []string) ([]structs.Chapter, *logging.ScraperError) {
+func (m *Scraper) SelectNewChapters(chapterIDs []string) ([]manga.Chapter, *logging.ScraperError) {
 	// Parse chapters if not already done
 	chapters, err := m.Chapters()
 	if err != nil {
-		return []structs.Chapter{}, err
+		return []manga.Chapter{}, err
 	}
 
-	var newChapters []structs.Chapter
+	var newChapters []manga.Chapter
 
 	for _, v := range chapters {
 		if _, ok := utils.FindInSlice(chapterIDs, v.ID); !ok {
@@ -37,7 +37,7 @@ func (m *Scraper) SelectNewChapters(chapterIDs []string) ([]structs.Chapter, *lo
 
 // SelectChapters from allChapters that are to be downloaded
 func (m *Scraper) SelectChapters(titles []string) *logging.ScraperError {
-	var selectedChaps []structs.Chapter
+	var selectedChaps []manga.Chapter
 
 	for _, v := range m.allChapters {
 		_, ok := utils.FindInSlice(titles, v.FullTitle)
@@ -49,7 +49,7 @@ func (m *Scraper) SelectChapters(titles []string) *logging.ScraperError {
 	m.selectedChapters = selectedChaps
 
 	// Once chapters have been selected, clear all chapters
-	m.allChapters = []structs.Chapter{}
+	m.allChapters = []manga.Chapter{}
 
 	return nil
 }
@@ -100,8 +100,8 @@ func parseProxyStyle(c json.RawMessage) (urls []string, ok bool) {
 }
 
 // Chapters returns chapter data from Cubari's API
-func (m *Scraper) parseChapters() ([]structs.Chapter, *logging.ScraperError) {
-	var allChaps []structs.Chapter
+func (m *Scraper) parseChapters() ([]manga.Chapter, *logging.ScraperError) {
+	var allChaps []manga.Chapter
 
 	// Grab all chapters
 	for chapterNum, v := range m.manga.Chapters {
@@ -125,7 +125,7 @@ func (m *Scraper) parseChapters() ([]structs.Chapter, *logging.ScraperError) {
 				// Try proxy style
 				urls = parsedURLs
 			} else {
-				return []structs.Chapter{}, &logging.ScraperError{
+				return []manga.Chapter{}, &logging.ScraperError{
 					Error:   errors.New("unable to extract page data for chapter"),
 					Message: "An error occurred while getting chapter pages",
 					Code:    0,
@@ -141,7 +141,7 @@ func (m *Scraper) parseChapters() ([]structs.Chapter, *logging.ScraperError) {
 				if strRD, ok := chapterReleaseDate.(string); ok {
 					i, err := strconv.ParseInt(strRD, 10, 64)
 					if err != nil {
-						return []structs.Chapter{}, &logging.ScraperError{
+						return []manga.Chapter{}, &logging.ScraperError{
 							Error:   err,
 							Message: "An error occurred while getting chapters",
 							Code:    0,
@@ -182,7 +182,7 @@ func (m *Scraper) parseChapters() ([]structs.Chapter, *logging.ScraperError) {
 
 			sortNum, err := strconv.ParseFloat(chapterNum, 64)
 			if err != nil {
-				return []structs.Chapter{}, &logging.ScraperError{
+				return []manga.Chapter{}, &logging.ScraperError{
 					Error:   err,
 					Message: "An error occurred while getting chapters",
 					Code:    0,
@@ -196,12 +196,12 @@ func (m *Scraper) parseChapters() ([]structs.Chapter, *logging.ScraperError) {
 
 			groups := []string{strings.ReplaceAll(m.manga.Groups[groupNum], "/", ", ")}
 
-			allChaps = append(allChaps, structs.Chapter{
+			allChaps = append(allChaps, manga.Chapter{
 				ID:        chapterID,
 				SortNum:   sortNum,
 				RawTitle:  title,
 				FullTitle: fullTitle,
-				Metadata: structs.Metadata{
+				Metadata: manga.Metadata{
 					Title:    title,
 					Num:      chapterNum,
 					Language: "",

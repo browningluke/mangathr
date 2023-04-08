@@ -3,7 +3,7 @@ package cubari
 import (
 	"fmt"
 	"github.com/browningluke/mangathr/internal/logging"
-	"github.com/browningluke/mangathr/internal/sources/structs"
+	"github.com/browningluke/mangathr/internal/manga"
 	"github.com/browningluke/mangathr/internal/utils"
 	"strings"
 )
@@ -17,7 +17,7 @@ const (
 
 type Scraper struct {
 	allChapters, selectedChapters,
-	filteredChapters []structs.Chapter
+	filteredChapters []manga.Chapter
 
 	// pages URLs mapped by chapter ID
 	pages map[string][]string
@@ -45,7 +45,7 @@ func (m *Scraper) SelectManga(_ string) *logging.ScraperError {
 */
 
 // Chapters returns chapter data from Cubari's API
-func (m *Scraper) Chapters() ([]structs.Chapter, *logging.ScraperError) {
+func (m *Scraper) Chapters() ([]manga.Chapter, *logging.ScraperError) {
 	// If chapters have been filtered, only show the filtered chapters
 	if len(m.filteredChapters) != 0 {
 		return m.filteredChapters, nil
@@ -105,7 +105,7 @@ func (m *Scraper) FilterGroups(groups []string) *logging.ScraperError {
 		return err
 	}
 
-	var filteredChapters []structs.Chapter
+	var filteredChapters []manga.Chapter
 
 	for _, v := range m.allChapters {
 		// Assuming chapters must have 1 and only 1 group (as Cubari does with GIST provider)
