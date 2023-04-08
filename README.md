@@ -173,7 +173,8 @@ Available variables are (verbatim):
 
 | Source   | URL                   | Scraper | Account Sync |
 |----------|-----------------------|---------|--------------|
-| Mangadex | https://mangadex.org/ |    ✓    |     WIP      |
+| Mangadex | https://mangadex.org/ |    ✓    | WIP          |
+| Cubari   | https://cubari.moe/   |    ✓    | ✗            |
 
 
 ### Mangadex
@@ -187,6 +188,16 @@ mangadex:
   languageFilter: ["en", "fr"]                         # Include chapters with these languages
   dataSaver: false                                     # Use Mangadex's 'data saver' page size
 ```
+
+### Cubari
+
+#### Configuration
+
+```yaml
+cubari:
+  filenameTemplate: "..."      # See config template section (overrides global template)
+```
+
 
 ## Databases
 
