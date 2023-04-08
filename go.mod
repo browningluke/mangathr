@@ -1,4 +1,4 @@
-module github.com/browningluke/mangathrV2
+module github.com/browningluke/mangathr
 
 go 1.18
 

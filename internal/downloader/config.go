@@ -1,9 +1,9 @@
 package downloader
 
 import (
-	"github.com/browningluke/mangathrV2/internal/config/defaults"
-	"github.com/browningluke/mangathrV2/internal/logging"
-	"github.com/browningluke/mangathrV2/internal/ui"
+	"github.com/browningluke/mangathr/internal/config/defaults"
+	"github.com/browningluke/mangathr/internal/logging"
+	"github.com/browningluke/mangathr/internal/ui"
 	"os"
 	"path/filepath"
 )
@@ -12,6 +12,7 @@ var config Config
 
 type Config struct {
 	DryRun            bool `yaml:"dryRun"`
+	CleanupOnError    bool `yaml:"cleanupOnError"`
 	SimultaneousPages int  `yaml:"simultaneousPages"`
 	PageRetries       int  `yaml:"pageRetries"`
 	Delay             struct {
@@ -41,6 +42,7 @@ func DryRun() bool {
 
 func (c *Config) Default(inContainer bool) {
 	c.DryRun = false
+	c.CleanupOnError = true
 	c.SimultaneousPages = 2
 	c.PageRetries = 5
 
@@ -69,5 +71,5 @@ func getCWD() string {
 		logging.Errorln(err)
 		ui.Fatal("Failed to find current working directory.")
 	}
-	return filepath.Join(path, "mangathrv2")
+	return filepath.Join(path, "mangathr")
 }

@@ -2,10 +2,9 @@ package config
 
 import (
 	"errors"
-	"github.com/browningluke/mangathrV2/internal/config/defaults"
-	"github.com/browningluke/mangathrV2/internal/downloader"
-	"github.com/browningluke/mangathrV2/internal/sources/cubari"
-	"github.com/browningluke/mangathrV2/internal/sources/mangadex"
+	"github.com/browningluke/mangathr/internal/config/defaults"
+	"github.com/browningluke/mangathr/internal/downloader"
+	"github.com/browningluke/mangathr/internal/sources/mangadex"
 	"gopkg.in/yaml.v2"
 	"os"
 	"strings"

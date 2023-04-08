@@ -3,11 +3,11 @@ package download
 import (
 	"errors"
 	"fmt"
-	"github.com/browningluke/mangathrV2/internal/config"
-	"github.com/browningluke/mangathrV2/internal/downloader"
-	"github.com/browningluke/mangathrV2/internal/logging"
-	"github.com/browningluke/mangathrV2/internal/sources"
-	"github.com/browningluke/mangathrV2/internal/ui"
+	"github.com/browningluke/mangathr/internal/config"
+	"github.com/browningluke/mangathr/internal/downloader"
+	"github.com/browningluke/mangathr/internal/logging"
+	"github.com/browningluke/mangathr/internal/sources"
+	"github.com/browningluke/mangathr/internal/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -82,9 +82,7 @@ func (o *downloadOpts) run(cfg *config.Config) {
 	err = scraper.SelectChapters(chapterSelections)
 	logging.ExitIfError(err)
 
-	scraper.Download(
-		downloader.NewDownloader(false, scraper.EnforceChapterDuration()),
-		"", "download")
+	scraper.Download(downloader.NewDownloader(downloader.DOWNLOAD, scraper.EnforceChapterDuration()), "")
 }
 
 func SelectChapters(titles []string, mangaTitle string, sourceName string) ([]string, error) {

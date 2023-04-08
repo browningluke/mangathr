@@ -3,9 +3,9 @@ package mangadex
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/browningluke/mangathrV2/internal/logging"
-	"github.com/browningluke/mangathrV2/internal/rester"
-	"github.com/browningluke/mangathrV2/internal/sources/structs"
+	"github.com/browningluke/mangathr/internal/logging"
+	"github.com/browningluke/mangathr/internal/manga"
+	"github.com/browningluke/mangathr/internal/rester"
 	"strconv"
 	"strings"
 )
@@ -165,13 +165,13 @@ func (m *Scraper) generateTitle(chapterTitle, num, lang string, groups []string)
 	return fullTitle, metadataTitle
 }
 
-func (m *Scraper) scrapeChapters() ([]structs.Chapter, *logging.ScraperError) { // Get entire Manga feed
+func (m *Scraper) scrapeChapters() ([]manga.Chapter, *logging.ScraperError) { // Get entire Manga feed
 	mangaFeed, err := getMangaFeed(m.MangaID(), config.LanguageFilter, config.RatingFilter)
 	if err != nil {
-		return []structs.Chapter{}, err
+		return []manga.Chapter{}, err
 	}
 
-	var searchResults []structs.Chapter
+	var searchResults []manga.Chapter
 	// For each page
 	for _, mangaFeedResp := range mangaFeed {
 		// For each chapter in page
@@ -179,7 +179,7 @@ func (m *Scraper) scrapeChapters() ([]structs.Chapter, *logging.ScraperError) { 
 
 			numString, numFloat, err := parseChapterNum(item.Attributes.Chapter)
 			if err != nil {
-				return []structs.Chapter{}, err
+				return []manga.Chapter{}, err
 			}
 
 			groups := m.parseGroups(item)
@@ -188,14 +188,14 @@ func (m *Scraper) scrapeChapters() ([]structs.Chapter, *logging.ScraperError) { 
 				item.Attributes.TranslatedLanguage, groups)
 
 			searchResults = append(searchResults,
-				structs.Chapter{
+				manga.Chapter{
 					ID:      item.Id,
 					SortNum: numFloat,
 
 					FullTitle: fullTitle,
 					RawTitle:  item.Attributes.Title,
 
-					Metadata: structs.Metadata{
+					Metadata: manga.Metadata{
 						Title:    metadataTitle,
 						Num:      numString,
 						Language: item.Attributes.TranslatedLanguage,
@@ -213,7 +213,7 @@ func (m *Scraper) scrapeChapters() ([]structs.Chapter, *logging.ScraperError) { 
 
 // handleDuplicates: returns a slice of structs.Chapter, with IDs appended to chapters with duplicate titles.
 // Handles the rare case where a chapter has the same number, title AND group.
-func handleDuplicates(chapters []structs.Chapter) []structs.Chapter {
+func handleDuplicates(chapters []manga.Chapter) []manga.Chapter {
 	allKeys := make(map[string][]int)
 
 	for i, item := range chapters {
@@ -245,7 +245,7 @@ func handleDuplicates(chapters []structs.Chapter) []structs.Chapter {
 */
 
 func (m *Scraper) SelectChapters(titles []string) *logging.ScraperError {
-	var chapters []structs.Chapter
+	var chapters []manga.Chapter
 
 	for _, chapter := range m.allChapters {
 		for _, promptTitle := range titles {
@@ -257,19 +257,19 @@ func (m *Scraper) SelectChapters(titles []string) *logging.ScraperError {
 	m.selectedChapters = chapters
 
 	// Once chapters have been selected, clear all chapters
-	m.allChapters = []structs.Chapter{}
+	m.allChapters = []manga.Chapter{}
 
 	return nil
 }
 
-func (m *Scraper) SelectNewChapters(chapterIDs []string) ([]structs.Chapter, *logging.ScraperError) {
+func (m *Scraper) SelectNewChapters(chapterIDs []string) ([]manga.Chapter, *logging.ScraperError) {
 	// Parse chapters if not already done
 	chapters, err := m.Chapters()
 	if err != nil {
-		return []structs.Chapter{}, err
+		return []manga.Chapter{}, err
 	}
 
-	var diffChapters []structs.Chapter
+	var diffChapters []manga.Chapter
 	for _, newChapter := range chapters {
 		exists := false
 		for _, oldChapterID := range chapterIDs {

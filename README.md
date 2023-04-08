@@ -1,13 +1,13 @@
-# 📦 MangathrV2
-[![Go Report Card](https://goreportcard.com/badge/github.com/browningluke/mangathrV2)](https://goreportcard.com/report/github.com/browningluke/mangathrV2)
-![docker build](https://github.com/browningluke/mangathrV2/actions/workflows/docker-publish.yml/badge.svg)
+# 📦 mangathr
+[![Go Report Card](https://goreportcard.com/badge/github.com/browningluke/mangathr)](https://goreportcard.com/report/github.com/browningluke/mangathr)
+![docker build](https://github.com/browningluke/mangathr/actions/workflows/docker-publish.yml/badge.svg)
 
-**mangathrV2** is a command-line program to download Manga chapters from numerous online platforms (See [Sources](#sources)). It bundles each chapter with metadata in ComicInfo format, or a number of others (see [Metadata Agents](#metadata-agents)). It supports monitoring a source for new chapters of registered Manga.
+**mangathr** is a command-line program to download Manga chapters from numerous online platforms (See [Sources](#sources)). It bundles each chapter with metadata in ComicInfo format, or a number of others (see [Metadata Agents](#metadata-agents)). It supports monitoring a source for new chapters of registered Manga.
 
-It has an older version ([mangathr](https://github.com/browningluke/mangathr)), written in Typescript.
+It has an older version ([mangathr-legacy](https://github.com/browningluke/mangathr-legacy)), written in Typescript.
 
 ```
-$ mangathrv2 <COMMAND> -s SOURCE QUERY
+$ mangathr <COMMAND> -s SOURCE QUERY
 ```
 
 - [Installation](#installation)
@@ -24,16 +24,16 @@ $ mangathrv2 <COMMAND> -s SOURCE QUERY
 
 If Go is installed, install it with:
 ```
-$ go install github.com/browningluke/mangathrV2/cmd/mangathrV2@latest
+$ go install github.com/browningluke/mangathr/cmd/mangathr@latest
 ```
 
 ### Pre-build binary
 
-The pre-built binary files for most common UNIX OS/ARCH can be found in the latest [release](https://github.com/browningluke/mangathrV2/releases). No external dependencies should be required.
+The pre-built binary files for most common UNIX OS/ARCH can be found in the latest [release](https://github.com/browningluke/mangathr/releases). No external dependencies should be required.
 
 ### Docker (via Docker hub / ghcr.io)
 
-An official docker image can be found on [Dockerhub](https://hub.docker.com/r/browningluke/mangathrv2) and [ghcr.io](https://github.com/browningluke/mangathrV2/pkgs/container/mangathrv2).
+An official docker image can be found on [Dockerhub](https://hub.docker.com/r/browningluke/mangathr) and [ghcr.io](https://github.com/browningluke/mangathr/pkgs/container/mangathr).
 
 Get started with [here](docker/production/README.md) with an example [docker-compose.yml](docker/production/docker-compose.yml) file.
 
@@ -45,8 +45,8 @@ The docker image can be built from source by following the instructions [here](d
 
 Clone the repo with:
 ```
-$ git clone https://github.com/browningluke/mangathrV2.git
-$ cd mangathrV2
+$ git clone https://github.com/browningluke/mangathr.git
+$ cd mangathr
 ```
 
 Install all Go module dependencies with:
@@ -56,19 +56,19 @@ $ go mod download && go mod verify
 
 Build executable with:
 ```
-$ go build -v -o path/to/place/bin ./cmd/mangathrV2
+$ go build -v -o path/to/place/bin ./cmd/mangathr
 ```
 
 Make binary executable and move into path with:
 ```
 $ chmod +x path/to/place/bin
-$ cp path/to/place/bin /usr/local/bin/mangathrv2
+$ cp path/to/place/bin /usr/local/bin/mangathr
 ```
 
 ## Usage
 
 ```
-Usage:  mangathrv2 [OPTIONS] COMMAND
+Usage:  mangathr [OPTIONS] COMMAND
 
 📦 A CLI utility for downloading Manga & metadata.
 
@@ -79,17 +79,17 @@ Commands:
   update      Check for new chapters
 
 Options:
-      --config string      config file (default is $XDG_CONFIG_HOME/mangathrv2/config)
-  -h, --help               help for mangathrv2
+      --config string      config file (default is $XDG_CONFIG_HOME/mangathr/config)
+  -h, --help               help for mangathr
   -l, --log-level string   Set the logging level ("debug"|"info"|"warn"|"error"|"off") (default "off")
 
-Use "mangathrv2 [command] --help" for more information about a command.
+Use "mangathr [command] --help" for more information about a command.
 ```
 
 ## Options
 
 ```
-    --config string          Path to config file (default is $XDG_CONFIG_HOME/mangathrv2/config)
+    --config string          Path to config file (default is $XDG_CONFIG_HOME/mangathr/config)
 -l, --log-level string       Set the logging level ("debug"|"info"|"warn"|"error"|"off") (default "off")
 -h, --help                   Print this text
     --version                Print program version and exit
@@ -110,7 +110,7 @@ Use "mangathrv2 [command] --help" for more information about a command.
 
 ## Configuration
 
-The default configuration path is `$XDG_CONFIG_HOME/mangathrv2/config`, which on most machines should be `~/.config/mangathrv2/config`.
+The default configuration path is `$XDG_CONFIG_HOME/mangathr/config`, which on most machines should be `~/.config/mangathr/config`.
 
 ```yaml
 logLevel: "off"                  # One of: ("debug"|"info"|"warn"|"error"|"off") 
@@ -140,7 +140,7 @@ sources:
 
 ### Templating
 
-mangathrV2 uses a custom (simplified) templating structure. It should be powerful enough to cover most desired changes of positioning and addition/removal of variables from chapter names.
+mangathr uses a custom (simplified) templating structure. It should be powerful enough to cover most desired changes of positioning and addition/removal of variables from chapter names.
 
 The following is the default template used, and the filename it produces:
 ```

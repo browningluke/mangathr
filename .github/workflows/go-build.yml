@@ -1,0 +1,35 @@
+name: Go build & publish
+
+on:
+  workflow_dispatch:
+  push:
+    tags: [ 'v*.*.*' ]   # Publish semver tags as releases.
+    paths-ignore:
+      - "docs/**"
+      - ".github/**"
+      - ".idea/**"
+      - "examples/**"
+      - "*.md"
+      - ".gitignore"
+
+jobs:
+  build:
+    name: Publish binaries
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cross-compile Go programs
+        run: |
+          GOOS=darwin GOARCH=arm64 go build -o build/mangathr_arm64-darwin ./cmd/mangathr
+          GOOS=darwin GOARCH=amd64 go build -o build/mangathr_amd64-darwin ./cmd/mangathr
+          GOOS=linux GOARCH=arm64 go build -o build/mangathr_arm64-linux ./cmd/mangathr
+          GOOS=linux GOARCH=amd64 go build -o build/mangathr_amd64-linux ./cmd/mangathr
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          file: build/mangathr_*
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true

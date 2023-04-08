@@ -2,32 +2,39 @@ package downloader
 
 import (
 	"fmt"
-	"github.com/browningluke/mangathrV2/internal/logging"
-	"github.com/browningluke/mangathrV2/internal/metadata"
-	"github.com/browningluke/mangathrV2/internal/sources/structs"
-	"github.com/schollz/progressbar/v3"
+	"github.com/browningluke/mangathr/internal/downloader/workerpool"
+	"github.com/browningluke/mangathr/internal/downloader/writer"
+	"github.com/browningluke/mangathr/internal/logging"
+	"github.com/browningluke/mangathr/internal/manga"
+	"github.com/browningluke/mangathr/internal/metadata"
+	"github.com/browningluke/mangathr/internal/rester"
+	"github.com/browningluke/mangathr/internal/utils"
 	"os"
 	"time"
+	"unicode/utf8"
+)
+
+type DownloadMode int
+
+const (
+	DOWNLOAD DownloadMode = iota
+	UPDATE
 )
 
 type Downloader struct {
 	agent metadata.Agent
 
-	updateMode bool
+	downloadMode    DownloadMode
+	destinationPath string
 
 	enforceChapterDuration bool
 	chapterDuration        int64
+	maxRuneCount           int
 }
 
-type Job struct {
-	Chapter structs.Chapter
-	Bar     *progressbar.ProgressBar
-}
-
-func NewDownloader(updateMode bool,
-	enforceChapterDuration bool) *Downloader {
+func NewDownloader(mode DownloadMode, enforceChapterDuration bool) *Downloader {
 	return &Downloader{
-		updateMode:             updateMode,
+		downloadMode:           mode,
 		enforceChapterDuration: enforceChapterDuration,
 	}
 }
@@ -37,22 +44,45 @@ func (d *Downloader) MetadataAgent() *metadata.Agent {
 	return &d.agent
 }
 
-func (d *Downloader) SetChapterDuration(duration int64) {
-	d.chapterDuration = duration
+func (d *Downloader) DownloadMode() DownloadMode {
+	return d.downloadMode
 }
 
-func (d *Downloader) SetTemplate(template string) {
+func (d *Downloader) SetChapterDuration(duration int64) *Downloader {
+	d.chapterDuration = duration
+	return d
+}
+
+func (d *Downloader) SetTemplate(template string) *Downloader {
 	if template != "" {
 		config.Output.FilenameTemplate = template
 	}
+	return d
+}
+
+func (d *Downloader) SetMaxRuneCount(chapters []manga.Chapter) *Downloader {
+	maxRC := 0 // Used for padding (e.g. Chapter 10 vs Chapter 10.5)
+	for _, chapter := range chapters {
+		// Check if string length is max in list
+		if runeCount := utf8.RuneCountInString(chapter.Metadata.Num); runeCount > maxRC {
+			maxRC = runeCount
+		}
+	}
+	d.maxRuneCount = maxRC
+	return d
+}
+
+func (d *Downloader) SetPath(path string) *Downloader {
+	d.destinationPath = path
+	return d
 }
 
 /*
 	-- Chapter Downloading --
 */
 
-func (d *Downloader) CanDownload(path, filename string) *logging.ScraperError {
-	chapterPath := d.GetChapterPath(path, filename)
+func (d *Downloader) CanDownload(chapter *manga.Chapter) *logging.ScraperError {
+	chapterPath := d.GetChapterPath(chapter.Filename())
 
 	if config.DryRun {
 		return &logging.ScraperError{
@@ -73,8 +103,37 @@ func (d *Downloader) CanDownload(path, filename string) *logging.ScraperError {
 	return nil
 }
 
+func (d *Downloader) DownloadPage(page *manga.Page) ([]byte, error) {
+	logging.Debugln("Starting download of page: ", page.Filename())
+
+	// Parse page time delay
+	dur, err := time.ParseDuration(config.Delay.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	time.Sleep(dur)
+
+	imageBytesResp, _ := rester.New().GetBytes(page.Url,
+		map[string]string{},
+		[]rester.QueryParam{}).Do(config.PageRetries, "100ms")
+	pageBytes := imageBytesResp.([]byte)
+
+	err = page.GetExtFromBytes(pageBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	logging.Debugln("Downloaded page. Byte length: ", len(pageBytes))
+
+	return pageBytes, nil
+}
+
 // Download chapter. Assumes CanDownload() has been called and has returned true
-func (d *Downloader) Download(path, filename string, pages []Page, bar *progressbar.ProgressBar) error {
+func (d *Downloader) Download(chapter *manga.Chapter) error {
+
+	// Initialize progress bar
+	bar := utils.CreateProgressBar(len(chapter.Pages()), d.maxRuneCount, chapter.Metadata.Num)
 
 	// Ensure chapter time is correct
 	if d.enforceChapterDuration {
@@ -89,11 +148,90 @@ func (d *Downloader) Download(path, filename string, pages []Page, bar *progress
 		time.Sleep(dur)
 	}
 
-	chapterPath := d.GetChapterPath(path, filename)
+	chapterPath := d.GetChapterPath(chapter.Filename())
 
+	// Set up writer
+	var chapterWriter writer.Writer
 	if config.Output.Zip {
-		return d.downloadZip(pages, chapterPath, bar)
+		chapterWriter = writer.NewZipWriter(chapterPath)
 	} else {
-		return d.downloadDir(pages, chapterPath, bar)
+		chapterWriter = writer.NewDirWriter(chapterPath)
 	}
+
+	// Write metadata to destination
+	filename, body, err := d.agent.GenerateMetadataFile()
+	if err != nil {
+		return err
+	}
+
+	err = chapterWriter.Write(body, filename)
+	if err != nil {
+		return err
+	}
+
+	// Build task array
+	pool := workerpool.New(config.SimultaneousPages)
+	for i, _ := range chapter.Pages() {
+		p := &chapter.Pages()[i]
+		pool.AddTask(func() {
+			// Get image bytes to write
+			pageBytes, err := d.DownloadPage(p)
+			if err != nil {
+				panic(err)
+			}
+
+			// Write bytes to whichever output
+			err = chapterWriter.Write(pageBytes, p.Filename())
+			if err != nil {
+				panic(err)
+			}
+
+			// Add 1 to the bar
+			err = bar.Add(1)
+			if err != nil {
+				panic(err)
+			}
+		})
+	}
+
+	// --- Run pool ---
+	var poolErr error
+
+	// Handle pool errors if an error occurred
+	defer func(err error) {
+		if err != nil {
+			// If there were errors, cleanup the writer (only if enabled in config)
+			if config.CleanupOnError {
+				if err := chapterWriter.Cleanup(); err != nil {
+					logging.Errorln("Unable to cleanup file. Reason: ", err)
+					fmt.Printf("An error occurred when deleting failed chapter: %s", chapter.Filename())
+				}
+			}
+
+			// Try to clear progressbar
+			if err := bar.Clear(); err != nil {
+				logging.Errorln("Unable to clear progress bar. Reason: ", err)
+			}
+		} else {
+			// If there were no errors, mark the writer as complete
+			if err := chapterWriter.MarkComplete(); err != nil {
+				logging.Errorln("Unable to mark file as complete. Reason: ", err)
+			}
+		}
+	}(poolErr)
+
+	// Run tasks on worker pool (blocking call)
+	poolErr = pool.Run()
+
+	// Attempt to close writer
+	closeErr := chapterWriter.Close()
+
+	// Propagate close error only if pool ran without errors
+	if poolErr == nil && closeErr != nil {
+		poolErr = closeErr // Ensures cleanup func is run correctly
+	}
+
+	fmt.Println("") // Terminate progress bar (creates a new bar for each chapter)
+
+	return poolErr
 }

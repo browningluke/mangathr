@@ -3,9 +3,9 @@ package metadata
 import (
 	"encoding/xml"
 	"fmt"
-	"github.com/browningluke/mangathrV2/internal/logging"
-	"github.com/browningluke/mangathrV2/internal/sources/structs"
-	"github.com/browningluke/mangathrV2/internal/utils"
+	"github.com/browningluke/mangathr/internal/logging"
+	"github.com/browningluke/mangathr/internal/manga"
+	"github.com/browningluke/mangathr/internal/utils"
 	"strings"
 )
 
@@ -89,7 +89,7 @@ func (a *comicInfoAgent) SetPageCount(count int) Agent {
 }
 
 // SetFromStruct ingests all data from Metadata struct EXCEPT PageCount
-func (a *comicInfoAgent) SetFromStruct(metadata structs.Metadata) Agent {
+func (a *comicInfoAgent) SetFromStruct(metadata manga.Metadata) Agent {
 	a.SetTitle(metadata.Title).
 		SetNum(metadata.Num).
 		SetWebLink(metadata.Link).

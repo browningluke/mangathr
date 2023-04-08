@@ -2,12 +2,12 @@ package update
 
 import (
 	"fmt"
-	"github.com/browningluke/mangathrV2/ent"
-	"github.com/browningluke/mangathrV2/internal/database"
-	"github.com/browningluke/mangathrV2/internal/downloader"
-	"github.com/browningluke/mangathrV2/internal/logging"
-	"github.com/browningluke/mangathrV2/internal/sources"
-	"github.com/browningluke/mangathrV2/internal/ui"
+	"github.com/browningluke/mangathr/ent"
+	"github.com/browningluke/mangathr/internal/database"
+	"github.com/browningluke/mangathr/internal/downloader"
+	"github.com/browningluke/mangathr/internal/logging"
+	"github.com/browningluke/mangathr/internal/sources"
+	"github.com/browningluke/mangathr/internal/ui"
 )
 
 // Package-wide accessible driver
@@ -32,8 +32,8 @@ func downloadNewChapters(manga *ent.Manga,
 		scraper.MangaTitle(), scraper.ScraperName(), numChapters)
 
 	succeeded := scraper.Download(
-		downloader.NewDownloader(true, scraper.EnforceChapterDuration()),
-		manga.Mapping, "update")
+		downloader.NewDownloader(downloader.UPDATE, scraper.EnforceChapterDuration()), manga.Mapping,
+	)
 
 	if !downloader.DryRun() {
 		// If it's not a dry run, add new chapters to db

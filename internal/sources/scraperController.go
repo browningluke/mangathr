@@ -1,12 +1,11 @@
 package sources
 
 import (
-	"github.com/browningluke/mangathrV2/internal/downloader"
-	"github.com/browningluke/mangathrV2/internal/logging"
-	"github.com/browningluke/mangathrV2/internal/sources/cubari"
-	"github.com/browningluke/mangathrV2/internal/sources/mangadex"
-	"github.com/browningluke/mangathrV2/internal/sources/structs"
-	"github.com/browningluke/mangathrV2/internal/ui"
+	"github.com/browningluke/mangathr/internal/downloader"
+	"github.com/browningluke/mangathr/internal/logging"
+	"github.com/browningluke/mangathr/internal/manga"
+	"github.com/browningluke/mangathr/internal/sources/mangadex"
+	"github.com/browningluke/mangathr/internal/ui"
 	"strings"
 )
 
@@ -41,7 +40,7 @@ type Scraper interface {
 	*/
 
 	SelectManga(name string) *logging.ScraperError
-	SelectNewChapters(chapterIDs []string) ([]structs.Chapter, *logging.ScraperError)
+	SelectNewChapters(chapterIDs []string) ([]manga.Chapter, *logging.ScraperError)
 	SelectChapters(titles []string) *logging.ScraperError
 
 	/*
@@ -50,7 +49,7 @@ type Scraper interface {
 
 	// Getters
 
-	Chapters() ([]structs.Chapter, *logging.ScraperError)
+	Chapters() ([]manga.Chapter, *logging.ScraperError)
 	ChapterTitles() ([]string, *logging.ScraperError)
 	GroupNames() ([]string, *logging.ScraperError)
 
@@ -60,7 +59,7 @@ type Scraper interface {
 
 	// Downloading
 
-	Download(downloader *downloader.Downloader, directoryMapping, downloadType string) (succeeded []structs.Chapter)
+	Download(downloader *downloader.Downloader, directoryMapping string) (succeeded []manga.Chapter)
 
 	// Getters
 

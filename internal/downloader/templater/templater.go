@@ -1,8 +1,8 @@
-package downloader
+package templater
 
 import (
-	"github.com/browningluke/mangathrV2/internal/sources/structs"
-	"github.com/browningluke/mangathrV2/internal/utils"
+	"github.com/browningluke/mangathr/internal/manga"
+	"github.com/browningluke/mangathr/internal/utils"
 	"regexp"
 	"strconv"
 	"strings"
@@ -10,7 +10,14 @@ import (
 
 type Templater struct {
 	RawTitle string
-	Metadata structs.Metadata
+	Metadata manga.Metadata
+}
+
+func New(chapter *manga.Chapter) *Templater {
+	return &Templater{
+		RawTitle: chapter.RawTitle,
+		Metadata: chapter.Metadata,
+	}
 }
 
 func (t *Templater) handleNum(options string) string {
