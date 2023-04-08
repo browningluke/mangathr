@@ -4,6 +4,7 @@ import (
 	"github.com/browningluke/mangathr/internal/downloader"
 	"github.com/browningluke/mangathr/internal/logging"
 	"github.com/browningluke/mangathr/internal/manga"
+	"github.com/browningluke/mangathr/internal/sources/cubari"
 	"github.com/browningluke/mangathr/internal/sources/mangadex"
 	"github.com/browningluke/mangathr/internal/ui"
 	"strings"

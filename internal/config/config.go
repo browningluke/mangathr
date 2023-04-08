@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/browningluke/mangathr/internal/config/defaults"
 	"github.com/browningluke/mangathr/internal/downloader"
+	"github.com/browningluke/mangathr/internal/sources/cubari"
 	"github.com/browningluke/mangathr/internal/sources/mangadex"
 	"gopkg.in/yaml.v2"
 	"os"
