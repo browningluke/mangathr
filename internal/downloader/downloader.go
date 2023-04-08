@@ -14,10 +14,17 @@ import (
 	"unicode/utf8"
 )
 
+type DownloadMode int
+
+const (
+	DOWNLOAD DownloadMode = iota
+	UPDATE
+)
+
 type Downloader struct {
 	agent metadata.Agent
 
-	updateMode      bool
+	downloadMode    DownloadMode
 	destinationPath string
 
 	enforceChapterDuration bool
@@ -25,10 +32,9 @@ type Downloader struct {
 	maxRuneCount           int
 }
 
-func NewDownloader(updateMode bool,
-	enforceChapterDuration bool) *Downloader {
+func NewDownloader(mode DownloadMode, enforceChapterDuration bool) *Downloader {
 	return &Downloader{
-		updateMode:             updateMode,
+		downloadMode:           mode,
 		enforceChapterDuration: enforceChapterDuration,
 	}
 }
@@ -36,6 +42,10 @@ func NewDownloader(updateMode bool,
 func (d *Downloader) MetadataAgent() *metadata.Agent {
 	d.agent = metadata.NewAgent(config.Metadata.Agent)
 	return &d.agent
+}
+
+func (d *Downloader) DownloadMode() DownloadMode {
+	return d.downloadMode
 }
 
 func (d *Downloader) SetChapterDuration(duration int64) *Downloader {

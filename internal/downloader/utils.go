@@ -20,12 +20,12 @@ func CleanPath(path string) string {
 	return re.ReplaceAllString(path, "")
 }
 
-func (d *Downloader) CreateDirectory(title, downloadType string) string {
+func (d *Downloader) CreateDirectory(title string) string {
 	var dirname string
 
-	if downloadType == "download" {
+	if d.downloadMode == DOWNLOAD {
 		dirname = config.Output.Path
-	} else {
+	} else if d.downloadMode == UPDATE {
 		dirname = config.Output.UpdatePath
 	}
 

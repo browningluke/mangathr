@@ -57,7 +57,7 @@ type Scraper interface {
 
 	// Downloading
 
-	Download(downloader *downloader.Downloader, directoryMapping, downloadType string) (succeeded []manga.Chapter)
+	Download(downloader *downloader.Downloader, directoryMapping string) (succeeded []manga.Chapter)
 
 	// Getters
 
