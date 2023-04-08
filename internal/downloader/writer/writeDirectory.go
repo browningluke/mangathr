@@ -8,19 +8,19 @@ import (
 )
 
 type dirWriter struct {
-	chapterPath string
+	dirPath string
 }
 
 func NewDirWriter(chapterPath string) Writer {
 	// Create directory at chapter path
 	path := fmt.Sprintf("%s", chapterPath)
-	err := os.MkdirAll(path, os.ModePerm)
+	err := os.MkdirAll(getPartPath(path), os.ModePerm)
 	if err != nil {
 		panic(err)
 	}
 
 	return &dirWriter{
-		chapterPath: path,
+		dirPath: path,
 	}
 }
 
@@ -28,7 +28,7 @@ func (d *dirWriter) Write(fileBytes []byte, filename string) error {
 	logging.Debugln("Writing ", filename, " to directory.")
 
 	// Create empty file
-	file, err := os.Create(filepath.Join(d.chapterPath, filename))
+	file, err := os.Create(filepath.Join(getPartPath(d.dirPath), filename))
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
@@ -45,6 +45,11 @@ func (d *dirWriter) Write(fileBytes []byte, filename string) error {
 	}
 
 	return nil
+}
+
+// MarkComplete runs any post-processing if everything else (including close) ran without errors
+func (d *dirWriter) MarkComplete() error {
+	return os.Rename(getPartPath(d.dirPath), d.dirPath)
 }
 
 func (d *dirWriter) Close() error {

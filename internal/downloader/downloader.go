@@ -212,6 +212,12 @@ func (d *Downloader) Download(chapter *manga.Chapter) error {
 			panic(err)
 		}
 		return err
+	} else {
+		// If there were no errors, mark the writer as complete
+		err = chapterWriter.MarkComplete()
+		if err != nil {
+			return err
+		}
 	}
 
 	fmt.Println("") // Terminate progress bar (creates a new bar for each chapter)
