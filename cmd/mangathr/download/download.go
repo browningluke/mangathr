@@ -82,9 +82,7 @@ func (o *downloadOpts) run(cfg *config.Config) {
 	err = scraper.SelectChapters(chapterSelections)
 	logging.ExitIfError(err)
 
-	scraper.Download(
-		downloader.NewDownloader(false, scraper.EnforceChapterDuration()),
-		"", "download")
+	scraper.Download(downloader.NewDownloader(downloader.DOWNLOAD, scraper.EnforceChapterDuration()), "")
 }
 
 func SelectChapters(titles []string, mangaTitle string, sourceName string) ([]string, error) {
