@@ -3,10 +3,10 @@ package cubari
 import (
 	"errors"
 	"fmt"
-	"github.com/browningluke/mangathrV2/internal/downloader"
-	"github.com/browningluke/mangathrV2/internal/logging"
-	"github.com/browningluke/mangathrV2/internal/rester"
-	"github.com/browningluke/mangathrV2/internal/utils"
+	"github.com/browningluke/mangathr/internal/downloader"
+	"github.com/browningluke/mangathr/internal/logging"
+	"github.com/browningluke/mangathr/internal/rester"
+	"github.com/browningluke/mangathr/internal/utils"
 	"math"
 )
 

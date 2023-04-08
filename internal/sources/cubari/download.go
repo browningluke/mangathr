@@ -2,10 +2,10 @@ package cubari
 
 import (
 	"fmt"
-	"github.com/browningluke/mangathrV2/internal/downloader"
-	"github.com/browningluke/mangathrV2/internal/logging"
-	"github.com/browningluke/mangathrV2/internal/sources/structs"
-	"github.com/browningluke/mangathrV2/internal/utils"
+	"github.com/browningluke/mangathr/internal/downloader"
+	"github.com/browningluke/mangathr/internal/logging"
+	"github.com/browningluke/mangathr/internal/sources/structs"
+	"github.com/browningluke/mangathr/internal/utils"
 )
 
 func (m *Scraper) runDownloadJob(job downloader.Job, dl *downloader.Downloader,
