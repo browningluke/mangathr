@@ -27,3 +27,5 @@ sources:
     ratingFilter: ["safe", "suggestive", "erotica"]
     languageFilter: ["en"] # , "fr"
     dataSaver: false
+  cubari:
+    filenameTemplate: "{num:4} - Chapter {num:2}{title: - <.>}{groups: {<.>}}" # Set specific for source (overrides global)

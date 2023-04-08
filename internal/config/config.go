@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/browningluke/mangathr/internal/config/defaults"
 	"github.com/browningluke/mangathr/internal/downloader"
+	"github.com/browningluke/mangathr/internal/sources/cubari"
 	"github.com/browningluke/mangathr/internal/sources/mangadex"
 	"gopkg.in/yaml.v2"
 	"os"
@@ -18,7 +19,7 @@ type Config struct {
 	Downloader downloader.Config
 	Sources    struct {
 		Mangadex mangadex.Config
-		//Cubari   cubari.Config
+		Cubari   cubari.Config
 	}
 	LogLevel string `yaml:"logLevel"`
 }
@@ -28,7 +29,7 @@ func (c *Config) Propagate() {
 
 	// Sources
 	mangadex.SetConfig(c.Sources.Mangadex)
-	// cubari.SetConfig(c.Sources.Cubari)
+	cubari.SetConfig(c.Sources.Cubari)
 }
 
 func (c *Config) Load(path string, inContainer bool) error {

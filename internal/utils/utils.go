@@ -43,7 +43,7 @@ func findInSlice(list interface{}, match interface{}, stringFold bool) (interfac
 		}
 		return nil, false
 	default:
-		fmt.Println("unknown")
+		fmt.Println("FindInSlice: unknown type")
 	}
 	return nil, false
 }
