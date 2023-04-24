@@ -1,7 +1,7 @@
 ariga.io/atlas v0.10.0 h1:B1aCP6gSDQET6j8ybn7m6MArjQuoLH5d4DQBT+NP5k8=
 ariga.io/atlas v0.10.0/go.mod h1:+TR129FJZ5Lvzms6dvCeGWh1yR6hMvmXBhug4hrNIGk=
-entgo.io/ent v0.12.0 h1:DTub/yd0pMK9s0ONfZps2cYkyD2VPIuknVBv10BESc0=
-entgo.io/ent v0.12.0/go.mod h1:OA1Y5bNE8EtlxKv4IyzWwt4jgvGbkoKMcwp668iEKQE=
+entgo.io/ent v0.12.2 h1:Ndl/JvCX76xCtUDlrUfMnOKBRodAtxE5yfGYxjbOxmM=
+entgo.io/ent v0.12.2/go.mod h1:OA1Y5bNE8EtlxKv4IyzWwt4jgvGbkoKMcwp668iEKQE=
 github.com/AlecAivazis/survey/v2 v2.3.6 h1:NvTuVHISgTHEHeBFqt6BHOe4Ny/NwGZr7w+F8S9ziyw=
 github.com/AlecAivazis/survey/v2 v2.3.6/go.mod h1:4AuI9b7RjAR+G7v9+C4YSlX/YL3K3cWNXgWXOhllqvI=
 github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20OEh60=
