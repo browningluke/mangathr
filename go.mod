@@ -3,7 +3,7 @@ module github.com/browningluke/mangathr
 go 1.18
 
 require (
-	entgo.io/ent v0.12.0
+	entgo.io/ent v0.12.3
 	github.com/AlecAivazis/survey/v2 v2.3.6
 	github.com/alitto/pond v1.8.3
 	github.com/schollz/progressbar/v3 v3.13.1
@@ -13,7 +13,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.10.0 // indirect
+	ariga.io/atlas v0.10.2-0.20230427182402-87a07dfb83bf // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -34,11 +34,11 @@ require (
 	github.com/rivo/uniseg v0.4.3 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/zclconf/go-cty v1.10.0 // indirect
-	golang.org/x/mod v0.8.0 // indirect
-	golang.org/x/sys v0.6.0 // indirect
+	golang.org/x/mod v0.10.0 // indirect
+	golang.org/x/sys v0.7.0 // indirect
 	golang.org/x/term v0.6.0 // indirect
 	golang.org/x/text v0.8.0 // indirect
-	golang.org/x/tools v0.6.1-0.20230222164832-25d2519c8696 // indirect
+	golang.org/x/tools v0.8.1-0.20230428195545-5283a0178901 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	lukechampine.com/uint128 v1.2.0 // indirect
 	modernc.org/cc/v3 v3.40.0 // indirect
