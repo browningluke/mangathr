@@ -2,20 +2,17 @@ package config
 
 import (
 	"errors"
-	"github.com/browningluke/mangathr/internal/config/defaults"
+	"github.com/browningluke/mangathr/internal/database"
 	"github.com/browningluke/mangathr/internal/downloader"
 	"github.com/browningluke/mangathr/internal/sources/cubari"
 	"github.com/browningluke/mangathr/internal/sources/mangadex"
+	"github.com/browningluke/mangathr/internal/utils"
 	"gopkg.in/yaml.v2"
 	"os"
-	"strings"
 )
 
 type Config struct {
-	Database struct {
-		Driver string
-		Uri    string
-	}
+	Database   database.Config
 	Downloader downloader.Config
 	Sources    struct {
 		Mangadex mangadex.Config
@@ -26,6 +23,7 @@ type Config struct {
 
 func (c *Config) Propagate() {
 	downloader.SetConfig(c.Downloader)
+	database.SetConfig(c.Database)
 
 	// Sources
 	mangadex.SetConfig(c.Sources.Mangadex)
@@ -50,12 +48,13 @@ func (c *Config) Load(path string, inContainer bool) error {
 }
 
 func (c *Config) useDefaults(inContainer bool) {
-	c.Database.Driver = defaults.DatabaseDriver()
-	c.Database.Uri = defaults.DatabaseUri()
-
 	downloadConf := downloader.Config{}
 	downloadConf.Default(inContainer)
 	c.Downloader = downloadConf
+
+	databaseConf := database.Config{}
+	databaseConf.Default(inContainer)
+	c.Database = databaseConf
 
 	mangadexConf := mangadex.Config{}
 	mangadexConf.Default()
@@ -65,13 +64,13 @@ func (c *Config) useDefaults(inContainer bool) {
 
 	// Overwrite defaults if we are in a container
 	if inContainer {
-		c.Database.Uri = defaults.DatabaseUriDocker()
 	}
 }
 
 func (c *Config) validate() error {
-	if !validateDatabaseDriver(c.Database.Driver) {
-		return errors.New("InvalidDatabaseError: " + c.Database.Driver + " is not a valid database.")
+	// Validate database
+	if err := c.Database.Validate(); err != nil {
+		return err
 	}
 	if !validateMetadataAgent(c.Downloader.Metadata.Agent) {
 		return errors.New("InvalidMetadataAgentError: " + c.Downloader.Metadata.Agent + " is not a valid agent.")
@@ -82,23 +81,12 @@ func (c *Config) validate() error {
 	return nil
 }
 
-func validateDatabaseDriver(driver string) bool {
-	return isInSlice(driver, []string{"sqlite"})
-}
-
 func validateMetadataAgent(agent string) bool {
-	return isInSlice(agent, []string{"comicinfo", "json"})
+	_, exists := utils.FindInSliceFold([]string{"comicinfo", "json"}, agent)
+	return exists
 }
 
 func validateMetadataLocation(location string) bool {
-	return isInSlice(location, []string{"internal", "external", "both"})
-}
-
-func isInSlice(s string, slice []string) bool {
-	for _, v := range slice {
-		if v == strings.ToLower(s) {
-			return true
-		}
-	}
-	return false
+	_, exists := utils.FindInSliceFold([]string{"internal", "external", "both"}, location)
+	return exists
 }

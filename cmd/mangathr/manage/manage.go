@@ -101,6 +101,9 @@ func listSubcommand(cfg *config.Config) *cobra.Command {
 }
 
 func (o *manageOpts) runWrapper(cfg *config.Config, f func(*manageOpts, *config.Config, *database.Driver)) {
+	// Propagate config to all sub-configs
+	cfg.Propagate()
+
 	utils.CreateSigIntHandler(closeDatabase)
 
 	// Open database
@@ -108,7 +111,7 @@ func (o *manageOpts) runWrapper(cfg *config.Config, f func(*manageOpts, *config.
 	driver, err = database.GetDriver(database.SQLITE, cfg.Database.Uri)
 	if err != nil {
 		logging.Errorln(err)
-		ui.Fatal("An error occurred while establishing a connection to the database")
+		ui.Fatalf("Unable to open database.\nReason: %s\n", err)
 	}
 	defer closeDatabase()
 

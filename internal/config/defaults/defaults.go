@@ -27,18 +27,6 @@ func ConfigPath() string {
 }
 
 /*
-	Config defaults
-*/
-
-func DatabaseDriver() string {
-	return "sqlite"
-}
-
-func DatabaseUri() string {
-	return filepath.Join(ConfigDir(), "db.sqlite")
-}
-
-/*
 	Container defaults
 */
 
@@ -49,10 +37,6 @@ func ConfigDirDocker() string {
 
 func ConfigPathDocker() string {
 	return filepath.Join(ConfigDirDocker(), "config")
-}
-
-func DatabaseUriDocker() string {
-	return filepath.Join(ConfigDirDocker(), "db.sqlite")
 }
 
 func DataPathDocker() string {

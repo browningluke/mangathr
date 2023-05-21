@@ -70,14 +70,14 @@ func (o *updateOpts) run(cfg *config.Config) {
 	driver, err = database.GetDriver(database.SQLITE, cfg.Database.Uri)
 	if err != nil {
 		logging.Errorln(err)
-		ui.Fatal("Unable to open database.")
+		ui.Fatalf("Unable to open database.\nReason: %s\n", err)
 	}
 	defer closeDatabase()
 
 	allManga, err := driver.QueryAllManga()
 	if err != nil {
 		logging.ExitIfErrorWithFunc(&logging.ScraperError{
-			Error: err, Message: "An error occurred while getting Manga from database.", Code: 0,
+			Error: err, Message: "An error occurred while loading all Manga from database.", Code: 0,
 		}, closeDatabase)
 	}
 
