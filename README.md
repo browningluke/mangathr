@@ -224,7 +224,7 @@ sqlite:
 postgres:
   host: 127.0.0.1             # default: 127.0.0.1
   port: 5432                  # default: 5432
-  user: postgres              # default: postgres
+  user: mangathr              # default: mangathr
   password: PASSWORD          # required
   dbName: mangathr            # default: mangathr
   sslMode: disable            # default: disable

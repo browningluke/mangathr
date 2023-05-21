@@ -9,7 +9,7 @@ database:
   postgres:
     host: 127.0.0.1
     port: 5432
-    user: postgres
+    user: mangathr
     password: PASSWORD
     dbName: mangathr
     sslMode: disable
