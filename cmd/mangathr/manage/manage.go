@@ -101,6 +101,9 @@ func listSubcommand(cfg *config.Config) *cobra.Command {
 }
 
 func (o *manageOpts) runWrapper(cfg *config.Config, f func(*manageOpts, *config.Config, *database.Driver)) {
+	// Propagate config to all sub-configs
+	cfg.Propagate()
+
 	utils.CreateSigIntHandler(closeDatabase)
 
 	// Open database
