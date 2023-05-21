@@ -94,5 +94,10 @@ func handleConnectionErrors(err error) error {
 		return fmt.Errorf("database hasn't been migrated, " +
 			"ensure database is created correctly or set 'database.autoMigrate' to true")
 	}
+
+	// Postgres: password auth failed for user
+	if strings.Contains(err.Error(), "password authentication failed for user") {
+		return fmt.Errorf("password authentication failed, check credentials are valid")
+	}
 	return err
 }
