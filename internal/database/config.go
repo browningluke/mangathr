@@ -68,6 +68,10 @@ func (c *Config) Default(inContainer bool) {
 	// Postgres
 	c.Postgres.Host = "127.0.0.1"
 	c.Postgres.Port = "5432"
+	c.Postgres.User = "mangathr"
+	c.Postgres.DbName = "mangathr"
+	c.Postgres.SSLMode = "disable"
+	c.Postgres.Opts = ""
 
 	if inContainer {
 		c.Sqlite.Path = filepath.Join(defaults.ConfigDirDocker(), "db.sqlite")
