@@ -53,7 +53,7 @@ func (o *registerOpts) run(cfg *config.Config) {
 
 	// Open database
 	var err error
-	driver, err = database.GetDriver(database.SQLITE, cfg.Database.Uri)
+	driver, err = database.GetDriver()
 	if err != nil {
 		logging.Errorln(err)
 		ui.Fatalf("Unable to open database.\nReason: %s\n", err)
