@@ -54,7 +54,7 @@ func downloadNewChapters(manga *ent.Manga,
 	return len(succeeded), numChapters - len(succeeded)
 }
 
-func checkMangaForNewChapters(manga *ent.Manga) seriesStats {
+func checkMangaForNewChapters(manga *ent.Manga) (seriesStats, *logging.ScraperError) {
 	stats := seriesStats{}
 
 	logging.Debugln("Requesting source...", manga.Source)
@@ -62,9 +62,8 @@ func checkMangaForNewChapters(manga *ent.Manga) seriesStats {
 
 	// Directly search for chapter by ID
 	if err := scraper.SearchByID(manga.MangaID, manga.Title); err != nil {
-		// Log error, abandon search, and continue (no need to exit program)
-		logging.Errorln(err)
-		ui.Error("An error occurred while search for ", manga.Title)
+		// Abandon search
+		return seriesStats{}, err
 	}
 
 	fmt.Printf("Checking  %s", manga.Title)
@@ -94,5 +93,5 @@ func checkMangaForNewChapters(manga *ent.Manga) seriesStats {
 		fmt.Printf("\rNone for  %s\n", manga.Title)
 	}
 
-	return stats
+	return stats, nil
 }

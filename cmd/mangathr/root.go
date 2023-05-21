@@ -9,6 +9,7 @@ import (
 	"github.com/browningluke/mangathr/internal/config"
 	"github.com/browningluke/mangathr/internal/config/defaults"
 	"github.com/browningluke/mangathr/internal/logging"
+	"github.com/browningluke/mangathr/internal/ui"
 	"github.com/browningluke/mangathr/internal/utils"
 	"github.com/spf13/cobra"
 	"os"
@@ -82,9 +83,19 @@ func getConfigPath() string {
 func initConfig() {
 	configPath := getConfigPath()
 
-	err := cfg.Load(configPath, utils.IsRunningInContainer())
+	exists, err := cfg.Load(configPath, utils.IsRunningInContainer())
 	if err != nil {
-		logging.Warningln(err)
+		if exists {
+			// If config file exists, and contains invalid data, exit.
+			// NOTE: an error will only be raised if the config file is
+			// missing **required** values. It will try to repair
+			// optional values on its own.
+			ui.Fatalf("Config file contains invalid data.\nReason: %s\n", err.Error())
+		} else {
+			// If config file does not exist, all default values will
+			// be used and only a warning will be raised.
+			logging.Warningln("Config file missing (or contains invalid yaml), ignoring. Error: ", err)
+		}
 	}
 
 	setLogLevel(logLevel, cfg.LogLevel)
