@@ -40,13 +40,18 @@ func (c *Config) Validate() error {
 
 	// Driver
 	if _, exists := utils.FindInSliceFold(validDrivers, c.Driver); !exists {
-		return fmt.Errorf("config error: database.driver not in [%s]", strings.Join(validDrivers, ", "))
+		return fmt.Errorf("database.driver not in [%s]", strings.Join(validDrivers, ", "))
 	}
 
 	// Postgres.SSLMode
 	if _, exists := utils.FindInSliceFold(validPostgresSSLMode, c.Postgres.SSLMode); !exists {
-		return fmt.Errorf("config error: database.postgres.sslMode not in [%s]",
+		return fmt.Errorf("database.postgres.sslMode not in [%s]",
 			strings.Join(validPostgresSSLMode, ", "))
+	}
+
+	// Postgres.Password
+	if len(c.Postgres.Password) == 0 {
+		return fmt.Errorf("database.postgres.password is empty")
 	}
 
 	return nil
