@@ -115,8 +115,11 @@ The default configuration path is `$XDG_CONFIG_HOME/mangathr/config`, which on m
 ```yaml
 logLevel: "off"                  # One of: ("debug"|"info"|"warn"|"error"|"off") 
 database:
-  driver: "sqlite"               # One of the supported database drivers
-  uri: "examples/db.sqlite"      # Relative/absolute path to database (or URI for non-file dbs)
+  driver: "sqlite"               # One of the supported database drivers (sqlite, postgres, etc.)
+  sqlite:
+    ...                          # See database section for configuration options
+  postgres:
+    ...                          # See database section for configuration options
 downloader:
   dryRun: false                  # Disables downloads & writes to the database
   simultaneousPages: 2           # Number of pages to download at once
@@ -201,9 +204,34 @@ cubari:
 
 ## Databases
 
-The following are the currently supported database drivers. More may be added as interest permits.
+| Database   | Supported |
+|------------|:---------:|
+| SQLite3    |     ✓     |
+| PostgreSQL |     ✓     |
+| MySQL      |     ✗     |
+| MongoDB    |     ✗     |
 
-- sqlite3
+### SQLite3
+
+```yaml
+sqlite:
+  path: ~/mangathr/db.sqlite    # default: ~/.config/mangathr/db.sqlite (/config/db.sqlite if in container)
+```
+
+### PostgreSQL
+
+```yaml
+postgres:
+  host: 127.0.0.1             # default: 127.0.0.1
+  port: 5432                  # default: 5432
+  user: postgres              # default: postgres
+  password: PASSWORD          # required
+  dbName: mangathr            # default: mangathr
+  sslMode: disable            # default: disable
+  
+  # (advanced usage) Appends extra options to connection string in format `key=value`
+  opts: ''                    # default: ''
+ ```
 
 ## Metadata Agents
 

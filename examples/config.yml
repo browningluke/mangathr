@@ -1,8 +1,19 @@
 ---
 logLevel: "INFO"
 database:
-  driver: "sqlite"
-  uri: "examples/db.sqlite"
+  driver: postgres
+  createDatabase: false
+  autoMigrate: true
+  sqlite:
+    path: ~/mangathr/db.sqlite
+  postgres:
+    host: 127.0.0.1
+    port: 5432
+    user: postgres
+    password: PASSWORD
+    dbName: mangathr
+    sslMode: disable
+    opts: ''
 downloader:
   dryRun: false
   cleanupOnError: true
