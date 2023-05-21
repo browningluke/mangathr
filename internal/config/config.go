@@ -30,21 +30,21 @@ func (c *Config) Propagate() {
 	cubari.SetConfig(c.Sources.Cubari)
 }
 
-func (c *Config) Load(path string, inContainer bool) error {
+func (c *Config) Load(path string, inContainer bool) (exists bool, err error) {
 	c.useDefaults(inContainer)
 
 	yamlFile, err := os.ReadFile(path)
 	if err != nil {
-		return err
+		return false, err
 	}
 	if err = yaml.Unmarshal(yamlFile, c); err != nil {
-		return err
+		return false, err
 	}
 	if err = c.validate(); err != nil {
-		return err
+		return true, err
 	}
 
-	return nil
+	return true, nil
 }
 
 func (c *Config) useDefaults(inContainer bool) {
