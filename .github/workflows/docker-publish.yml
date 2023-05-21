@@ -3,6 +3,7 @@ name: docker build
 on:
   workflow_dispatch:
   push:
+    branches: [ "main" ]
     tags: [ 'v*.*.*' ]   # Publish semver tags as releases.
     paths-ignore:
       - "docs/**"
@@ -61,6 +62,7 @@ jobs:
             ghcr.io/${{ env.IMAGE_NAME }}
           tags: |
             type=ref,event=branch
+            type=sha,event=branch
             type=semver,pattern={{version}}
           flavor: |
             latest=true
