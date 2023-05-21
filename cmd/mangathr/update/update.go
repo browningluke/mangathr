@@ -84,7 +84,12 @@ func (o *updateOpts) run(cfg *config.Config) {
 	stats := updateStats{}
 
 	for _, manga := range allManga {
-		s := checkMangaForNewChapters(manga)
+		s, err := checkMangaForNewChapters(manga)
+
+		if err != nil {
+			logging.Errorln(err)
+			ui.Error("Skipping... An error occurred while searching for ", manga.Title)
+		}
 
 		// Update stats
 		stats.checked++
