@@ -17,7 +17,7 @@ func closeDatabase() {
 	err := driver.Close()
 	if err != nil {
 		logging.Errorln(err)
-		ui.Error("Unable to close database.")
+		ui.Errorf("Unable to close database.\nReason: %s\n", err)
 	}
 }
 
@@ -44,6 +44,7 @@ func downloadNewChapters(manga *ent.Manga,
 		for _, chapter := range succeeded {
 			err := driver.CreateChapter(chapter.ID, chapter.Metadata.Num, chapter.Metadata.Title, manga)
 			if err != nil {
+				logging.Errorln(err)
 				ui.Error("Failed to save chapter to db: ",
 					chapter.Metadata.Title, " (", chapter.ID, ")")
 			}

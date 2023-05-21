@@ -17,7 +17,7 @@ func closeDatabase() {
 	err := driver.Close()
 	if err != nil {
 		logging.Errorln(err)
-		ui.Error("Unable to close database.")
+		ui.Error("Unable to close database.\nReason: %s\n", err)
 	}
 }
 

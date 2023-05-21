@@ -47,7 +47,7 @@ func (d *Driver) CreateChapter(chapterID, num, title string, manga *ent.Manga) e
 
 	err := builder.Exec(d.ctx)
 	if err != nil {
-		return fmt.Errorf("failed creating user: %w", err)
+		return fmt.Errorf("failed creating chapter: %w", err)
 	}
 	return nil
 }
