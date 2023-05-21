@@ -108,7 +108,7 @@ func (o *manageOpts) runWrapper(cfg *config.Config, f func(*manageOpts, *config.
 
 	// Open database
 	var err error
-	driver, err = database.GetDriver(database.SQLITE, cfg.Database.Uri)
+	driver, err = database.GetDriver()
 	if err != nil {
 		logging.Errorln(err)
 		ui.Fatalf("Unable to open database.\nReason: %s\n", err)

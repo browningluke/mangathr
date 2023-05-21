@@ -6,6 +6,7 @@ require (
 	entgo.io/ent v0.12.3
 	github.com/AlecAivazis/survey/v2 v2.3.6
 	github.com/alitto/pond v1.8.3
+	github.com/lib/pq v1.10.9
 	github.com/schollz/progressbar/v3 v3.13.1
 	github.com/spf13/cobra v1.7.0
 	gopkg.in/yaml.v2 v2.4.0
