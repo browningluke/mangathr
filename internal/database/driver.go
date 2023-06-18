@@ -8,6 +8,7 @@ import (
 	"github.com/browningluke/mangathr/internal/database/postgresql"
 	_ "github.com/browningluke/mangathr/internal/database/sqlite3"
 	"github.com/browningluke/mangathr/internal/logging"
+	"github.com/browningluke/mangathr/internal/utils"
 	_ "github.com/lib/pq"
 	"strings"
 )
@@ -27,7 +28,7 @@ func GetDriver() (*Driver, error) {
 	switch config.Driver {
 	case "sqlite":
 		driverName = dialect.SQLite
-		options = fmt.Sprintf("file:%s?cache=shared", config.Sqlite.Path)
+		options = fmt.Sprintf("file:%s?cache=shared", utils.ExpandHomePath(config.Sqlite.Path))
 	case "postgres":
 		driverName = dialect.Postgres
 		options = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s %s",
@@ -87,6 +88,14 @@ func handleConnectionErrors(err error) error {
 	if strings.Contains(err.Error(), fmt.Sprintf("pq: database \"%s\" does not exist", config.Postgres.DbName)) {
 		return fmt.Errorf("database doesn't exist, " +
 			"ensure database has been created or set 'database.createDatabase' to true")
+	}
+
+	// SQLite3: database could not be created
+	if strings.Contains(err.Error(),
+		"sqlite: check foreign_keys pragma: "+
+			"reading schema information unable to open database file: out of memory (14)") {
+		return fmt.Errorf("database could not be created, " +
+			"ensure database path is valid and user has correct permissions to access path")
 	}
 
 	// Postgres: mangas doesn't exist (migration hasn't run)

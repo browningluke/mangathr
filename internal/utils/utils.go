@@ -5,6 +5,7 @@ import (
 	"github.com/schollz/progressbar/v3"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"syscall"
@@ -85,6 +86,14 @@ func CreateProgressBar(length, maxRunes int, chapterNum string) *progressbar.Pro
 	return progressbar.NewOptions(length,
 		progressbar.OptionSetDescription(fmt.Sprintf("Chapter %s", chapterNum)),
 	)
+}
+
+func ExpandHomePath(path string) string {
+	if strings.HasPrefix(path, "~/") {
+		dirname, _ := os.UserHomeDir()
+		return filepath.Join(dirname, path[2:])
+	}
+	return path
 }
 
 func IsRunningInContainer() bool {
