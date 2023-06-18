@@ -10,7 +10,7 @@ require (
 	github.com/schollz/progressbar/v3 v3.13.1
 	github.com/spf13/cobra v1.7.0
 	gopkg.in/yaml.v2 v2.4.0
-	modernc.org/sqlite v1.22.1
+	modernc.org/sqlite v1.23.1
 )
 
 require (
