@@ -90,6 +90,14 @@ func handleConnectionErrors(err error) error {
 			"ensure database has been created or set 'database.createDatabase' to true")
 	}
 
+	// SQLite3: database could not be created
+	if strings.Contains(err.Error(),
+		"sqlite: check foreign_keys pragma: "+
+			"reading schema information unable to open database file: out of memory (14)") {
+		return fmt.Errorf("database could not be created, " +
+			"ensure database path is valid and user has correct permissions to access path")
+	}
+
 	// Postgres: mangas doesn't exist (migration hasn't run)
 	if err.Error() == "pq: relation \"mangas\" does not exist" {
 		return fmt.Errorf("database hasn't been migrated, " +
