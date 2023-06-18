@@ -8,6 +8,7 @@ import (
 	"github.com/browningluke/mangathr/internal/database/postgresql"
 	_ "github.com/browningluke/mangathr/internal/database/sqlite3"
 	"github.com/browningluke/mangathr/internal/logging"
+	"github.com/browningluke/mangathr/internal/utils"
 	_ "github.com/lib/pq"
 	"strings"
 )
@@ -27,7 +28,7 @@ func GetDriver() (*Driver, error) {
 	switch config.Driver {
 	case "sqlite":
 		driverName = dialect.SQLite
-		options = fmt.Sprintf("file:%s?cache=shared", config.Sqlite.Path)
+		options = fmt.Sprintf("file:%s?cache=shared", utils.ExpandHomePath(config.Sqlite.Path))
 	case "postgres":
 		driverName = dialect.Postgres
 		options = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s %s",
