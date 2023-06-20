@@ -10,16 +10,19 @@ type ScraperError struct {
 
 // The following functions are temporary (bad) error handling
 
-// ExitIfError TODO make this better
 func ExitIfError(err *ScraperError) {
-	if err != nil {
-		Errorln(err.Error)
-		ui.Fatal(err.Message)
-	}
+	ExitIfErrorWithFunc(err, func() {})
 }
 
 func ExitIfErrorWithFunc(err *ScraperError, f func()) {
 	if err != nil {
+		if err.Error.Error() == "interrupt" {
+			Errorln("Caught SIGINT, exiting safely")
+			f()
+			ui.Fatal("Exiting...")
+			return
+		}
+
 		Errorln(err.Error)
 		f()
 		ui.Fatal(err.Message)

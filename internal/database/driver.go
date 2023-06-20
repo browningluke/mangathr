@@ -80,6 +80,7 @@ func GetDriver() (*Driver, error) {
 }
 
 func (d *Driver) Close() error {
+	logging.Debugln("Closing database client")
 	return d.client.Close()
 }
 
