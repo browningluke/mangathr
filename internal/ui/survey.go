@@ -2,24 +2,7 @@ package ui
 
 import (
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/AlecAivazis/survey/v2/terminal"
-	"syscall"
 )
-
-func handleSIGINT(err error) error {
-	if err != nil {
-		if err == terminal.InterruptErr {
-			err := syscall.Kill(syscall.Getpid(), syscall.SIGINT)
-			if err != nil {
-				panic(err)
-			}
-
-			// Block execution until Goroutine kills program
-			select {}
-		}
-	}
-	return err
-}
 
 func Checkboxes(label string, opts []string) ([]string, error) {
 	survey.MultiSelectQuestionTemplate = `
@@ -51,7 +34,6 @@ func Checkboxes(label string, opts []string) ([]string, error) {
 		icons.Question.Text = ""
 		icons.Question.Format = "yellow+hb"
 	}), survey.WithKeepFilter(true))
-	err = handleSIGINT(err)
 	if err != nil {
 		return []string{}, err
 	}
@@ -89,7 +71,6 @@ func singleCheckboxes(label string, opts []string, res interface{}) error {
 		icons.Question.Text = ""
 		icons.Question.Format = "yellow+hb"
 	}))
-	err = handleSIGINT(err)
 
 	return err
 }
@@ -102,7 +83,6 @@ func ConfirmPrompt(label string) (bool, error) {
 	}
 
 	err := survey.AskOne(prompt, &res)
-	err = handleSIGINT(err)
 	if err != nil {
 		return false, err
 	}
@@ -116,7 +96,6 @@ func InputPrompt(label string) (string, error) {
 		Message: label,
 	}
 	err := survey.AskOne(prompt, &res)
-	err = handleSIGINT(err)
 	if err != nil {
 		return "", err
 	}
