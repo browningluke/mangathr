@@ -3,9 +3,9 @@ package mangadex
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/browningluke/mangathr/internal/logging"
-	"github.com/browningluke/mangathr/internal/manga"
-	"github.com/browningluke/mangathr/internal/rester"
+	"github.com/browningluke/mangathr/v2/internal/logging"
+	"github.com/browningluke/mangathr/v2/internal/manga"
+	"github.com/browningluke/mangathr/v2/internal/rester"
 	"strconv"
 	"strings"
 )

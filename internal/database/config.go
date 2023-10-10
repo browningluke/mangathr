@@ -2,8 +2,8 @@ package database
 
 import (
 	"fmt"
-	"github.com/browningluke/mangathr/internal/config/defaults"
-	"github.com/browningluke/mangathr/internal/utils"
+	"github.com/browningluke/mangathr/v2/internal/config/defaults"
+	"github.com/browningluke/mangathr/v2/internal/utils"
 	"path/filepath"
 	"strings"
 )

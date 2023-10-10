@@ -1,8 +1,8 @@
 package downloader
 
 import (
-	"github.com/browningluke/mangathr/internal/downloader/templater"
-	"github.com/browningluke/mangathr/internal/manga"
+	"github.com/browningluke/mangathr/v2/internal/downloader/templater"
+	"github.com/browningluke/mangathr/v2/internal/manga"
 	"log"
 	"os"
 	"path/filepath"

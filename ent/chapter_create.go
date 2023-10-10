@@ -10,8 +10,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/browningluke/mangathr/ent/chapter"
-	"github.com/browningluke/mangathr/ent/manga"
+	"github.com/browningluke/mangathr/v2/ent/chapter"
+	"github.com/browningluke/mangathr/v2/ent/manga"
 )
 
 // ChapterCreate is the builder for creating a Chapter entity.

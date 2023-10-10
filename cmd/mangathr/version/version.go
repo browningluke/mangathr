@@ -2,7 +2,7 @@ package version
 
 import (
 	"fmt"
-	"github.com/browningluke/mangathr/internal/config"
+	"github.com/browningluke/mangathr/v2/internal/config"
 	"github.com/spf13/cobra"
 )
 

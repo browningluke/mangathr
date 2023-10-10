@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/browningluke/mangathr/ent/manga"
+	"github.com/browningluke/mangathr/v2/ent/manga"
 )
 
 // Manga is the model entity for the Manga schema.
