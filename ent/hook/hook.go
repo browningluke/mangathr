@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/browningluke/mangathr/ent"
+	"github.com/browningluke/mangathr/v2/ent"
 )
 
 // The ChapterFunc type is an adapter to allow the use of ordinary

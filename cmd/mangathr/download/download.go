@@ -3,11 +3,11 @@ package download
 import (
 	"errors"
 	"fmt"
-	"github.com/browningluke/mangathr/internal/config"
-	"github.com/browningluke/mangathr/internal/downloader"
-	"github.com/browningluke/mangathr/internal/logging"
-	"github.com/browningluke/mangathr/internal/sources"
-	"github.com/browningluke/mangathr/internal/ui"
+	"github.com/browningluke/mangathr/v2/internal/config"
+	"github.com/browningluke/mangathr/v2/internal/downloader"
+	"github.com/browningluke/mangathr/v2/internal/logging"
+	"github.com/browningluke/mangathr/v2/internal/sources"
+	"github.com/browningluke/mangathr/v2/internal/ui"
 	"github.com/spf13/cobra"
 )
 

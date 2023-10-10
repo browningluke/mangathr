@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/browningluke/mangathr/internal/logging"
-	"github.com/browningluke/mangathr/internal/rester"
+	"github.com/browningluke/mangathr/v2/internal/logging"
+	"github.com/browningluke/mangathr/v2/internal/rester"
 	"regexp"
 	"strings"
 )

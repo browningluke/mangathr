@@ -1,7 +1,7 @@
 package sources
 
 import (
-	"github.com/browningluke/mangathr/internal/sources/mangadex"
+	"github.com/browningluke/mangathr/v2/internal/sources/mangadex"
 )
 
 type Connection interface {

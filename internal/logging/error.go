@@ -1,6 +1,6 @@
 package logging
 
-import "github.com/browningluke/mangathr/internal/ui"
+import "github.com/browningluke/mangathr/v2/internal/ui"
 
 type ScraperError struct {
 	Error   error

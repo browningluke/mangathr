@@ -2,12 +2,12 @@ package update
 
 import (
 	"fmt"
-	"github.com/browningluke/mangathr/ent"
-	"github.com/browningluke/mangathr/internal/database"
-	"github.com/browningluke/mangathr/internal/downloader"
-	"github.com/browningluke/mangathr/internal/logging"
-	"github.com/browningluke/mangathr/internal/sources"
-	"github.com/browningluke/mangathr/internal/ui"
+	"github.com/browningluke/mangathr/v2/ent"
+	"github.com/browningluke/mangathr/v2/internal/database"
+	"github.com/browningluke/mangathr/v2/internal/downloader"
+	"github.com/browningluke/mangathr/v2/internal/logging"
+	"github.com/browningluke/mangathr/v2/internal/sources"
+	"github.com/browningluke/mangathr/v2/internal/ui"
 )
 
 // Package-wide accessible driver

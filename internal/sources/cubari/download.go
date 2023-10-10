@@ -2,9 +2,9 @@ package cubari
 
 import (
 	"fmt"
-	"github.com/browningluke/mangathr/internal/downloader"
-	"github.com/browningluke/mangathr/internal/logging"
-	"github.com/browningluke/mangathr/internal/manga"
+	"github.com/browningluke/mangathr/v2/internal/downloader"
+	"github.com/browningluke/mangathr/v2/internal/logging"
+	"github.com/browningluke/mangathr/v2/internal/manga"
 )
 
 func (m *Scraper) runDownloadJob(dl *downloader.Downloader, chapter *manga.Chapter) *logging.ScraperError {

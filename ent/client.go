@@ -8,14 +8,14 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/browningluke/mangathr/ent/migrate"
+	"github.com/browningluke/mangathr/v2/ent/migrate"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/browningluke/mangathr/ent/chapter"
-	"github.com/browningluke/mangathr/ent/manga"
+	"github.com/browningluke/mangathr/v2/ent/chapter"
+	"github.com/browningluke/mangathr/v2/ent/manga"
 )
 
 // Client is the client that holds all ent builders.

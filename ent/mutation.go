@@ -11,9 +11,9 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/browningluke/mangathr/ent/chapter"
-	"github.com/browningluke/mangathr/ent/manga"
-	"github.com/browningluke/mangathr/ent/predicate"
+	"github.com/browningluke/mangathr/v2/ent/chapter"
+	"github.com/browningluke/mangathr/v2/ent/manga"
+	"github.com/browningluke/mangathr/v2/ent/predicate"
 )
 
 const (

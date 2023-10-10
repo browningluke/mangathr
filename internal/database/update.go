@@ -2,10 +2,10 @@ package database
 
 import (
 	"fmt"
-	"github.com/browningluke/mangathr/ent"
-	"github.com/browningluke/mangathr/ent/chapter"
-	"github.com/browningluke/mangathr/ent/manga"
-	"github.com/browningluke/mangathr/internal/logging"
+	"github.com/browningluke/mangathr/v2/ent"
+	"github.com/browningluke/mangathr/v2/ent/chapter"
+	"github.com/browningluke/mangathr/v2/ent/manga"
+	"github.com/browningluke/mangathr/v2/internal/logging"
 )
 
 func (d *Driver) UpdateManga(mangaUpdate *ent.MangaUpdateOne) (*ent.Manga, error) {

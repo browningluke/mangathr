@@ -3,7 +3,7 @@ package postgresql
 import (
 	"database/sql"
 	"fmt"
-	"github.com/browningluke/mangathr/internal/logging"
+	"github.com/browningluke/mangathr/v2/internal/logging"
 	_ "github.com/lib/pq"
 )
 

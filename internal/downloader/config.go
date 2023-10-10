@@ -1,9 +1,9 @@
 package downloader
 
 import (
-	"github.com/browningluke/mangathr/internal/config/defaults"
-	"github.com/browningluke/mangathr/internal/logging"
-	"github.com/browningluke/mangathr/internal/ui"
+	"github.com/browningluke/mangathr/v2/internal/config/defaults"
+	"github.com/browningluke/mangathr/v2/internal/logging"
+	"github.com/browningluke/mangathr/v2/internal/ui"
 	"os"
 	"path/filepath"
 )

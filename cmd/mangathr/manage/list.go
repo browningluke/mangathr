@@ -2,10 +2,10 @@ package manage
 
 import (
 	"fmt"
-	"github.com/browningluke/mangathr/internal/config"
-	"github.com/browningluke/mangathr/internal/database"
-	"github.com/browningluke/mangathr/internal/logging"
-	"github.com/browningluke/mangathr/internal/utils"
+	"github.com/browningluke/mangathr/v2/internal/config"
+	"github.com/browningluke/mangathr/v2/internal/database"
+	"github.com/browningluke/mangathr/v2/internal/logging"
+	"github.com/browningluke/mangathr/v2/internal/utils"
 	"strings"
 )
 

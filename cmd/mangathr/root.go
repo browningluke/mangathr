@@ -1,16 +1,16 @@
 package main
 
 import (
-	"github.com/browningluke/mangathr/cmd/mangathr/download"
-	"github.com/browningluke/mangathr/cmd/mangathr/manage"
-	"github.com/browningluke/mangathr/cmd/mangathr/register"
-	"github.com/browningluke/mangathr/cmd/mangathr/update"
-	"github.com/browningluke/mangathr/cmd/mangathr/version"
-	"github.com/browningluke/mangathr/internal/config"
-	"github.com/browningluke/mangathr/internal/config/defaults"
-	"github.com/browningluke/mangathr/internal/logging"
-	"github.com/browningluke/mangathr/internal/ui"
-	"github.com/browningluke/mangathr/internal/utils"
+	"github.com/browningluke/mangathr/v2/cmd/mangathr/download"
+	"github.com/browningluke/mangathr/v2/cmd/mangathr/manage"
+	"github.com/browningluke/mangathr/v2/cmd/mangathr/register"
+	"github.com/browningluke/mangathr/v2/cmd/mangathr/update"
+	"github.com/browningluke/mangathr/v2/cmd/mangathr/version"
+	"github.com/browningluke/mangathr/v2/internal/config"
+	"github.com/browningluke/mangathr/v2/internal/config/defaults"
+	"github.com/browningluke/mangathr/v2/internal/logging"
+	"github.com/browningluke/mangathr/v2/internal/ui"
+	"github.com/browningluke/mangathr/v2/internal/utils"
 	"github.com/spf13/cobra"
 	"os"
 )

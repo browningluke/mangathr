@@ -2,11 +2,11 @@ package config
 
 import (
 	"errors"
-	"github.com/browningluke/mangathr/internal/database"
-	"github.com/browningluke/mangathr/internal/downloader"
-	"github.com/browningluke/mangathr/internal/sources/cubari"
-	"github.com/browningluke/mangathr/internal/sources/mangadex"
-	"github.com/browningluke/mangathr/internal/utils"
+	"github.com/browningluke/mangathr/v2/internal/database"
+	"github.com/browningluke/mangathr/v2/internal/downloader"
+	"github.com/browningluke/mangathr/v2/internal/sources/cubari"
+	"github.com/browningluke/mangathr/v2/internal/sources/mangadex"
+	"github.com/browningluke/mangathr/v2/internal/utils"
 	"gopkg.in/yaml.v2"
 	"os"
 )

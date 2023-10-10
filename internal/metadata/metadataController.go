@@ -1,6 +1,6 @@
 package metadata
 
-import "github.com/browningluke/mangathr/internal/manga"
+import "github.com/browningluke/mangathr/v2/internal/manga"
 
 type Agent interface {
 	GenerateMetadataFile() (filename string, body []byte, err error)

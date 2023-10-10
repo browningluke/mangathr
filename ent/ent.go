@@ -11,8 +11,8 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/browningluke/mangathr/ent/chapter"
-	"github.com/browningluke/mangathr/ent/manga"
+	"github.com/browningluke/mangathr/v2/ent/chapter"
+	"github.com/browningluke/mangathr/v2/ent/manga"
 )
 
 // ent aliases to avoid import conflicts in user's code.
