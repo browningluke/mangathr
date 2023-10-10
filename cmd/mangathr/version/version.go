@@ -13,7 +13,7 @@ func NewCmd(_ *config.Config) *cobra.Command {
 		Aliases: []string{"v"},
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("mangathr v2.1.0 -- HEAD")
+			fmt.Println("mangathr v2.2.0 -- HEAD")
 		},
 		DisableFlagsInUseLine: true,
 	}
