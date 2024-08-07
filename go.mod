@@ -5,7 +5,7 @@ go 1.22
 require (
 	entgo.io/ent v0.14.0
 	github.com/AlecAivazis/survey/v2 v2.3.7
-	github.com/alitto/pond v1.8.3
+	github.com/alitto/pond v1.9.1
 	github.com/lib/pq v1.10.9
 	github.com/schollz/progressbar/v3 v3.13.1
 	github.com/spf13/cobra v1.7.0
