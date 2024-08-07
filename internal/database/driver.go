@@ -80,8 +80,11 @@ func GetDriver() (*Driver, error) {
 }
 
 func (d *Driver) Close() error {
-	logging.Debugln("Closing database client")
-	return d.client.Close()
+	if d.client != nil {
+		logging.Debugln("Closing database client")
+		return d.client.Close()
+	}
+	return nil
 }
 
 func handleConnectionErrors(err error) error {
