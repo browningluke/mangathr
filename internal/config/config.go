@@ -7,7 +7,8 @@ import (
 	"github.com/browningluke/mangathr/v2/internal/sources/cubari"
 	"github.com/browningluke/mangathr/v2/internal/sources/mangadex"
 	"github.com/browningluke/mangathr/v2/internal/utils"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
+	"k8s.io/helm/pkg/strvals"
 	"os"
 )
 
@@ -45,6 +46,65 @@ func (c *Config) Load(path string, inContainer bool) (exists bool, err error) {
 	}
 
 	return true, nil
+}
+
+// Merge combines sVals `key1=value1` pairs with current config (overwriting existing values)
+func (c *Config) Merge(sVals *[]string) error {
+	// Convert current config to map[string]interface{}
+	currentConfig, err := yaml.Marshal(&c)
+	if err != nil {
+		return err
+	}
+
+	currentData := map[string]interface{}{}
+	if err = yaml.Unmarshal(currentConfig, &currentData); err != nil {
+		return err
+	}
+
+	// Parse strvals into map[string]interface{}
+	strValData := map[string]interface{}{}
+	for _, val := range *sVals {
+		err := strvals.ParseInto(val, strValData)
+		if err != nil {
+			return err
+		}
+	}
+
+	currentData = mergeMaps(currentData, strValData)
+
+	// Convert map[string]interface{} back to config object
+	d, err := yaml.Marshal(&currentData)
+	if err != nil {
+		return err
+	}
+
+	if err = yaml.Unmarshal(d, &c); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// mergeMaps used with "k8s.io/helm/pkg/strvals". Sourced from:
+// https://github.com/helm/helm/blob/3bb50bbbdd9c946ba9989fbe4fb4104766302a64/pkg/cli/values/options.go#L108
+func mergeMaps(a, b map[string]interface{}) map[string]interface{} {
+	out := make(map[string]interface{}, len(a))
+	for k, v := range a {
+		out[k] = v
+	}
+
+	for k, v := range b {
+		if v, ok := v.(map[string]interface{}); ok {
+			if bv, ok := out[k]; ok {
+				if bv, ok := bv.(map[string]interface{}); ok {
+					out[k] = mergeMaps(bv, v)
+					continue
+				}
+			}
+		}
+		out[k] = v
+	}
+	return out
 }
 
 func (c *Config) useDefaults(inContainer bool) {
