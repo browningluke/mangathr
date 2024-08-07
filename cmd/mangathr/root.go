@@ -17,9 +17,10 @@ import (
 )
 
 var (
-	cfg      *config.Config
-	cfgFile  string
-	logLevel string
+	cfg             *config.Config
+	cfgFile         string
+	logLevel        string
+	overrideStrVals []string
 
 	rootCmd = &cobra.Command{
 		Use:                   "mangathr [OPTIONS]",
@@ -43,6 +44,10 @@ func init() {
 		"", "Path to config file (default is $XDG_CONFIG_HOME/mangathr/config)")
 	rootCmd.PersistentFlags().StringVarP(&logLevel, "log-level", "l",
 		"", "Set the logging level (\"debug\"|\"info\"|\"warn\"|\"error\"|\"off\") (default \"off\")")
+
+	// Override strvals
+	rootCmd.PersistentFlags().StringSliceVar(&overrideStrVals, "override", []string{},
+		"Override config values (e.g. database.driver=postgres,database.postgres.user=example)")
 
 	// Help func
 	rootCmd.SetUsageTemplate(usageTemplate)
@@ -85,6 +90,7 @@ func getConfigPath() string {
 func initConfig() {
 	configPath := getConfigPath()
 
+	// Load config file
 	exists, err := cfg.Load(configPath, utils.IsRunningInContainer())
 	if err != nil {
 		if exists {
@@ -100,8 +106,15 @@ func initConfig() {
 		}
 	}
 
+	// Set log level
 	setLogLevel(logLevel, cfg.LogLevel)
 	logging.Debugln("Using config path: ", configPath)
+
+	// Handle override flags
+	err = cfg.Merge(&overrideStrVals)
+	if err != nil {
+		ui.Fatalf("Cannot merge override values.\nReason: %s\n", err.Error())
+	}
 }
 
 func setLogLevel(logLevelArg, logLevelConf string) {
