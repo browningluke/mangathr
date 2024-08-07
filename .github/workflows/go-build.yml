@@ -19,6 +19,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Setup Go 1.22.x
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.x'
+
       - name: Cross-compile Go programs
         run: |
           GOOS=darwin GOARCH=arm64 go build -o build/mangathr_arm64-darwin ./cmd/mangathr
