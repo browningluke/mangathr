@@ -50,7 +50,7 @@ func (c *Config) Validate() error {
 	}
 
 	// Postgres.Password
-	if len(c.Postgres.Password) == 0 {
+	if c.Driver == "postgres" && len(c.Postgres.Password) == 0 {
 		return fmt.Errorf("database.postgres.password is empty")
 	}
 
