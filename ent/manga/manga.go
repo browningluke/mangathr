@@ -2,6 +2,11 @@
 
 package manga
 
+import (
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
+)
+
 const (
 	// Label holds the string label denoting the manga type in the database.
 	Label = "manga"
@@ -51,4 +56,58 @@ func ValidColumn(column string) bool {
 		}
 	}
 	return false
+}
+
+// OrderOption defines the ordering options for the Manga queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByMangaID orders the results by the MangaID field.
+func ByMangaID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMangaID, opts...).ToFunc()
+}
+
+// BySource orders the results by the Source field.
+func BySource(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSource, opts...).ToFunc()
+}
+
+// ByTitle orders the results by the Title field.
+func ByTitle(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTitle, opts...).ToFunc()
+}
+
+// ByMapping orders the results by the Mapping field.
+func ByMapping(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMapping, opts...).ToFunc()
+}
+
+// ByRegisteredOn orders the results by the RegisteredOn field.
+func ByRegisteredOn(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRegisteredOn, opts...).ToFunc()
+}
+
+// ByChaptersCount orders the results by Chapters count.
+func ByChaptersCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newChaptersStep(), opts...)
+	}
+}
+
+// ByChapters orders the results by Chapters terms.
+func ByChapters(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newChaptersStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newChaptersStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ChaptersInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ChaptersTable, ChaptersColumn),
+	)
 }

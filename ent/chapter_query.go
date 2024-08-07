@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -19,7 +20,7 @@ import (
 type ChapterQuery struct {
 	config
 	ctx        *QueryContext
-	order      []OrderFunc
+	order      []chapter.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Chapter
 	withManga  *MangaQuery
@@ -55,7 +56,7 @@ func (cq *ChapterQuery) Unique(unique bool) *ChapterQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (cq *ChapterQuery) Order(o ...OrderFunc) *ChapterQuery {
+func (cq *ChapterQuery) Order(o ...chapter.OrderOption) *ChapterQuery {
 	cq.order = append(cq.order, o...)
 	return cq
 }
@@ -85,7 +86,7 @@ func (cq *ChapterQuery) QueryManga() *MangaQuery {
 // First returns the first Chapter entity from the query.
 // Returns a *NotFoundError when no Chapter was found.
 func (cq *ChapterQuery) First(ctx context.Context) (*Chapter, error) {
-	nodes, err := cq.Limit(1).All(setContextOp(ctx, cq.ctx, "First"))
+	nodes, err := cq.Limit(1).All(setContextOp(ctx, cq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +109,7 @@ func (cq *ChapterQuery) FirstX(ctx context.Context) *Chapter {
 // Returns a *NotFoundError when no Chapter ID was found.
 func (cq *ChapterQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = cq.Limit(1).IDs(setContextOp(ctx, cq.ctx, "FirstID")); err != nil {
+	if ids, err = cq.Limit(1).IDs(setContextOp(ctx, cq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -131,7 +132,7 @@ func (cq *ChapterQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one Chapter entity is found.
 // Returns a *NotFoundError when no Chapter entities are found.
 func (cq *ChapterQuery) Only(ctx context.Context) (*Chapter, error) {
-	nodes, err := cq.Limit(2).All(setContextOp(ctx, cq.ctx, "Only"))
+	nodes, err := cq.Limit(2).All(setContextOp(ctx, cq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +160,7 @@ func (cq *ChapterQuery) OnlyX(ctx context.Context) *Chapter {
 // Returns a *NotFoundError when no entities are found.
 func (cq *ChapterQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = cq.Limit(2).IDs(setContextOp(ctx, cq.ctx, "OnlyID")); err != nil {
+	if ids, err = cq.Limit(2).IDs(setContextOp(ctx, cq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -184,7 +185,7 @@ func (cq *ChapterQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of Chapters.
 func (cq *ChapterQuery) All(ctx context.Context) ([]*Chapter, error) {
-	ctx = setContextOp(ctx, cq.ctx, "All")
+	ctx = setContextOp(ctx, cq.ctx, ent.OpQueryAll)
 	if err := cq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -206,7 +207,7 @@ func (cq *ChapterQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if cq.ctx.Unique == nil && cq.path != nil {
 		cq.Unique(true)
 	}
-	ctx = setContextOp(ctx, cq.ctx, "IDs")
+	ctx = setContextOp(ctx, cq.ctx, ent.OpQueryIDs)
 	if err = cq.Select(chapter.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -224,7 +225,7 @@ func (cq *ChapterQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (cq *ChapterQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, cq.ctx, "Count")
+	ctx = setContextOp(ctx, cq.ctx, ent.OpQueryCount)
 	if err := cq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -242,7 +243,7 @@ func (cq *ChapterQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (cq *ChapterQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, cq.ctx, "Exist")
+	ctx = setContextOp(ctx, cq.ctx, ent.OpQueryExist)
 	switch _, err := cq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -271,7 +272,7 @@ func (cq *ChapterQuery) Clone() *ChapterQuery {
 	return &ChapterQuery{
 		config:     cq.config,
 		ctx:        cq.ctx.Clone(),
-		order:      append([]OrderFunc{}, cq.order...),
+		order:      append([]chapter.OrderOption{}, cq.order...),
 		inters:     append([]Interceptor{}, cq.inters...),
 		predicates: append([]predicate.Chapter{}, cq.predicates...),
 		withManga:  cq.withManga.Clone(),
@@ -536,7 +537,7 @@ func (cgb *ChapterGroupBy) Aggregate(fns ...AggregateFunc) *ChapterGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (cgb *ChapterGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, cgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, cgb.build.ctx, ent.OpQueryGroupBy)
 	if err := cgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -584,7 +585,7 @@ func (cs *ChapterSelect) Aggregate(fns ...AggregateFunc) *ChapterSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (cs *ChapterSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, cs.ctx, "Select")
+	ctx = setContextOp(ctx, cs.ctx, ent.OpQuerySelect)
 	if err := cs.prepareQuery(ctx); err != nil {
 		return err
 	}

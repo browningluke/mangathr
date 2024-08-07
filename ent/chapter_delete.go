@@ -27,7 +27,7 @@ func (cd *ChapterDelete) Where(ps ...predicate.Chapter) *ChapterDelete {
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (cd *ChapterDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks[int, ChapterMutation](ctx, cd.sqlExec, cd.mutation, cd.hooks)
+	return withHooks(ctx, cd.sqlExec, cd.mutation, cd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.

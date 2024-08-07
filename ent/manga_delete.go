@@ -27,7 +27,7 @@ func (md *MangaDelete) Where(ps ...predicate.Manga) *MangaDelete {
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (md *MangaDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks[int, MangaMutation](ctx, md.sqlExec, md.mutation, md.hooks)
+	return withHooks(ctx, md.sqlExec, md.mutation, md.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.

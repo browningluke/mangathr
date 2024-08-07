@@ -93,7 +93,7 @@ func (cc *ChapterCreate) Mutation() *ChapterMutation {
 
 // Save creates the Chapter in the database.
 func (cc *ChapterCreate) Save(ctx context.Context) (*Chapter, error) {
-	return withHooks[*Chapter, ChapterMutation](ctx, cc.sqlSave, cc.mutation, cc.hooks)
+	return withHooks(ctx, cc.sqlSave, cc.mutation, cc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -198,11 +198,15 @@ func (cc *ChapterCreate) createSpec() (*Chapter, *sqlgraph.CreateSpec) {
 // ChapterCreateBulk is the builder for creating many Chapter entities in bulk.
 type ChapterCreateBulk struct {
 	config
+	err      error
 	builders []*ChapterCreate
 }
 
 // Save creates the Chapter entities in the database.
 func (ccb *ChapterCreateBulk) Save(ctx context.Context) ([]*Chapter, error) {
+	if ccb.err != nil {
+		return nil, ccb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(ccb.builders))
 	nodes := make([]*Chapter, len(ccb.builders))
 	mutators := make([]Mutator, len(ccb.builders))
@@ -218,8 +222,8 @@ func (ccb *ChapterCreateBulk) Save(ctx context.Context) ([]*Chapter, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, ccb.builders[i+1].mutation)
 				} else {
