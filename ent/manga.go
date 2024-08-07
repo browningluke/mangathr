@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/browningluke/mangathr/v2/ent/manga"
 )
@@ -31,7 +32,8 @@ type Manga struct {
 	FilteredGroups []string `json:"FilteredGroups,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MangaQuery when eager-loading is set.
-	Edges MangaEdges `json:"edges"`
+	Edges        MangaEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // MangaEdges holds the relations/edges for other nodes in the graph.
@@ -66,7 +68,7 @@ func (*Manga) scanValues(columns []string) ([]any, error) {
 		case manga.FieldRegisteredOn:
 			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Manga", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -124,9 +126,17 @@ func (m *Manga) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field FilteredGroups: %w", err)
 				}
 			}
+		default:
+			m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Manga.
+// This includes values selected through modifiers, order, etc.
+func (m *Manga) Value(name string) (ent.Value, error) {
+	return m.selectValues.Get(name)
 }
 
 // QueryChapters queries the "Chapters" edge of the Manga entity.

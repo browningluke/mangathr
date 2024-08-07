@@ -2,6 +2,11 @@
 
 package chapter
 
+import (
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
+)
+
 const (
 	// Label holds the string label denoting the chapter type in the database.
 	Label = "chapter"
@@ -59,4 +64,51 @@ func ValidColumn(column string) bool {
 		}
 	}
 	return false
+}
+
+// OrderOption defines the ordering options for the Chapter queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByChapterID orders the results by the ChapterID field.
+func ByChapterID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldChapterID, opts...).ToFunc()
+}
+
+// ByNum orders the results by the Num field.
+func ByNum(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNum, opts...).ToFunc()
+}
+
+// ByTitle orders the results by the Title field.
+func ByTitle(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTitle, opts...).ToFunc()
+}
+
+// ByCreatedOn orders the results by the CreatedOn field.
+func ByCreatedOn(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatedOn, opts...).ToFunc()
+}
+
+// ByRegisteredOn orders the results by the RegisteredOn field.
+func ByRegisteredOn(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRegisteredOn, opts...).ToFunc()
+}
+
+// ByMangaField orders the results by Manga field.
+func ByMangaField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newMangaStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newMangaStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(MangaInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, MangaTable, MangaColumn),
+	)
 }

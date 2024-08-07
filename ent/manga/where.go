@@ -394,11 +394,7 @@ func HasChapters() predicate.Manga {
 // HasChaptersWith applies the HasEdge predicate on the "Chapters" edge with a given conditions (other predicates).
 func HasChaptersWith(preds ...predicate.Chapter) predicate.Manga {
 	return predicate.Manga(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(ChaptersInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ChaptersTable, ChaptersColumn),
-		)
+		step := newChaptersStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -409,32 +405,15 @@ func HasChaptersWith(preds ...predicate.Chapter) predicate.Manga {
 
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Manga) predicate.Manga {
-	return predicate.Manga(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Manga(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.Manga) predicate.Manga {
-	return predicate.Manga(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Manga(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.Manga) predicate.Manga {
-	return predicate.Manga(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.Manga(sql.NotPredicates(p))
 }

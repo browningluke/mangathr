@@ -79,7 +79,7 @@ func (mc *MangaCreate) Mutation() *MangaMutation {
 
 // Save creates the Manga in the database.
 func (mc *MangaCreate) Save(ctx context.Context) (*Manga, error) {
-	return withHooks[*Manga, MangaMutation](ctx, mc.sqlSave, mc.mutation, mc.hooks)
+	return withHooks(ctx, mc.sqlSave, mc.mutation, mc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -196,11 +196,15 @@ func (mc *MangaCreate) createSpec() (*Manga, *sqlgraph.CreateSpec) {
 // MangaCreateBulk is the builder for creating many Manga entities in bulk.
 type MangaCreateBulk struct {
 	config
+	err      error
 	builders []*MangaCreate
 }
 
 // Save creates the Manga entities in the database.
 func (mcb *MangaCreateBulk) Save(ctx context.Context) ([]*Manga, error) {
+	if mcb.err != nil {
+		return nil, mcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(mcb.builders))
 	nodes := make([]*Manga, len(mcb.builders))
 	mutators := make([]Mutator, len(mcb.builders))
@@ -216,8 +220,8 @@ func (mcb *MangaCreateBulk) Save(ctx context.Context) ([]*Manga, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, mcb.builders[i+1].mutation)
 				} else {

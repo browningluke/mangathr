@@ -36,9 +36,25 @@ func (mu *MangaUpdate) SetMangaID(s string) *MangaUpdate {
 	return mu
 }
 
+// SetNillableMangaID sets the "MangaID" field if the given value is not nil.
+func (mu *MangaUpdate) SetNillableMangaID(s *string) *MangaUpdate {
+	if s != nil {
+		mu.SetMangaID(*s)
+	}
+	return mu
+}
+
 // SetSource sets the "Source" field.
 func (mu *MangaUpdate) SetSource(s string) *MangaUpdate {
 	mu.mutation.SetSource(s)
+	return mu
+}
+
+// SetNillableSource sets the "Source" field if the given value is not nil.
+func (mu *MangaUpdate) SetNillableSource(s *string) *MangaUpdate {
+	if s != nil {
+		mu.SetSource(*s)
+	}
 	return mu
 }
 
@@ -48,15 +64,39 @@ func (mu *MangaUpdate) SetTitle(s string) *MangaUpdate {
 	return mu
 }
 
+// SetNillableTitle sets the "Title" field if the given value is not nil.
+func (mu *MangaUpdate) SetNillableTitle(s *string) *MangaUpdate {
+	if s != nil {
+		mu.SetTitle(*s)
+	}
+	return mu
+}
+
 // SetMapping sets the "Mapping" field.
 func (mu *MangaUpdate) SetMapping(s string) *MangaUpdate {
 	mu.mutation.SetMapping(s)
 	return mu
 }
 
+// SetNillableMapping sets the "Mapping" field if the given value is not nil.
+func (mu *MangaUpdate) SetNillableMapping(s *string) *MangaUpdate {
+	if s != nil {
+		mu.SetMapping(*s)
+	}
+	return mu
+}
+
 // SetRegisteredOn sets the "RegisteredOn" field.
 func (mu *MangaUpdate) SetRegisteredOn(t time.Time) *MangaUpdate {
 	mu.mutation.SetRegisteredOn(t)
+	return mu
+}
+
+// SetNillableRegisteredOn sets the "RegisteredOn" field if the given value is not nil.
+func (mu *MangaUpdate) SetNillableRegisteredOn(t *time.Time) *MangaUpdate {
+	if t != nil {
+		mu.SetRegisteredOn(*t)
+	}
 	return mu
 }
 
@@ -115,7 +155,7 @@ func (mu *MangaUpdate) RemoveChapters(c ...*Chapter) *MangaUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (mu *MangaUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, MangaMutation](ctx, mu.sqlSave, mu.mutation, mu.hooks)
+	return withHooks(ctx, mu.sqlSave, mu.mutation, mu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -243,9 +283,25 @@ func (muo *MangaUpdateOne) SetMangaID(s string) *MangaUpdateOne {
 	return muo
 }
 
+// SetNillableMangaID sets the "MangaID" field if the given value is not nil.
+func (muo *MangaUpdateOne) SetNillableMangaID(s *string) *MangaUpdateOne {
+	if s != nil {
+		muo.SetMangaID(*s)
+	}
+	return muo
+}
+
 // SetSource sets the "Source" field.
 func (muo *MangaUpdateOne) SetSource(s string) *MangaUpdateOne {
 	muo.mutation.SetSource(s)
+	return muo
+}
+
+// SetNillableSource sets the "Source" field if the given value is not nil.
+func (muo *MangaUpdateOne) SetNillableSource(s *string) *MangaUpdateOne {
+	if s != nil {
+		muo.SetSource(*s)
+	}
 	return muo
 }
 
@@ -255,15 +311,39 @@ func (muo *MangaUpdateOne) SetTitle(s string) *MangaUpdateOne {
 	return muo
 }
 
+// SetNillableTitle sets the "Title" field if the given value is not nil.
+func (muo *MangaUpdateOne) SetNillableTitle(s *string) *MangaUpdateOne {
+	if s != nil {
+		muo.SetTitle(*s)
+	}
+	return muo
+}
+
 // SetMapping sets the "Mapping" field.
 func (muo *MangaUpdateOne) SetMapping(s string) *MangaUpdateOne {
 	muo.mutation.SetMapping(s)
 	return muo
 }
 
+// SetNillableMapping sets the "Mapping" field if the given value is not nil.
+func (muo *MangaUpdateOne) SetNillableMapping(s *string) *MangaUpdateOne {
+	if s != nil {
+		muo.SetMapping(*s)
+	}
+	return muo
+}
+
 // SetRegisteredOn sets the "RegisteredOn" field.
 func (muo *MangaUpdateOne) SetRegisteredOn(t time.Time) *MangaUpdateOne {
 	muo.mutation.SetRegisteredOn(t)
+	return muo
+}
+
+// SetNillableRegisteredOn sets the "RegisteredOn" field if the given value is not nil.
+func (muo *MangaUpdateOne) SetNillableRegisteredOn(t *time.Time) *MangaUpdateOne {
+	if t != nil {
+		muo.SetRegisteredOn(*t)
+	}
 	return muo
 }
 
@@ -335,7 +415,7 @@ func (muo *MangaUpdateOne) Select(field string, fields ...string) *MangaUpdateOn
 
 // Save executes the query and returns the updated Manga entity.
 func (muo *MangaUpdateOne) Save(ctx context.Context) (*Manga, error) {
-	return withHooks[*Manga, MangaMutation](ctx, muo.sqlSave, muo.mutation, muo.hooks)
+	return withHooks(ctx, muo.sqlSave, muo.mutation, muo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

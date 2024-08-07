@@ -35,9 +35,25 @@ func (cu *ChapterUpdate) SetChapterID(s string) *ChapterUpdate {
 	return cu
 }
 
+// SetNillableChapterID sets the "ChapterID" field if the given value is not nil.
+func (cu *ChapterUpdate) SetNillableChapterID(s *string) *ChapterUpdate {
+	if s != nil {
+		cu.SetChapterID(*s)
+	}
+	return cu
+}
+
 // SetNum sets the "Num" field.
 func (cu *ChapterUpdate) SetNum(s string) *ChapterUpdate {
 	cu.mutation.SetNum(s)
+	return cu
+}
+
+// SetNillableNum sets the "Num" field if the given value is not nil.
+func (cu *ChapterUpdate) SetNillableNum(s *string) *ChapterUpdate {
+	if s != nil {
+		cu.SetNum(*s)
+	}
 	return cu
 }
 
@@ -87,6 +103,14 @@ func (cu *ChapterUpdate) SetRegisteredOn(t time.Time) *ChapterUpdate {
 	return cu
 }
 
+// SetNillableRegisteredOn sets the "RegisteredOn" field if the given value is not nil.
+func (cu *ChapterUpdate) SetNillableRegisteredOn(t *time.Time) *ChapterUpdate {
+	if t != nil {
+		cu.SetRegisteredOn(*t)
+	}
+	return cu
+}
+
 // SetMangaID sets the "Manga" edge to the Manga entity by ID.
 func (cu *ChapterUpdate) SetMangaID(id int) *ChapterUpdate {
 	cu.mutation.SetMangaID(id)
@@ -119,7 +143,7 @@ func (cu *ChapterUpdate) ClearManga() *ChapterUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (cu *ChapterUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, ChapterMutation](ctx, cu.sqlSave, cu.mutation, cu.hooks)
+	return withHooks(ctx, cu.sqlSave, cu.mutation, cu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -229,9 +253,25 @@ func (cuo *ChapterUpdateOne) SetChapterID(s string) *ChapterUpdateOne {
 	return cuo
 }
 
+// SetNillableChapterID sets the "ChapterID" field if the given value is not nil.
+func (cuo *ChapterUpdateOne) SetNillableChapterID(s *string) *ChapterUpdateOne {
+	if s != nil {
+		cuo.SetChapterID(*s)
+	}
+	return cuo
+}
+
 // SetNum sets the "Num" field.
 func (cuo *ChapterUpdateOne) SetNum(s string) *ChapterUpdateOne {
 	cuo.mutation.SetNum(s)
+	return cuo
+}
+
+// SetNillableNum sets the "Num" field if the given value is not nil.
+func (cuo *ChapterUpdateOne) SetNillableNum(s *string) *ChapterUpdateOne {
+	if s != nil {
+		cuo.SetNum(*s)
+	}
 	return cuo
 }
 
@@ -281,6 +321,14 @@ func (cuo *ChapterUpdateOne) SetRegisteredOn(t time.Time) *ChapterUpdateOne {
 	return cuo
 }
 
+// SetNillableRegisteredOn sets the "RegisteredOn" field if the given value is not nil.
+func (cuo *ChapterUpdateOne) SetNillableRegisteredOn(t *time.Time) *ChapterUpdateOne {
+	if t != nil {
+		cuo.SetRegisteredOn(*t)
+	}
+	return cuo
+}
+
 // SetMangaID sets the "Manga" edge to the Manga entity by ID.
 func (cuo *ChapterUpdateOne) SetMangaID(id int) *ChapterUpdateOne {
 	cuo.mutation.SetMangaID(id)
@@ -326,7 +374,7 @@ func (cuo *ChapterUpdateOne) Select(field string, fields ...string) *ChapterUpda
 
 // Save executes the query and returns the updated Chapter entity.
 func (cuo *ChapterUpdateOne) Save(ctx context.Context) (*Chapter, error) {
-	return withHooks[*Chapter, ChapterMutation](ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
+	return withHooks(ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

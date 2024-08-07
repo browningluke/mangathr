@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/browningluke/mangathr/v2/ent/chapter"
 	"github.com/browningluke/mangathr/v2/ent/manga"
@@ -31,6 +32,7 @@ type Chapter struct {
 	// The values are being populated by the ChapterQuery when eager-loading is set.
 	Edges          ChapterEdges `json:"edges"`
 	manga_chapters *int
+	selectValues   sql.SelectValues
 }
 
 // ChapterEdges holds the relations/edges for other nodes in the graph.
@@ -45,12 +47,10 @@ type ChapterEdges struct {
 // MangaOrErr returns the Manga value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e ChapterEdges) MangaOrErr() (*Manga, error) {
-	if e.loadedTypes[0] {
-		if e.Manga == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: manga.Label}
-		}
+	if e.Manga != nil {
 		return e.Manga, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: manga.Label}
 	}
 	return nil, &NotLoadedError{edge: "Manga"}
 }
@@ -69,7 +69,7 @@ func (*Chapter) scanValues(columns []string) ([]any, error) {
 		case chapter.ForeignKeys[0]: // manga_chapters
 			values[i] = new(sql.NullInt64)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Chapter", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -126,9 +126,17 @@ func (c *Chapter) assignValues(columns []string, values []any) error {
 				c.manga_chapters = new(int)
 				*c.manga_chapters = int(value.Int64)
 			}
+		default:
+			c.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Chapter.
+// This includes values selected through modifiers, order, etc.
+func (c *Chapter) Value(name string) (ent.Value, error) {
+	return c.selectValues.Get(name)
 }
 
 // QueryManga queries the "Manga" edge of the Chapter entity.

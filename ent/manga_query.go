@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -20,7 +21,7 @@ import (
 type MangaQuery struct {
 	config
 	ctx          *QueryContext
-	order        []OrderFunc
+	order        []manga.OrderOption
 	inters       []Interceptor
 	predicates   []predicate.Manga
 	withChapters *ChapterQuery
@@ -55,7 +56,7 @@ func (mq *MangaQuery) Unique(unique bool) *MangaQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (mq *MangaQuery) Order(o ...OrderFunc) *MangaQuery {
+func (mq *MangaQuery) Order(o ...manga.OrderOption) *MangaQuery {
 	mq.order = append(mq.order, o...)
 	return mq
 }
@@ -85,7 +86,7 @@ func (mq *MangaQuery) QueryChapters() *ChapterQuery {
 // First returns the first Manga entity from the query.
 // Returns a *NotFoundError when no Manga was found.
 func (mq *MangaQuery) First(ctx context.Context) (*Manga, error) {
-	nodes, err := mq.Limit(1).All(setContextOp(ctx, mq.ctx, "First"))
+	nodes, err := mq.Limit(1).All(setContextOp(ctx, mq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +109,7 @@ func (mq *MangaQuery) FirstX(ctx context.Context) *Manga {
 // Returns a *NotFoundError when no Manga ID was found.
 func (mq *MangaQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = mq.Limit(1).IDs(setContextOp(ctx, mq.ctx, "FirstID")); err != nil {
+	if ids, err = mq.Limit(1).IDs(setContextOp(ctx, mq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -131,7 +132,7 @@ func (mq *MangaQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one Manga entity is found.
 // Returns a *NotFoundError when no Manga entities are found.
 func (mq *MangaQuery) Only(ctx context.Context) (*Manga, error) {
-	nodes, err := mq.Limit(2).All(setContextOp(ctx, mq.ctx, "Only"))
+	nodes, err := mq.Limit(2).All(setContextOp(ctx, mq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +160,7 @@ func (mq *MangaQuery) OnlyX(ctx context.Context) *Manga {
 // Returns a *NotFoundError when no entities are found.
 func (mq *MangaQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = mq.Limit(2).IDs(setContextOp(ctx, mq.ctx, "OnlyID")); err != nil {
+	if ids, err = mq.Limit(2).IDs(setContextOp(ctx, mq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -184,7 +185,7 @@ func (mq *MangaQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of Mangas.
 func (mq *MangaQuery) All(ctx context.Context) ([]*Manga, error) {
-	ctx = setContextOp(ctx, mq.ctx, "All")
+	ctx = setContextOp(ctx, mq.ctx, ent.OpQueryAll)
 	if err := mq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -206,7 +207,7 @@ func (mq *MangaQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if mq.ctx.Unique == nil && mq.path != nil {
 		mq.Unique(true)
 	}
-	ctx = setContextOp(ctx, mq.ctx, "IDs")
+	ctx = setContextOp(ctx, mq.ctx, ent.OpQueryIDs)
 	if err = mq.Select(manga.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -224,7 +225,7 @@ func (mq *MangaQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (mq *MangaQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, mq.ctx, "Count")
+	ctx = setContextOp(ctx, mq.ctx, ent.OpQueryCount)
 	if err := mq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -242,7 +243,7 @@ func (mq *MangaQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (mq *MangaQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, mq.ctx, "Exist")
+	ctx = setContextOp(ctx, mq.ctx, ent.OpQueryExist)
 	switch _, err := mq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -271,7 +272,7 @@ func (mq *MangaQuery) Clone() *MangaQuery {
 	return &MangaQuery{
 		config:       mq.config,
 		ctx:          mq.ctx.Clone(),
-		order:        append([]OrderFunc{}, mq.order...),
+		order:        append([]manga.OrderOption{}, mq.order...),
 		inters:       append([]Interceptor{}, mq.inters...),
 		predicates:   append([]predicate.Manga{}, mq.predicates...),
 		withChapters: mq.withChapters.Clone(),
@@ -414,7 +415,7 @@ func (mq *MangaQuery) loadChapters(ctx context.Context, query *ChapterQuery, nod
 	}
 	query.withFKs = true
 	query.Where(predicate.Chapter(func(s *sql.Selector) {
-		s.Where(sql.InValues(manga.ChaptersColumn, fks...))
+		s.Where(sql.InValues(s.C(manga.ChaptersColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -427,7 +428,7 @@ func (mq *MangaQuery) loadChapters(ctx context.Context, query *ChapterQuery, nod
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "manga_chapters" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "manga_chapters" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -529,7 +530,7 @@ func (mgb *MangaGroupBy) Aggregate(fns ...AggregateFunc) *MangaGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (mgb *MangaGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, mgb.build.ctx, ent.OpQueryGroupBy)
 	if err := mgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -577,7 +578,7 @@ func (ms *MangaSelect) Aggregate(fns ...AggregateFunc) *MangaSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (ms *MangaSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ms.ctx, "Select")
+	ctx = setContextOp(ctx, ms.ctx, ent.OpQuerySelect)
 	if err := ms.prepareQuery(ctx); err != nil {
 		return err
 	}
