@@ -70,7 +70,7 @@ $(PLATFORMS):
 	GOOS=$$(echo $$platform | cut -d'/' -f1) ; \
 	echo "Building for $$GOOS/$$GOARCH"; \
 	mkdir -p dist/$$GOOS-$$GOARCH; \
-	go build -o dist/$$GOOS-$$GOARCH/ -trimpath -ldflags '$(LDFLAGS)' $(PKG)
+	GOARCH=$$GOARCH GOOS=$$GOOS go build -o dist/$$GOOS-$$GOARCH/ -trimpath -ldflags '$(LDFLAGS)' $(PKG)
 
 .PHONY: dist
 dist:
