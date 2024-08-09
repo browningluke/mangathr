@@ -3,6 +3,8 @@ package version
 import (
 	"fmt"
 	"github.com/browningluke/mangathr/v2/internal/config"
+	"github.com/browningluke/mangathr/v2/internal/utils"
+	"github.com/browningluke/mangathr/v2/internal/version"
 	"github.com/spf13/cobra"
 )
 
@@ -13,7 +15,18 @@ func NewCmd(_ *config.Config) *cobra.Command {
 		Aliases: []string{"v"},
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("mangathr v2.2.0 -- HEAD")
+			containerStr := ""
+
+			if utils.IsRunningInContainer() {
+				containerStr = "-docker"
+			}
+
+			fmt.Printf(
+				"mangathr %s%s -- %s\n",
+				version.GetVersion(),
+				containerStr,
+				version.GetSHA(),
+			)
 		},
 		DisableFlagsInUseLine: true,
 	}
