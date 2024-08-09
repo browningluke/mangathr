@@ -3,12 +3,11 @@ FROM golang:1.22-alpine AS build
 
 WORKDIR /app
 
-COPY ../../go.mod ./
-COPY ../../go.sum ./
-RUN go mod download && go mod verify
+# Add build dependencies
+RUN apk add make git
 
 COPY ../../ .
-RUN go build -v -o /mangathr ./cmd/mangathr
+RUN make
 
 ENTRYPOINT ["mangathr"]
 
@@ -19,6 +18,7 @@ WORKDIR /
 
 RUN mkdir config data
 
-COPY --from=build /mangathr /mangathr
+COPY --from=build /app/bin/mangathr /usr/local/bin/mangathr
 
-ENTRYPOINT ["/mangathr"]
+ENTRYPOINT ["mangathr"]
+
