@@ -112,6 +112,12 @@ func (mu *MangaUpdate) AppendFilteredGroups(s []string) *MangaUpdate {
 	return mu
 }
 
+// ClearFilteredGroups clears the value of the "FilteredGroups" field.
+func (mu *MangaUpdate) ClearFilteredGroups() *MangaUpdate {
+	mu.mutation.ClearFilteredGroups()
+	return mu
+}
+
 // SetExcludedGroups sets the "ExcludedGroups" field.
 func (mu *MangaUpdate) SetExcludedGroups(s []string) *MangaUpdate {
 	mu.mutation.SetExcludedGroups(s)
@@ -121,6 +127,12 @@ func (mu *MangaUpdate) SetExcludedGroups(s []string) *MangaUpdate {
 // AppendExcludedGroups appends s to the "ExcludedGroups" field.
 func (mu *MangaUpdate) AppendExcludedGroups(s []string) *MangaUpdate {
 	mu.mutation.AppendExcludedGroups(s)
+	return mu
+}
+
+// ClearExcludedGroups clears the value of the "ExcludedGroups" field.
+func (mu *MangaUpdate) ClearExcludedGroups() *MangaUpdate {
+	mu.mutation.ClearExcludedGroups()
 	return mu
 }
 
@@ -224,6 +236,9 @@ func (mu *MangaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			sqljson.Append(u, manga.FieldFilteredGroups, value)
 		})
 	}
+	if mu.mutation.FilteredGroupsCleared() {
+		_spec.ClearField(manga.FieldFilteredGroups, field.TypeJSON)
+	}
 	if value, ok := mu.mutation.ExcludedGroups(); ok {
 		_spec.SetField(manga.FieldExcludedGroups, field.TypeJSON, value)
 	}
@@ -231,6 +246,9 @@ func (mu *MangaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, manga.FieldExcludedGroups, value)
 		})
+	}
+	if mu.mutation.ExcludedGroupsCleared() {
+		_spec.ClearField(manga.FieldExcludedGroups, field.TypeJSON)
 	}
 	if mu.mutation.ChaptersCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -379,6 +397,12 @@ func (muo *MangaUpdateOne) AppendFilteredGroups(s []string) *MangaUpdateOne {
 	return muo
 }
 
+// ClearFilteredGroups clears the value of the "FilteredGroups" field.
+func (muo *MangaUpdateOne) ClearFilteredGroups() *MangaUpdateOne {
+	muo.mutation.ClearFilteredGroups()
+	return muo
+}
+
 // SetExcludedGroups sets the "ExcludedGroups" field.
 func (muo *MangaUpdateOne) SetExcludedGroups(s []string) *MangaUpdateOne {
 	muo.mutation.SetExcludedGroups(s)
@@ -388,6 +412,12 @@ func (muo *MangaUpdateOne) SetExcludedGroups(s []string) *MangaUpdateOne {
 // AppendExcludedGroups appends s to the "ExcludedGroups" field.
 func (muo *MangaUpdateOne) AppendExcludedGroups(s []string) *MangaUpdateOne {
 	muo.mutation.AppendExcludedGroups(s)
+	return muo
+}
+
+// ClearExcludedGroups clears the value of the "ExcludedGroups" field.
+func (muo *MangaUpdateOne) ClearExcludedGroups() *MangaUpdateOne {
+	muo.mutation.ClearExcludedGroups()
 	return muo
 }
 
@@ -521,6 +551,9 @@ func (muo *MangaUpdateOne) sqlSave(ctx context.Context) (_node *Manga, err error
 			sqljson.Append(u, manga.FieldFilteredGroups, value)
 		})
 	}
+	if muo.mutation.FilteredGroupsCleared() {
+		_spec.ClearField(manga.FieldFilteredGroups, field.TypeJSON)
+	}
 	if value, ok := muo.mutation.ExcludedGroups(); ok {
 		_spec.SetField(manga.FieldExcludedGroups, field.TypeJSON, value)
 	}
@@ -528,6 +561,9 @@ func (muo *MangaUpdateOne) sqlSave(ctx context.Context) (_node *Manga, err error
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, manga.FieldExcludedGroups, value)
 		})
+	}
+	if muo.mutation.ExcludedGroupsCleared() {
+		_spec.ClearField(manga.FieldExcludedGroups, field.TypeJSON)
 	}
 	if muo.mutation.ChaptersCleared() {
 		edge := &sqlgraph.EdgeSpec{

@@ -380,6 +380,26 @@ func RegisteredOnLTE(v time.Time) predicate.Manga {
 	return predicate.Manga(sql.FieldLTE(FieldRegisteredOn, v))
 }
 
+// FilteredGroupsIsNil applies the IsNil predicate on the "FilteredGroups" field.
+func FilteredGroupsIsNil() predicate.Manga {
+	return predicate.Manga(sql.FieldIsNull(FieldFilteredGroups))
+}
+
+// FilteredGroupsNotNil applies the NotNil predicate on the "FilteredGroups" field.
+func FilteredGroupsNotNil() predicate.Manga {
+	return predicate.Manga(sql.FieldNotNull(FieldFilteredGroups))
+}
+
+// ExcludedGroupsIsNil applies the IsNil predicate on the "ExcludedGroups" field.
+func ExcludedGroupsIsNil() predicate.Manga {
+	return predicate.Manga(sql.FieldIsNull(FieldExcludedGroups))
+}
+
+// ExcludedGroupsNotNil applies the NotNil predicate on the "ExcludedGroups" field.
+func ExcludedGroupsNotNil() predicate.Manga {
+	return predicate.Manga(sql.FieldNotNull(FieldExcludedGroups))
+}
+
 // HasChapters applies the HasEdge predicate on the "Chapters" edge.
 func HasChapters() predicate.Manga {
 	return predicate.Manga(func(s *sql.Selector) {

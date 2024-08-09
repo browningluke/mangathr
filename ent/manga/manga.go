@@ -61,6 +61,13 @@ func ValidColumn(column string) bool {
 	return false
 }
 
+var (
+	// DefaultFilteredGroups holds the default value on creation for the "FilteredGroups" field.
+	DefaultFilteredGroups []string
+	// DefaultExcludedGroups holds the default value on creation for the "ExcludedGroups" field.
+	DefaultExcludedGroups []string
+)
+
 // OrderOption defines the ordering options for the Manga queries.
 type OrderOption func(*sql.Selector)
 

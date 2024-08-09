@@ -1026,10 +1026,24 @@ func (m *MangaMutation) AppendedFilteredGroups() ([]string, bool) {
 	return m.append_FilteredGroups, true
 }
 
+// ClearFilteredGroups clears the value of the "FilteredGroups" field.
+func (m *MangaMutation) ClearFilteredGroups() {
+	m._FilteredGroups = nil
+	m.append_FilteredGroups = nil
+	m.clearedFields[manga.FieldFilteredGroups] = struct{}{}
+}
+
+// FilteredGroupsCleared returns if the "FilteredGroups" field was cleared in this mutation.
+func (m *MangaMutation) FilteredGroupsCleared() bool {
+	_, ok := m.clearedFields[manga.FieldFilteredGroups]
+	return ok
+}
+
 // ResetFilteredGroups resets all changes to the "FilteredGroups" field.
 func (m *MangaMutation) ResetFilteredGroups() {
 	m._FilteredGroups = nil
 	m.append_FilteredGroups = nil
+	delete(m.clearedFields, manga.FieldFilteredGroups)
 }
 
 // SetExcludedGroups sets the "ExcludedGroups" field.
@@ -1077,10 +1091,24 @@ func (m *MangaMutation) AppendedExcludedGroups() ([]string, bool) {
 	return m.append_ExcludedGroups, true
 }
 
+// ClearExcludedGroups clears the value of the "ExcludedGroups" field.
+func (m *MangaMutation) ClearExcludedGroups() {
+	m._ExcludedGroups = nil
+	m.append_ExcludedGroups = nil
+	m.clearedFields[manga.FieldExcludedGroups] = struct{}{}
+}
+
+// ExcludedGroupsCleared returns if the "ExcludedGroups" field was cleared in this mutation.
+func (m *MangaMutation) ExcludedGroupsCleared() bool {
+	_, ok := m.clearedFields[manga.FieldExcludedGroups]
+	return ok
+}
+
 // ResetExcludedGroups resets all changes to the "ExcludedGroups" field.
 func (m *MangaMutation) ResetExcludedGroups() {
 	m._ExcludedGroups = nil
 	m.append_ExcludedGroups = nil
+	delete(m.clearedFields, manga.FieldExcludedGroups)
 }
 
 // AddChapterIDs adds the "Chapters" edge to the Chapter entity by ids.
@@ -1325,7 +1353,14 @@ func (m *MangaMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *MangaMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(manga.FieldFilteredGroups) {
+		fields = append(fields, manga.FieldFilteredGroups)
+	}
+	if m.FieldCleared(manga.FieldExcludedGroups) {
+		fields = append(fields, manga.FieldExcludedGroups)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1338,6 +1373,14 @@ func (m *MangaMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *MangaMutation) ClearField(name string) error {
+	switch name {
+	case manga.FieldFilteredGroups:
+		m.ClearFilteredGroups()
+		return nil
+	case manga.FieldExcludedGroups:
+		m.ClearExcludedGroups()
+		return nil
+	}
 	return fmt.Errorf("unknown Manga nullable field %s", name)
 }
 

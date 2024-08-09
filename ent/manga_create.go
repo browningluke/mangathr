@@ -85,6 +85,7 @@ func (mc *MangaCreate) Mutation() *MangaMutation {
 
 // Save creates the Manga in the database.
 func (mc *MangaCreate) Save(ctx context.Context) (*Manga, error) {
+	mc.defaults()
 	return withHooks(ctx, mc.sqlSave, mc.mutation, mc.hooks)
 }
 
@@ -110,6 +111,18 @@ func (mc *MangaCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (mc *MangaCreate) defaults() {
+	if _, ok := mc.mutation.FilteredGroups(); !ok {
+		v := manga.DefaultFilteredGroups
+		mc.mutation.SetFilteredGroups(v)
+	}
+	if _, ok := mc.mutation.ExcludedGroups(); !ok {
+		v := manga.DefaultExcludedGroups
+		mc.mutation.SetExcludedGroups(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (mc *MangaCreate) check() error {
 	if _, ok := mc.mutation.MangaID(); !ok {
@@ -126,12 +139,6 @@ func (mc *MangaCreate) check() error {
 	}
 	if _, ok := mc.mutation.RegisteredOn(); !ok {
 		return &ValidationError{Name: "RegisteredOn", err: errors.New(`ent: missing required field "Manga.RegisteredOn"`)}
-	}
-	if _, ok := mc.mutation.FilteredGroups(); !ok {
-		return &ValidationError{Name: "FilteredGroups", err: errors.New(`ent: missing required field "Manga.FilteredGroups"`)}
-	}
-	if _, ok := mc.mutation.ExcludedGroups(); !ok {
-		return &ValidationError{Name: "ExcludedGroups", err: errors.New(`ent: missing required field "Manga.ExcludedGroups"`)}
 	}
 	return nil
 }
@@ -224,6 +231,7 @@ func (mcb *MangaCreateBulk) Save(ctx context.Context) ([]*Manga, error) {
 	for i := range mcb.builders {
 		func(i int, root context.Context) {
 			builder := mcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*MangaMutation)
 				if !ok {

@@ -19,8 +19,8 @@ func (Manga) Fields() []ent.Field {
 		field.String("Title"),
 		field.String("Mapping"),
 		field.Time("RegisteredOn"),
-		field.Strings("FilteredGroups"),
-		field.Strings("ExcludedGroups"),
+		field.Strings("FilteredGroups").Default([]string{}).Optional(),
+		field.Strings("ExcludedGroups").Default([]string{}).Optional(),
 	}
 }
 
