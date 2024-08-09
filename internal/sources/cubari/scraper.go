@@ -18,6 +18,7 @@ const (
 type Scraper struct {
 	allChapters, selectedChapters,
 	filteredChapters []manga.Chapter
+	filtered bool
 
 	// pages URLs mapped by chapter ID
 	pages map[string][]string
@@ -29,7 +30,8 @@ type Scraper struct {
 func NewScraper() *Scraper {
 	logging.Debugln("Created a Cubari scraper")
 	s := &Scraper{
-		pages: make(map[string][]string),
+		pages:    make(map[string][]string),
+		filtered: false,
 	}
 	return s
 }
@@ -47,7 +49,7 @@ func (m *Scraper) SelectManga(_ string) *logging.ScraperError {
 // Chapters returns chapter data from Cubari's API
 func (m *Scraper) Chapters() ([]manga.Chapter, *logging.ScraperError) {
 	// If chapters have been filtered, only show the filtered chapters
-	if len(m.filteredChapters) != 0 {
+	if m.filtered {
 		return m.filteredChapters, nil
 	}
 
@@ -115,6 +117,8 @@ func (m *Scraper) FilterGroups(groups []string) *logging.ScraperError {
 	}
 
 	m.filteredChapters = filteredChapters
+	// Mark filtering done
+	m.filtered = true
 
 	return nil
 }
