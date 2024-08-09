@@ -34,6 +34,13 @@ endif
 all: build
 
 
+# install dependencies (for docker caching)
+
+deps:
+	go mod download
+	go mod verify
+
+
 # build
 
 .PHONY: build
