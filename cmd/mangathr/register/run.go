@@ -24,7 +24,8 @@ func closeDatabase() {
 type options struct {
 	title          string
 	mapping        string
-	filteredGroups []string
+	includedGroups []string
+	excludedGroups []string
 	scraper        *sources.Scraper
 }
 
@@ -78,7 +79,8 @@ func findManga(args *registerOpts) (options, bool) {
 		title:          mangaTitle,
 		mapping:        downloader.CleanPath(mangaTitle),
 		scraper:        &scraper,
-		filteredGroups: []string{},
+		includedGroups: []string{},
+		excludedGroups: []string{},
 	}
 
 	if exists, _ := driver.CheckMangaExistence(scraper.MangaID()); exists {
@@ -173,7 +175,7 @@ func handleMenu(args *registerOpts, driver *database.Driver) {
 				mangaID := (*opts.scraper).MangaID()
 				source := (*opts.scraper).ScraperName()
 
-				manga, err := driver.CreateManga(mangaID, opts.title, source, opts.mapping, opts.filteredGroups)
+				manga, err := driver.CreateManga(mangaID, opts.title, source, opts.mapping, opts.includedGroups, opts.excludedGroups)
 				if err != nil {
 					logging.ExitIfErrorWithFunc(&logging.ScraperError{
 						Error: err, Message: "An error occurred when adding Manga to database", Code: 0,
