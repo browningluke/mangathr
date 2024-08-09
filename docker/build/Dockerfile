@@ -6,6 +6,14 @@ WORKDIR /app
 # Add build dependencies
 RUN apk add make git
 
+# Install go dependencies separately
+# Allows for docker layer caching
+COPY ../../go.mod ./
+COPY ../../go.sum ./
+COPY ../../Makefile ./
+RUN make deps
+
+# Build the package
 COPY ../../ .
 RUN make
 
