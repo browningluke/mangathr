@@ -30,6 +30,8 @@ type Manga struct {
 	RegisteredOn time.Time `json:"RegisteredOn,omitempty"`
 	// FilteredGroups holds the value of the "FilteredGroups" field.
 	FilteredGroups []string `json:"FilteredGroups,omitempty"`
+	// ExcludedGroups holds the value of the "ExcludedGroups" field.
+	ExcludedGroups []string `json:"ExcludedGroups,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MangaQuery when eager-loading is set.
 	Edges        MangaEdges `json:"edges"`
@@ -59,7 +61,7 @@ func (*Manga) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case manga.FieldFilteredGroups:
+		case manga.FieldFilteredGroups, manga.FieldExcludedGroups:
 			values[i] = new([]byte)
 		case manga.FieldID:
 			values[i] = new(sql.NullInt64)
@@ -126,6 +128,14 @@ func (m *Manga) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field FilteredGroups: %w", err)
 				}
 			}
+		case manga.FieldExcludedGroups:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field ExcludedGroups", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &m.ExcludedGroups); err != nil {
+					return fmt.Errorf("unmarshal field ExcludedGroups: %w", err)
+				}
+			}
 		default:
 			m.selectValues.Set(columns[i], values[i])
 		}
@@ -184,6 +194,9 @@ func (m *Manga) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("FilteredGroups=")
 	builder.WriteString(fmt.Sprintf("%v", m.FilteredGroups))
+	builder.WriteString(", ")
+	builder.WriteString("ExcludedGroups=")
+	builder.WriteString(fmt.Sprintf("%v", m.ExcludedGroups))
 	builder.WriteByte(')')
 	return builder.String()
 }

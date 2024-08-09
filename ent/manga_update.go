@@ -112,6 +112,18 @@ func (mu *MangaUpdate) AppendFilteredGroups(s []string) *MangaUpdate {
 	return mu
 }
 
+// SetExcludedGroups sets the "ExcludedGroups" field.
+func (mu *MangaUpdate) SetExcludedGroups(s []string) *MangaUpdate {
+	mu.mutation.SetExcludedGroups(s)
+	return mu
+}
+
+// AppendExcludedGroups appends s to the "ExcludedGroups" field.
+func (mu *MangaUpdate) AppendExcludedGroups(s []string) *MangaUpdate {
+	mu.mutation.AppendExcludedGroups(s)
+	return mu
+}
+
 // AddChapterIDs adds the "Chapters" edge to the Chapter entity by IDs.
 func (mu *MangaUpdate) AddChapterIDs(ids ...int) *MangaUpdate {
 	mu.mutation.AddChapterIDs(ids...)
@@ -210,6 +222,14 @@ func (mu *MangaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := mu.mutation.AppendedFilteredGroups(); ok {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, manga.FieldFilteredGroups, value)
+		})
+	}
+	if value, ok := mu.mutation.ExcludedGroups(); ok {
+		_spec.SetField(manga.FieldExcludedGroups, field.TypeJSON, value)
+	}
+	if value, ok := mu.mutation.AppendedExcludedGroups(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, manga.FieldExcludedGroups, value)
 		})
 	}
 	if mu.mutation.ChaptersCleared() {
@@ -359,6 +379,18 @@ func (muo *MangaUpdateOne) AppendFilteredGroups(s []string) *MangaUpdateOne {
 	return muo
 }
 
+// SetExcludedGroups sets the "ExcludedGroups" field.
+func (muo *MangaUpdateOne) SetExcludedGroups(s []string) *MangaUpdateOne {
+	muo.mutation.SetExcludedGroups(s)
+	return muo
+}
+
+// AppendExcludedGroups appends s to the "ExcludedGroups" field.
+func (muo *MangaUpdateOne) AppendExcludedGroups(s []string) *MangaUpdateOne {
+	muo.mutation.AppendExcludedGroups(s)
+	return muo
+}
+
 // AddChapterIDs adds the "Chapters" edge to the Chapter entity by IDs.
 func (muo *MangaUpdateOne) AddChapterIDs(ids ...int) *MangaUpdateOne {
 	muo.mutation.AddChapterIDs(ids...)
@@ -487,6 +519,14 @@ func (muo *MangaUpdateOne) sqlSave(ctx context.Context) (_node *Manga, err error
 	if value, ok := muo.mutation.AppendedFilteredGroups(); ok {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, manga.FieldFilteredGroups, value)
+		})
+	}
+	if value, ok := muo.mutation.ExcludedGroups(); ok {
+		_spec.SetField(manga.FieldExcludedGroups, field.TypeJSON, value)
+	}
+	if value, ok := muo.mutation.AppendedExcludedGroups(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, manga.FieldExcludedGroups, value)
 		})
 	}
 	if muo.mutation.ChaptersCleared() {

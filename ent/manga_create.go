@@ -57,6 +57,12 @@ func (mc *MangaCreate) SetFilteredGroups(s []string) *MangaCreate {
 	return mc
 }
 
+// SetExcludedGroups sets the "ExcludedGroups" field.
+func (mc *MangaCreate) SetExcludedGroups(s []string) *MangaCreate {
+	mc.mutation.SetExcludedGroups(s)
+	return mc
+}
+
 // AddChapterIDs adds the "Chapters" edge to the Chapter entity by IDs.
 func (mc *MangaCreate) AddChapterIDs(ids ...int) *MangaCreate {
 	mc.mutation.AddChapterIDs(ids...)
@@ -124,6 +130,9 @@ func (mc *MangaCreate) check() error {
 	if _, ok := mc.mutation.FilteredGroups(); !ok {
 		return &ValidationError{Name: "FilteredGroups", err: errors.New(`ent: missing required field "Manga.FilteredGroups"`)}
 	}
+	if _, ok := mc.mutation.ExcludedGroups(); !ok {
+		return &ValidationError{Name: "ExcludedGroups", err: errors.New(`ent: missing required field "Manga.ExcludedGroups"`)}
+	}
 	return nil
 }
 
@@ -173,6 +182,10 @@ func (mc *MangaCreate) createSpec() (*Manga, *sqlgraph.CreateSpec) {
 	if value, ok := mc.mutation.FilteredGroups(); ok {
 		_spec.SetField(manga.FieldFilteredGroups, field.TypeJSON, value)
 		_node.FilteredGroups = value
+	}
+	if value, ok := mc.mutation.ExcludedGroups(); ok {
+		_spec.SetField(manga.FieldExcludedGroups, field.TypeJSON, value)
+		_node.ExcludedGroups = value
 	}
 	if nodes := mc.mutation.ChaptersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

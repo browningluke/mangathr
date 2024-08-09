@@ -20,6 +20,7 @@ func (Manga) Fields() []ent.Field {
 		field.String("Mapping"),
 		field.Time("RegisteredOn"),
 		field.Strings("FilteredGroups"),
+		field.Strings("ExcludedGroups"),
 	}
 }
 
