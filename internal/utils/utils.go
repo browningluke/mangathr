@@ -49,6 +49,27 @@ func findInSlice(list interface{}, match interface{}, stringFold bool) (interfac
 	return nil, false
 }
 
+// MergeSlices merges multiple slices and removes duplicates.
+func MergeSlices[K comparable](slices ...[]K) []K {
+	// Create a map to keep track of unique elements
+	uniqueElements := make(map[K]struct{})
+
+	// Iterate over each slice
+	for _, slice := range slices {
+		for _, value := range slice {
+			uniqueElements[value] = struct{}{}
+		}
+	}
+
+	// Convert map keys to a slice
+	var result []K
+	for key := range uniqueElements {
+		result = append(result, key)
+	}
+
+	return result
+}
+
 func PadString(s string, length int) string {
 	stringSlice := strings.Split(s, ".")
 	s = stringSlice[0]
