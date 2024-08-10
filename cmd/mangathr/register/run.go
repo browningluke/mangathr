@@ -34,6 +34,14 @@ func generateString(opts *options, prompt string) string {
 	logging.ExitIfErrorWithFunc(err, closeDatabase)
 	source := (*opts.scraper).ScraperName()
 
+	latestChapter := "N/A"
+	firstChapter := "N/A"
+
+	if len(chapterTitles) > 0 {
+		latestChapter = chapterTitles[0]
+		firstChapter = chapterTitles[len(chapterTitles)-1]
+	}
+
 	return fmt.Sprintf(
 		"\rTitle: %s"+
 			"\nSource: %s"+
@@ -44,8 +52,8 @@ func generateString(opts *options, prompt string) string {
 			"\nIncluded groups: [%s]"+
 			"\nExcluded groups: [%s]"+
 			"\n%s",
-		opts.title, source, len(chapterTitles), chapterTitles[0],
-		chapterTitles[len(chapterTitles)-1], opts.mapping,
+		opts.title, source, len(chapterTitles),
+		latestChapter, firstChapter, opts.mapping,
 		strings.Join(opts.includedGroups, ", "),
 		strings.Join(opts.excludedGroups, ", "), prompt)
 }
