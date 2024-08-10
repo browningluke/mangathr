@@ -74,26 +74,23 @@ Usage:  mangathr [OPTIONS] COMMAND
 
 Commands:
   completion  Generate the autocompletion script for the specified shell
+  config      Manage the config file
   download    Download chapters from source
+  manage      Manage series registered in database
   register    Register chapters to database
   update      Check for new chapters
+  version     Print the version number of mangathr
 
 Options:
       --config string      config file (default is $XDG_CONFIG_HOME/mangathr/config)
   -h, --help               help for mangathr
   -l, --log-level string   Set the logging level ("debug"|"info"|"warn"|"error"|"off") (default "off")
+      --override strings   Override config values (e.g. database.driver=postgres,database.postgres.user=example)
 
 Use "mangathr [command] --help" for more information about a command.
 ```
 
 ## Options
-
-```
-    --config string          Path to config file (default is $XDG_CONFIG_HOME/mangathr/config)
--l, --log-level string       Set the logging level ("debug"|"info"|"warn"|"error"|"off") (default "off")
--h, --help                   Print this text
-    --version                Print program version and exit
-```
 
 ### Download / Register
 
@@ -106,6 +103,23 @@ Use "mangathr [command] --help" for more information about a command.
 
 ```
     --dry-run            Disables downloads & writes to the database
+```
+
+### Configuration Overrides
+
+Configuration options can be specified in the command line to temporarily override the config file's values (either set by the user, or the default values). This may be useful when switching databases, or running in unusual environments, such as Kubernetes.
+
+This option uses the same format (`key.subkey=value`) as [Helm's](https://helm.sh/) `--set`. More details about how the values get converted to YAML can be found on [Helm's website](https://helm.sh/docs/intro/using_helm/#the-format-and-limitations-of---set).
+
+The following command will connect to PostgreSQL with the provided details, regardless of the values in the config file.
+```shell
+    mangathr \
+      --override database.driver=postgres \
+      --override database.postgres.host=127.0.0.1 \
+      --override database.postgres.user=postgres \
+      --override database.postgres.password=mangathr \
+      --override database.postgres.dbName=mangathr \
+      update
 ```
 
 ## Configuration
