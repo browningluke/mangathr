@@ -24,6 +24,8 @@ const (
 	FieldRegisteredOn = "registered_on"
 	// FieldFilteredGroups holds the string denoting the filteredgroups field in the database.
 	FieldFilteredGroups = "filtered_groups"
+	// FieldExcludedGroups holds the string denoting the excludedgroups field in the database.
+	FieldExcludedGroups = "excluded_groups"
 	// EdgeChapters holds the string denoting the chapters edge name in mutations.
 	EdgeChapters = "Chapters"
 	// Table holds the table name of the manga in the database.
@@ -46,6 +48,7 @@ var Columns = []string{
 	FieldMapping,
 	FieldRegisteredOn,
 	FieldFilteredGroups,
+	FieldExcludedGroups,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -57,6 +60,13 @@ func ValidColumn(column string) bool {
 	}
 	return false
 }
+
+var (
+	// DefaultFilteredGroups holds the default value on creation for the "FilteredGroups" field.
+	DefaultFilteredGroups []string
+	// DefaultExcludedGroups holds the default value on creation for the "ExcludedGroups" field.
+	DefaultExcludedGroups []string
+)
 
 // OrderOption defines the ordering options for the Manga queries.
 type OrderOption func(*sql.Selector)

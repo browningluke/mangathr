@@ -56,7 +56,7 @@ type Scraper interface {
 
 	// Setters
 
-	FilterGroups(groups []string) *logging.ScraperError
+	FilterGroups(includeGroups []string, excludeGroups []string) *logging.ScraperError
 
 	// Downloading
 

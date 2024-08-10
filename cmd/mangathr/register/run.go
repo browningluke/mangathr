@@ -24,7 +24,8 @@ func closeDatabase() {
 type options struct {
 	title          string
 	mapping        string
-	filteredGroups []string
+	includedGroups []string
+	excludedGroups []string
 	scraper        *sources.Scraper
 }
 
@@ -33,6 +34,14 @@ func generateString(opts *options, prompt string) string {
 	logging.ExitIfErrorWithFunc(err, closeDatabase)
 	source := (*opts.scraper).ScraperName()
 
+	latestChapter := "N/A"
+	firstChapter := "N/A"
+
+	if len(chapterTitles) > 0 {
+		latestChapter = chapterTitles[0]
+		firstChapter = chapterTitles[len(chapterTitles)-1]
+	}
+
 	return fmt.Sprintf(
 		"\rTitle: %s"+
 			"\nSource: %s"+
@@ -40,10 +49,13 @@ func generateString(opts *options, prompt string) string {
 			"\nLatest Chapter: %s"+
 			"\nFirst  Chapter: %s"+
 			"\nMapped to: ./%s"+
-			"\nFiltered groups: [%s]"+
+			"\nIncluded groups: [%s]"+
+			"\nExcluded groups: [%s]"+
 			"\n%s",
-		opts.title, source, len(chapterTitles), chapterTitles[0],
-		chapterTitles[len(chapterTitles)-1], opts.mapping, strings.Join(opts.filteredGroups, ", "), prompt)
+		opts.title, source, len(chapterTitles),
+		latestChapter, firstChapter, opts.mapping,
+		strings.Join(opts.includedGroups, ", "),
+		strings.Join(opts.excludedGroups, ", "), prompt)
 }
 
 func findManga(args *registerOpts) (options, bool) {
@@ -78,7 +90,8 @@ func findManga(args *registerOpts) (options, bool) {
 		title:          mangaTitle,
 		mapping:        downloader.CleanPath(mangaTitle),
 		scraper:        &scraper,
-		filteredGroups: []string{},
+		includedGroups: []string{},
+		excludedGroups: []string{},
 	}
 
 	if exists, _ := driver.CheckMangaExistence(scraper.MangaID()); exists {
@@ -86,6 +99,9 @@ func findManga(args *registerOpts) (options, bool) {
 		ui.PrintlnColor(ui.Yellow, "Manga is already registered. Exiting...")
 		return options{}, true
 	}
+
+	// Manga might have some configured `filter` / `exclude` groups, so handle them here
+	scraper.FilterGroups(opts.includedGroups, opts.excludedGroups)
 
 	return opts, false
 }
@@ -136,8 +152,32 @@ func handleMenu(args *registerOpts, driver *database.Driver) {
 			},
 			func(i []string) {
 				// Handle selected options
-				opts.filteredGroups = i
-				err := (*opts.scraper).FilterGroups(i)
+				opts.includedGroups = i
+				err := (*opts.scraper).FilterGroups(opts.includedGroups, opts.excludedGroups)
+				logging.ExitIfErrorWithFunc(err, closeDatabase)
+			},
+			func(err error) {
+				// Handle error
+				logging.ExitIfErrorWithFunc(&logging.ScraperError{
+					Error: err, Message: "An error occurred while getting input", Code: 0,
+				}, closeDatabase)
+			},
+		)
+
+	customizePanel.
+		AddOption("Exclude groups").
+		CheckboxHandler("Select groups to exclude: ",
+			func() []string {
+				// Generate options to display in checkboxes
+				groups, err := (*opts.scraper).GroupNames()
+				logging.ExitIfErrorWithFunc(err, closeDatabase)
+
+				return groups
+			},
+			func(i []string) {
+				// Handle selected options
+				opts.excludedGroups = i
+				err := (*opts.scraper).FilterGroups(opts.includedGroups, opts.excludedGroups)
 				logging.ExitIfErrorWithFunc(err, closeDatabase)
 			},
 			func(err error) {
@@ -173,7 +213,7 @@ func handleMenu(args *registerOpts, driver *database.Driver) {
 				mangaID := (*opts.scraper).MangaID()
 				source := (*opts.scraper).ScraperName()
 
-				manga, err := driver.CreateManga(mangaID, opts.title, source, opts.mapping, opts.filteredGroups)
+				manga, err := driver.CreateManga(mangaID, opts.title, source, opts.mapping, opts.includedGroups, opts.excludedGroups)
 				if err != nil {
 					logging.ExitIfErrorWithFunc(&logging.ScraperError{
 						Error: err, Message: "An error occurred when adding Manga to database", Code: 0,
