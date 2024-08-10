@@ -38,5 +38,21 @@ sources:
     ratingFilter: ["safe", "suggestive", "erotica"]
     languageFilter: ["en"] # , "fr"
     dataSaver: false
+    groups:
+      # Only download chapters from <Example A> and <Example B>
+      # include:
+        # - "Example A"
+        # - "Example B"
+      # Do not download chapters from <Example C>
+      exclude:
+        - "Example C"
   cubari:
     filenameTemplate: "{num:4} - Chapter {num:2}{title: - <.>}{groups: {<.>}}" # Set specific for source (overrides global)
+    groups:
+      # Only download chapters from <Example A> and <Example B>
+      # include:
+      # - "Example A"
+      # - "Example B"
+      # Do not download chapters from <Example C>
+      exclude:
+        - "Example C"

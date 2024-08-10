@@ -9,6 +9,12 @@ type Config struct {
 	LanguageFilter   []string `yaml:"languageFilter"`
 	DataSaver        bool     `yaml:"dataSaver"`
 
+	// Groups
+	Groups struct {
+		Include []string `yaml:"include"`
+		Exclude []string `yaml:"exclude"`
+	} `yaml:"groups"`
+
 	// Connection
 	SyncDeletions bool `yaml:"syncDeletions"`
 }
@@ -22,6 +28,9 @@ func (c *Config) Default() {
 	c.RatingFilter = []string{"safe", "suggestive"}
 	c.LanguageFilter = []string{"en"}
 	c.DataSaver = false
+
+	c.Groups.Include = []string{}
+	c.Groups.Exclude = []string{}
 
 	c.SyncDeletions = false
 }

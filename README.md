@@ -186,10 +186,19 @@ Available variables are (verbatim):
 
 ```yaml
 mangadex:
-  filenameTemplate: "..."                              # See config template section (overrides global template)
-  ratingFilter: ["safe", "suggestive", "erotica"]      # Show only these ratings when searching
-  languageFilter: ["en", "fr"]                         # Include chapters with these languages
-  dataSaver: false                                     # Use Mangadex's 'data saver' page size
+  filenameTemplate: "..."           # See config template section (overrides global template)
+  ratingFilter:                     # Show only these ratings when searching
+    - "safe"
+    - "suggestive"
+    - "erotica"
+  languageFilter: ["en", "fr"]      # Include chapters with these languages
+  dataSaver: false                  # Use Mangadex's 'data saver' page size
+  groups:
+    include:                        # Only download chapters from <Example A> and <Example B>
+      - "Example A"
+      - "Example B"
+    exclude:                        # Do not download chapters from <Example C>
+      - "Example C"
 ```
 
 ### Cubari
@@ -199,6 +208,12 @@ mangadex:
 ```yaml
 cubari:
   filenameTemplate: "..."      # See config template section (overrides global template)
+  groups:
+    include:                   # Only download chapters from <Example A> and <Example B>
+      - "Example A"
+      - "Example B"
+    exclude:                   # Do not download chapters from <Example C>
+      - "Example C"
 ```
 
 

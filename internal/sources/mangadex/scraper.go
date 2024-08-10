@@ -3,6 +3,7 @@ package mangadex
 import (
 	"github.com/browningluke/mangathr/v2/internal/logging"
 	"github.com/browningluke/mangathr/v2/internal/manga"
+	"github.com/browningluke/mangathr/v2/internal/utils"
 )
 
 const (
@@ -122,17 +123,21 @@ func (m *Scraper) FilterGroups(includeGroups []string, excludeGroups []string) *
 		return err
 	}
 
+	// Merge `groups` with config value
+	toInclude := utils.MergeSlices(includeGroups, config.Groups.Include)
+	toExclude := utils.MergeSlices(excludeGroups, config.Groups.Exclude)
+
 	// Start with all
 	chaptersToFilter := m.allChapters
 
 	// Include
-	if len(includeGroups) > 0 {
-		chaptersToFilter = filterGroups(chaptersToFilter, includeGroups, false)
+	if len(toInclude) > 0 {
+		chaptersToFilter = filterGroups(chaptersToFilter, toInclude, false)
 	}
 
 	// Exclude
-	if len(excludeGroups) > 0 {
-		chaptersToFilter = filterGroups(chaptersToFilter, excludeGroups, true)
+	if len(toExclude) > 0 {
+		chaptersToFilter = filterGroups(chaptersToFilter, toExclude, true)
 	}
 
 	m.filteredChapters = chaptersToFilter
