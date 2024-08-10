@@ -35,11 +35,13 @@ func printList(driver *database.Driver, sourceFilter string, titleFilter []strin
 				"  Source:          %s\n"+
 				"  Mapping:         %s\n"+
 				"  Filtered Groups: %s\n"+
+				"  Excluded Groups: %s\n"+
 				"\n",
 			m.Title,
 			m.Source,
 			m.Mapping,
 			m.FilteredGroups,
+			m.ExcludedGroups,
 		)
 	}
 }

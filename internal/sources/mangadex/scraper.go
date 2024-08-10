@@ -85,10 +85,7 @@ func (m *Scraper) GroupNames() ([]string, *logging.ScraperError) {
 	return m.groups, nil
 }
 
-func (m *Scraper) FilterGroups(groups []string) *logging.ScraperError {
-	// Ensure chapters are parsed
-	m.Chapters()
-
+func filterGroups(chapters []manga.Chapter, groups []string, exclude bool) []manga.Chapter {
 	findElemInSlice := func(slice []string, elem string) bool {
 		for _, v := range slice {
 			if elem == v {
@@ -99,17 +96,47 @@ func (m *Scraper) FilterGroups(groups []string) *logging.ScraperError {
 	}
 
 	var filteredChapters []manga.Chapter
-	for _, chapter := range m.allChapters { // go through each chapter
+	for _, chapter := range chapters { // go through each chapter
+		// if excluding: starts as true, inverts if match found
+		// if including: start as false, inverts if match found
+		addChapter := exclude
+
 		for _, group := range groups { // go through each filtered group
-			exists := findElemInSlice(chapter.Metadata.Groups, group)
-			if exists {
-				filteredChapters = append(filteredChapters, chapter)
+			if exists := findElemInSlice(chapter.Metadata.Groups, group); exists {
+				addChapter = !addChapter
 				break
 			}
 		}
+
+		if addChapter {
+			filteredChapters = append(filteredChapters, chapter)
+		}
 	}
 
-	m.filteredChapters = filteredChapters
+	return filteredChapters
+}
+
+func (m *Scraper) FilterGroups(includeGroups []string, excludeGroups []string) *logging.ScraperError {
+	// Ensure chapters are parsed
+	if _, err := m.Chapters(); err != nil {
+		return err
+	}
+
+	// Start with all
+	chaptersToFilter := m.allChapters
+
+	// Include
+	if len(includeGroups) > 0 {
+		chaptersToFilter = filterGroups(chaptersToFilter, includeGroups, false)
+	}
+
+	// Exclude
+	if len(excludeGroups) > 0 {
+		chaptersToFilter = filterGroups(chaptersToFilter, excludeGroups, true)
+	}
+
+	m.filteredChapters = chaptersToFilter
+
 	// Mark filtering done
 	m.filtered = true
 

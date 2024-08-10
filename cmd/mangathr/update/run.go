@@ -75,7 +75,7 @@ func checkMangaForNewChapters(manga *ent.Manga) (seriesStats, *logging.ScraperEr
 	}
 
 	// Filter groups
-	scraper.FilterGroups(manga.FilteredGroups)
+	scraper.FilterGroups(manga.FilteredGroups, manga.ExcludedGroups)
 
 	// Select new chapters in scraper, get array of them; and download if > 0
 	newChapters, err := scraper.SelectNewChapters(chapterIDs)

@@ -100,23 +100,48 @@ func (m *Scraper) GroupNames() ([]string, *logging.ScraperError) {
 	return groupNames, nil
 }
 
+func filterGroups(chapters []manga.Chapter, groups []string, exclude bool) []manga.Chapter {
+	var filteredChapters []manga.Chapter
+
+	for _, v := range chapters {
+		// Assuming chapters must have 1 and only 1 group (as Cubari does with GIST provider)
+		_, ok := utils.FindInSlice(groups, v.Metadata.Groups[0])
+
+		// If we're excluding, invert the answer
+		if exclude {
+			ok = !ok
+		}
+
+		if ok {
+			filteredChapters = append(filteredChapters, v)
+		}
+	}
+
+	return filteredChapters
+}
+
 // FilterGroups to find all chapters with groups in groups list
-func (m *Scraper) FilterGroups(groups []string) *logging.ScraperError {
+func (m *Scraper) FilterGroups(includeGroups []string, excludeGroups []string) *logging.ScraperError {
 	// Ensure chapters are parsed
 	if _, err := m.Chapters(); err != nil {
 		return err
 	}
 
-	var filteredChapters []manga.Chapter
+	// Start with all
+	chaptersToFilter := m.allChapters
 
-	for _, v := range m.allChapters {
-		// Assuming chapters must have 1 and only 1 group (as Cubari does with GIST provider)
-		if _, ok := utils.FindInSlice(groups, v.Metadata.Groups[0]); ok {
-			filteredChapters = append(filteredChapters, v)
-		}
+	// Include
+	if len(includeGroups) > 0 {
+		chaptersToFilter = filterGroups(chaptersToFilter, includeGroups, false)
 	}
 
-	m.filteredChapters = filteredChapters
+	// Exclude
+	if len(excludeGroups) > 0 {
+		chaptersToFilter = filterGroups(chaptersToFilter, excludeGroups, true)
+	}
+
+	m.filteredChapters = chaptersToFilter
+
 	// Mark filtering done
 	m.filtered = true
 
