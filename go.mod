@@ -1,9 +1,10 @@
 module github.com/browningluke/mangathr/v2
 
 go 1.22
+toolchain go1.23.2
 
 require (
-	entgo.io/ent v0.14.0
+	entgo.io/ent v0.14.1
 	github.com/AlecAivazis/survey/v2 v2.3.7
 	github.com/alitto/pond v1.9.2
 	github.com/lib/pq v1.10.9
@@ -38,7 +39,7 @@ require (
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/zclconf/go-cty v1.10.0 // indirect
-	golang.org/x/mod v0.16.0 // indirect
+	golang.org/x/mod v0.20.0 // indirect
 	golang.org/x/sys v0.26.0 // indirect
 	golang.org/x/term v0.25.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
