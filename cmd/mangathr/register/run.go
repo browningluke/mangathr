@@ -70,6 +70,12 @@ func findManga(args *registerOpts) (options, bool) {
 		return options{}, true
 	}
 
+	// Exit if no manga are found
+	if len(titles) == 0 {
+		ui.PrintlnColor(ui.Yellow, "No manga found with specified query. Exiting...")
+		return options{}, true
+	}
+
 	selection := titles[0]
 	if len(titles) > 1 {
 		var uierr error
