@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"github.com/browningluke/mangathr/v2/internal/logging"
 	"github.com/browningluke/mangathr/v2/internal/rester"
+	"github.com/browningluke/mangathr/v2/internal/utils"
 )
 
 /*
 	-- Search --
 */
 
-func buildQueryParams(query string, contentRatings []string) []rester.QueryParam {
+func buildContentRatingParams(contentRatings []string) []rester.QueryParam {
 	queryParams := []rester.QueryParam{
 		{Key: "order[relevance]", Value: "desc", Encode: true},
-		{Key: "title", Value: query, Encode: true},
 	}
 
 	for _, rating := range contentRatings {
@@ -53,13 +53,24 @@ func parseSearchResults(mangaResp mangaResponse) ([]searchResult, []string) {
 // Search for a Manga, will fill searchResults with 0 or more results
 func (m *Scraper) Search(query string) ([]string, *logging.ScraperError) {
 	// Build query params
-	queryParams := buildQueryParams(query, config.RatingFilter)
+	searchParams := buildContentRatingParams(config.RatingFilter)
+	queryKey := "title"
+
+	// If search query is a valid UUID (Mangadex ID), mark the query as ID instead of title
+	if utils.IsValidUUID(query) {
+		queryKey = "ids[]"
+	}
+
+	// Append the query params to the list of params
+	searchParams = append(searchParams, rester.QueryParam{
+		Key: queryKey, Value: query, Encode: true,
+	})
 
 	// Search for list of Manga
 	jsonResp, _ := rester.New().Get(
 		fmt.Sprintf("%s/manga", APIROOT),
 		map[string]string{},
-		queryParams).Do(4, "100ms")
+		searchParams).Do(4, "100ms")
 	jsonString := jsonResp.(string)
 
 	var mangaResp mangaResponse
