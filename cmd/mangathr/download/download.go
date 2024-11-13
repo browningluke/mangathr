@@ -54,6 +54,13 @@ func (o *downloadOpts) run(cfg *config.Config) {
 
 	// Search and select manga
 	titles, err := scraper.Search(o.Query)
+
+	// Exit if no manga are found
+	if len(titles) == 0 {
+		ui.PrintlnColor(ui.Yellow, "No manga found with specified query. Exiting...")
+		return
+	}
+
 	logging.ExitIfError(err)
 
 	selection, uierr := ui.SingleCheckboxes("Select Manga:", titles)
