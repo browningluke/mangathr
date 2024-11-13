@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/schollz/progressbar/v3"
 	"os"
 	"os/signal"
@@ -132,4 +133,9 @@ func CreateSigIntHandler(f func()) {
 		f()
 		os.Exit(1)
 	}()
+}
+
+func IsValidUUID(u string) bool {
+	_, err := uuid.Parse(u)
+	return err == nil
 }

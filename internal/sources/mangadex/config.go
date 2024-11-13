@@ -25,7 +25,7 @@ func SetConfig(cfg Config) {
 
 func (c *Config) Default() {
 	c.FilenameTemplate = "" // No override of downloader.output.filenameTemplate
-	c.RatingFilter = []string{"safe", "suggestive"}
+	c.RatingFilter = []string{"safe", "suggestive", "erotica"}
 	c.LanguageFilter = []string{"en"}
 	c.DataSaver = false
 
