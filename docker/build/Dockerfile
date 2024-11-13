@@ -17,16 +17,11 @@ RUN make deps
 COPY ../../ .
 RUN make
 
-ENTRYPOINT ["mangathr"]
-
 ## Production
-FROM alpine:latest
+FROM gcr.io/distroless/static-debian12
 
 WORKDIR /
+COPY --from=build /app/bin/mangathr /mangathr
 
-RUN mkdir config data
-
-COPY --from=build /app/bin/mangathr /usr/local/bin/mangathr
-
-ENTRYPOINT ["mangathr"]
-
+VOLUME ["/config", "/data"]
+ENTRYPOINT ["/mangathr"]
