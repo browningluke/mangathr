@@ -16,7 +16,7 @@ func (m *Scraper) runDownloadJob(dl *downloader.Downloader, chapter *manga.Chapt
 
 	// Get chapter filename
 	dl.SetTemplate(config.FilenameTemplate)
-	chapter.SetFilename(dl.GetNameFromTemplate(chapter))
+	chapter.SetFilename(dl.GetNameFromTemplate(chapter, m.MangaTitle(), SCRAPERNAME))
 
 	// Set MetadataAgent values
 	(*dl.MetadataAgent()).

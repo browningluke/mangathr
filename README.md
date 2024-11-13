@@ -161,9 +161,9 @@ mangathr uses a custom (simplified) templating structure. It should be powerful 
 
 The following is the default template used, and the filename it produces:
 ```
-"{num:3} - Chapter {num}{title: - <.>}{groups: [<.>]}"
+"{num:3} - {source:<.>} - {manga:<.>} - Chapter {num}{title: - <.>}{groups: [<.>]}"
 
-| 001 - Chapter 1 - This is an example chapter [Group 1, Group 2].cbz
+| 001 - Mangadex - Berserk - Chapter 1 - This is an example chapter [Group 1, Group 2].cbz
 | ...
 ```
 
@@ -173,6 +173,8 @@ The variable specified following the leading bracket `{` replaces the `<.>`.
 
 Available variables are (verbatim):
 ```
+- source   # Source name          (e.g. Mangadex, Cubari)
+- manga    # Manga title          (e.g. Berserk)
 - num      # Number               (e.g. 2.5)
 - lang     # ISO 2 Language code  (e.g fr)
 - title    # Title (no 'chapter') (e.g. This is an example chapter)

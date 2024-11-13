@@ -9,14 +9,18 @@ import (
 )
 
 type Templater struct {
-	RawTitle string
-	Metadata manga.Metadata
+	SourceName string
+	MangaTitle string
+	RawTitle   string
+	Metadata   manga.Metadata
 }
 
-func New(chapter *manga.Chapter) *Templater {
+func New(chapter *manga.Chapter, mangaTitle, sourceName string) *Templater {
 	return &Templater{
-		RawTitle: chapter.RawTitle,
-		Metadata: chapter.Metadata,
+		SourceName: sourceName,
+		MangaTitle: mangaTitle,
+		RawTitle:   chapter.RawTitle,
+		Metadata:   chapter.Metadata,
 	}
 }
 
@@ -36,6 +40,24 @@ func (t *Templater) handleLanguage(options string) string {
 
 	cleanString := strings.ReplaceAll(options, ":", "")
 	return strings.ReplaceAll(cleanString, "<.>", t.Metadata.Language)
+}
+
+func (t *Templater) handleSourceName(options string) string {
+	if t.SourceName == "" {
+		return ""
+	}
+
+	cleanString := strings.ReplaceAll(options, ":", "")
+	return strings.ReplaceAll(cleanString, "<.>", t.SourceName)
+}
+
+func (t *Templater) handleMangaTitle(options string) string {
+	if t.MangaTitle == "" {
+		return ""
+	}
+
+	cleanString := strings.ReplaceAll(options, ":", "")
+	return strings.ReplaceAll(cleanString, "<.>", t.MangaTitle)
 }
 
 func (t *Templater) handleTitle(options string) string {
@@ -75,6 +97,10 @@ func (t *Templater) ExecTemplate(template string) string {
 			replace = t.handleNum(options)
 		case "lang":
 			replace = t.handleLanguage(match[3])
+		case "source":
+			replace = t.handleSourceName(match[3])
+		case "manga":
+			replace = t.handleMangaTitle(match[3])
 		case "title":
 			replace = t.handleTitle(match[3])
 		case "groups":
