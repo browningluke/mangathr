@@ -40,8 +40,8 @@ func (d *Downloader) CreateDirectory(title string) string {
 	return newPath
 }
 
-func (d *Downloader) GetNameFromTemplate(chapter *manga.Chapter) string {
-	return templater.New(chapter).ExecTemplate(config.Output.FilenameTemplate)
+func (d *Downloader) GetNameFromTemplate(chapter *manga.Chapter, mangaTitle, source string) string {
+	return templater.New(chapter, mangaTitle, source).ExecTemplate(config.Output.FilenameTemplate)
 }
 
 func (d *Downloader) GetChapterPath(filename string) string {
