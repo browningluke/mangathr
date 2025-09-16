@@ -24,7 +24,7 @@ $ mangathr <COMMAND> -s SOURCE QUERY
 
 If Go is installed, install it with:
 ```
-$ go install github.com/browningluke/mangathr/cmd/mangathr@latest
+$ go install github.com/browningluke/mangathr/v2/cmd/mangathr@latest
 ```
 
 ### Pre-build binary
