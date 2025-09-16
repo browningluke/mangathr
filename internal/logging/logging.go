@@ -104,3 +104,15 @@ func Errorln(a ...interface{}) {
 func Errorf(format string, a ...interface{}) {
 	output(errorLogger, fmt.Sprintf("%s%s%s\n", "\033[31m", fmt.Sprintf(format, a...), "\033[0m"))
 }
+
+// Fatal
+
+func Fatalln(a ...interface{}) {
+	output(errorLogger, fmt.Sprintf("%s%s%s\n", "\033[31m", fmt.Sprint(a...), "\033[0m"))
+	os.Exit(1)
+}
+
+func Fatalf(format string, a ...interface{}) {
+	output(errorLogger, fmt.Sprintf("%s%s%s\n", "\033[31m", fmt.Sprintf(format, a...), "\033[0m"))
+	os.Exit(1)
+}

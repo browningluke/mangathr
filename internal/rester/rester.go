@@ -3,7 +3,6 @@ package rester
 import (
 	"context"
 	"crypto/tls"
-	"errors"
 	"fmt"
 	"github.com/browningluke/mangathr/v2/internal/logging"
 	"io"
@@ -48,7 +47,7 @@ func New() *RESTer {
 
 func (r RESTer) Do(retries int, timeout string) (interface{}, Response) {
 	if retries == 0 {
-		panic(errors.New("retried too many times, giving up"))
+		logging.Fatalln("retried too many times, giving up")
 	}
 	body, res, err := r.job()
 
@@ -70,7 +69,7 @@ func (r RESTer) Do(retries int, timeout string) (interface{}, Response) {
 
 func (r RESTer) DoWithHelperFunc(retries int, timeout string, f func(res Response, err error)) interface{} {
 	if retries == 0 {
-		panic(errors.New("retried too many times, giving up"))
+		logging.Fatalln("retried too many times, giving up")
 	}
 	body, res, err := r.job()
 

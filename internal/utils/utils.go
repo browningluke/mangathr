@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/schollz/progressbar/v3"
+	"net/url"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -138,4 +139,18 @@ func CreateSigIntHandler(f func()) {
 func IsValidUUID(u string) bool {
 	_, err := uuid.Parse(u)
 	return err == nil
+}
+
+func IsValidURL(str string) bool {
+	u, err := url.ParseRequestURI(str)
+	if err != nil {
+		return false
+	}
+
+	// Check if the scheme and host are present
+	if u.Scheme == "" || u.Host == "" {
+		return false
+	}
+
+	return true
 }

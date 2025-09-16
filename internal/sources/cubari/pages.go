@@ -16,20 +16,35 @@ func (m *Scraper) addPagesToChapter(chapter *manga.Chapter) *logging.ScraperErro
 	// Get pages from proxy URL
 	// (if using GIST provider)
 	if m.provider == GIST {
-		jsonResp, _ := rester.New().Get(fmt.Sprintf("%s%s", SITEROOT, pages[0]),
-			map[string]string{}, []rester.QueryParam{}).Do(4, "100ms")
-		jsonString := jsonResp.(string)
+		// Check if pages contain a valid URL
+		allValid := true
 
-		urls, ok := parseImgurStyle([]byte(jsonString))
-		if !ok {
-			return &logging.ScraperError{
-				Error:   errors.New("failed to get imgur URLs from proxy"),
-				Message: "An error occurred while getting pages from imgur",
-				Code:    0,
+		for _, u := range pages {
+			if !utils.IsValidURL(u) {
+				allValid = false
+				break
 			}
 		}
 
-		pages = urls
+		// If not all are valid urls, that means they are
+		// being proxied through Cubari so handle accordingly.
+		if !allValid {
+			logging.Debugln(fmt.Sprintf("Found pages: %v", pages))
+			jsonResp, _ := rester.New().Get(fmt.Sprintf("%s%s", SITEROOT, pages[0]),
+				map[string]string{}, []rester.QueryParam{}).Do(4, "100ms")
+			jsonString := jsonResp.(string)
+
+			urls, ok := parseImgurStyle([]byte(jsonString))
+			if !ok {
+				return &logging.ScraperError{
+					Error:   errors.New("failed to get imgur URLs from proxy"),
+					Message: "An error occurred while getting pages from imgur",
+					Code:    0,
+				}
+			}
+
+			pages = urls
+		}
 	}
 
 	// (if using MANGASEE provider)
