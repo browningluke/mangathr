@@ -1,4 +1,6 @@
 name: Go build & publish
+permissions:
+  contents: write
 
 on:
   workflow_dispatch:
