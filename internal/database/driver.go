@@ -52,7 +52,14 @@ func GetDriver() (*Driver, error) {
 	}
 
 	// Open driver
-	logging.Debugln("Opening database `", driverName, "` with options: ", options)
+	if driverName == dialect.Postgres {
+		redactedOptions := fmt.Sprintf("host=%s port=%s user=%s password=**** dbname=%s sslmode=%s %s",
+			config.Postgres.Host, config.Postgres.Port, config.Postgres.User,
+			config.Postgres.DbName, config.Postgres.SSLMode, config.Postgres.Opts)
+		logging.Debugln("Opening database `", driverName, "` with options: ", redactedOptions)
+	} else {
+		logging.Debugln("Opening database `", driverName, "` with options: ", options)
+	}
 	client, err := ent.Open(driverName, options)
 	if err != nil {
 		return nil, err
