@@ -9,6 +9,7 @@ import (
 type Page struct {
 	Url, Name string
 	Ext       string // file extension from MIME type
+	Transform func([]byte) ([]byte, error)
 }
 
 func (p *Page) GetExtFromBytes(pageBytes []byte) error {

@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package mangaplus;
+
+option go_package = "github.com/browningluke/mangathr/v2/internal/sources/mangaplus/proto";
+
+enum Language {
+  ENGLISH = 0;
+  SPANISH = 1;
+  FRENCH = 2;
+  INDONESIAN = 3;
+  PORTUGUESE_BR = 4;
+  RUSSIAN = 5;
+  THAI = 6;
+}
+
+message Title {
+  uint32 title_id = 1;
+  string name = 2;
+  Language language = 7;
+}
+
+message AllTitlesGroup {
+  string the_title = 1;
+  repeated Title titles = 2;
+}
+
+message AllTitlesViewV2 {
+  repeated AllTitlesGroup all_titles_group = 1;
+}
+
+message Chapter {
+  uint32 title_id = 1;
+  uint32 chapter_id = 2;
+  string name = 3;
+  string sub_title = 4;
+}
+
+message ChapterBlock {
+  repeated Chapter first_chapter_list = 2;
+  repeated Chapter last_chapter_list = 4;
+}
+
+message TitleDetailView {
+  Title title = 1;
+  repeated ChapterBlock chapters = 28;
+}
+
+message MangaPage {
+  string image_url = 1;
+  uint32 width = 2;
+  uint32 height = 3;
+  string encryption_key = 5;
+}
+
+message Page {
+  MangaPage page = 1;
+}
+
+message MangaViewer {
+  repeated Page pages = 1;
+}
+
+message SuccessResult {
+  bool is_featured_updated = 1;
+  TitleDetailView title_detail_view = 8;
+  MangaViewer manga_viewer = 10;
+  AllTitlesViewV2 all_titles_view_v2 = 25;
+}
+
+message Response {
+  SuccessResult success = 1;
+}

@@ -119,6 +119,13 @@ func (d *Downloader) DownloadPage(page *manga.Page) ([]byte, error) {
 		[]rester.QueryParam{}).Do(config.PageRetries, "100ms")
 	pageBytes := imageBytesResp.([]byte)
 
+	if page.Transform != nil {
+		pageBytes, err = page.Transform(pageBytes)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	err = page.GetExtFromBytes(pageBytes)
 	if err != nil {
 		return nil, err

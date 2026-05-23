@@ -56,3 +56,6 @@ sources:
       # Do not download chapters from <Example C>
       exclude:
         - "Example C"
+  mangaplus:
+    filenameTemplate: "{num:3} - Chapter {num}{title: - <.>} (mangaplus)" # Set specific for source (overrides global)
+    language: 0 # ENGLISH=0, SPANISH=1, FRENCH=2, INDONESIAN=3, PORTUGUESE_BR=4, RUSSIAN=5, THAI=6

@@ -190,10 +190,11 @@ Available variables are (verbatim):
 
 ## Sources
 
-| Source   | URL                   | Scraper | Account Sync |
-|----------|-----------------------|---------|--------------|
-| Mangadex | https://mangadex.org/ |    ✓    | WIP          |
-| Cubari   | https://cubari.moe/   |    ✓    | ✗            |
+| Source    | URL                               | Scraper | Account Sync |
+|-----------|-----------------------------------|---------|--------------|
+| Mangadex  | https://mangadex.org/             |    ✓    | WIP          |
+| Cubari    | https://cubari.moe/               |    ✓    | ✗            |
+| MangaPlus | https://mangaplus.shueisha.co.jp/ |    ✓    | ✗            |
 
 
 ### Mangadex
@@ -232,6 +233,17 @@ cubari:
       - "Example C"
 ```
 
+### MangaPlus
+
+#### Configuration
+
+```yaml
+mangaplus:
+  filenameTemplate: "..."    # See config template section (overrides global template)
+  language: 0                # ENGLISH=0, SPANISH=1, FRENCH=2, INDONESIAN=3, PORTUGUESE_BR=4, RUSSIAN=5, THAI=6
+  imageQuality: "super_high" # One of: (super_high|high|low)
+  split: "no"                # One of: (no|yes) — whether to split spreads
+```
 
 ## Databases
 

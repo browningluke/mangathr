@@ -6,6 +6,7 @@ import (
 	"github.com/browningluke/mangathr/v2/internal/downloader"
 	"github.com/browningluke/mangathr/v2/internal/sources/cubari"
 	"github.com/browningluke/mangathr/v2/internal/sources/mangadex"
+	"github.com/browningluke/mangathr/v2/internal/sources/mangaplus"
 	"github.com/browningluke/mangathr/v2/internal/utils"
 	"gopkg.in/yaml.v3"
 	"k8s.io/helm/pkg/strvals"
@@ -16,8 +17,9 @@ type Config struct {
 	Database   database.Config
 	Downloader downloader.Config
 	Sources    struct {
-		Mangadex mangadex.Config
-		Cubari   cubari.Config
+		Mangadex  mangadex.Config
+		Cubari    cubari.Config
+		MangaPlus mangaplus.Config
 	}
 	LogLevel string `yaml:"logLevel"`
 }
@@ -29,6 +31,7 @@ func (c *Config) Propagate() {
 	// Sources
 	mangadex.SetConfig(c.Sources.Mangadex)
 	cubari.SetConfig(c.Sources.Cubari)
+	mangaplus.SetConfig(c.Sources.MangaPlus)
 }
 
 func (c *Config) Load(path string, inContainer bool) (exists bool, err error) {
@@ -120,6 +123,14 @@ func (c *Config) useDefaults(inContainer bool) {
 	mangadexConf.Default()
 	c.Sources.Mangadex = mangadexConf
 
+	cubariConf := cubari.Config{}
+	cubariConf.Default()
+	c.Sources.Cubari = cubariConf
+
+	mangaplusConf := mangaplus.Config{}
+	mangaplusConf.Default()
+	c.Sources.MangaPlus = mangaplusConf
+
 	c.LogLevel = ""
 }
 
@@ -133,6 +144,9 @@ func (c *Config) validate() error {
 	}
 	if !validateMetadataLocation(c.Downloader.Metadata.Location) {
 		return errors.New("InvalidMetadataLocationError: " + c.Downloader.Metadata.Location + " is not a valid location.")
+	}
+	if err := c.Sources.MangaPlus.Validate(); err != nil {
+		return err
 	}
 	return nil
 }
