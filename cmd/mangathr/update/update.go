@@ -105,6 +105,7 @@ func (o *updateOpts) run(cfg *config.Config) {
 		if durErr != nil {
 			logging.Errorln(durErr)
 			ui.Error("Failed to parse time duration.")
+			continue
 		}
 		time.Sleep(dur)
 	}
