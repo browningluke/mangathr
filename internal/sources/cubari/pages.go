@@ -34,11 +34,18 @@ func (m *Scraper) addPagesToChapter(chapter *manga.Chapter) *logging.ScraperErro
 				map[string]string{}, []rester.QueryParam{}).Do(4, "100ms")
 			jsonString := jsonResp.(string)
 
-			urls, ok := parseImgurStyle([]byte(jsonString))
+			// The proxy endpoint returns json.dumps(pages) directly:
+			//   imgur    → [{description, src}, ...]
+			//   imgchest → ["https://...", ...]
+			var urls []string
+			var ok bool
+			if urls, ok = parseImgurStyle([]byte(jsonString)); !ok {
+				urls, ok = parseListStyle([]byte(jsonString))
+			}
 			if !ok {
 				return &logging.ScraperError{
-					Error:   errors.New("failed to get imgur URLs from proxy"),
-					Message: "An error occurred while getting pages from imgur",
+					Error:   errors.New("failed to get image URLs from proxy"),
+					Message: "An error occurred while getting pages from proxy",
 					Code:    0,
 				}
 			}
