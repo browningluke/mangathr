@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"github.com/browningluke/mangathr/v2/internal/downloader/workerpool"
 	"github.com/browningluke/mangathr/v2/internal/downloader/writer"
+	"github.com/browningluke/mangathr/v2/internal/hooks"
 	"github.com/browningluke/mangathr/v2/internal/logging"
 	"github.com/browningluke/mangathr/v2/internal/manga"
 	"github.com/browningluke/mangathr/v2/internal/metadata"
 	"github.com/browningluke/mangathr/v2/internal/rester"
 	"github.com/browningluke/mangathr/v2/internal/utils"
 	"os"
+	"strings"
 	"time"
 	"unicode/utf8"
 )
@@ -26,6 +28,8 @@ type Downloader struct {
 
 	downloadMode    DownloadMode
 	destinationPath string
+	mangaTitle      string
+	mangaSource     string
 
 	enforceChapterDuration bool
 	chapterDuration        int64
@@ -74,6 +78,12 @@ func (d *Downloader) SetMaxRuneCount(chapters []manga.Chapter) *Downloader {
 
 func (d *Downloader) SetPath(path string) *Downloader {
 	d.destinationPath = path
+	return d
+}
+
+func (d *Downloader) SetMangaInfo(title, source string) *Downloader {
+	d.mangaTitle = title
+	d.mangaSource = source
 	return d
 }
 
@@ -137,7 +147,7 @@ func (d *Downloader) DownloadPage(page *manga.Page) ([]byte, error) {
 }
 
 // Download chapter. Assumes CanDownload() has been called and has returned true
-func (d *Downloader) Download(chapter *manga.Chapter) error {
+func (d *Downloader) Download(chapter *manga.Chapter) (retErr error) {
 
 	// Initialize progress bar
 	bar := utils.CreateProgressBar(len(chapter.Pages()), d.maxRuneCount, chapter.Metadata.Num)
@@ -205,6 +215,8 @@ func (d *Downloader) Download(chapter *manga.Chapter) error {
 
 	// Defer cleanup/completion using a closure so it captures poolErr by
 	// reference and sees its final value, not the nil set at declaration.
+	// On success, also fires the download.chapter hook; the named return lets
+	// us propagate a hook error that has abortOnError set.
 	defer func() {
 		if poolErr != nil {
 			// If there were errors, cleanup the writer (only if enabled in config)
@@ -223,6 +235,25 @@ func (d *Downloader) Download(chapter *manga.Chapter) error {
 			// If there were no errors, mark the writer as complete
 			if err := chapterWriter.MarkComplete(); err != nil {
 				logging.Errorln("Unable to mark file as complete. Reason: ", err)
+			}
+
+			// Fire download.chapter hook
+			ctx := hooks.HookContext{
+				Manga: hooks.MangaContext{
+					Title:  d.mangaTitle,
+					Source: d.mangaSource,
+				},
+				Chapter: hooks.ChapterContext{
+					Num:    chapter.Metadata.Num,
+					Title:  chapter.Metadata.Title,
+					Path:   chapterPath,
+					Lang:   chapter.Metadata.Language,
+					Groups: strings.Join(chapter.Metadata.Groups, ", "),
+					Count:  1,
+				},
+			}
+			if hookErr := hooks.Fire(hooks.EventDownloadChapter, ctx); hookErr != nil {
+				retErr = hookErr
 			}
 		}
 	}()
