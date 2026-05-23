@@ -65,8 +65,21 @@ func GetDriver() (*Driver, error) {
 		return nil, err
 	}
 
-	// Run the auto migration tool.
-	if config.AutoMigrate {
+	// For SQLite, run migration automatically when the DB file is new (no
+	// existing schema), regardless of the autoMigrate config flag. For all
+	// other drivers, respect the flag explicitly.
+	shouldMigrate := config.AutoMigrate
+	if driverName == dialect.SQLite && !shouldMigrate {
+		// Check whether the schema already exists by counting manga rows.
+		// If the query fails with "no such table", the DB is uninitialised.
+		_, schemaErr := client.Manga.Query().Count(context.Background())
+		if schemaErr != nil && strings.Contains(schemaErr.Error(), "no such table") {
+			logging.Debugln("SQLite database is new, running auto-migration")
+			shouldMigrate = true
+		}
+	}
+
+	if shouldMigrate {
 		logging.Debugln("Running auto-migration")
 		if err := client.Schema.Create(context.Background()); err != nil {
 			return nil, handleConnectionErrors(err)
