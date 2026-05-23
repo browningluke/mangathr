@@ -84,7 +84,7 @@ func (a *comicInfoAgent) SetWebLink(link string) Agent {
 }
 
 func (a *comicInfoAgent) SetPageCount(count int) Agent {
-	a.template.PageCount = count
+	a.template.PageCount += count
 	return a
 }
 
