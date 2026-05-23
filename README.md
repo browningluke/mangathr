@@ -239,8 +239,10 @@ cubari:
 
 ```yaml
 mangaplus:
-  filenameTemplate: "..." # See config template section (overrides global template)
-  language: 0              # ENGLISH=0, SPANISH=1, FRENCH=2, INDONESIAN=3, PORTUGUESE_BR=4, RUSSIAN=5, THAI=6
+  filenameTemplate: "..."    # See config template section (overrides global template)
+  language: 0                # ENGLISH=0, SPANISH=1, FRENCH=2, INDONESIAN=3, PORTUGUESE_BR=4, RUSSIAN=5, THAI=6
+  imageQuality: "super_high" # One of: (super_high|high|low)
+  split: "no"                # One of: (no|yes) — whether to split wide pages
 ```
 
 ## Databases
