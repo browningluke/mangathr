@@ -14,8 +14,8 @@ SRC := $(shell find . -type f -name '*.go' -print) go.mod go.sum
 SHELL      = /usr/bin/env sh
 
 # git
-GIT_COMMIT = $(shell git rev-parse HEAD)
-GIT_SHA    = $(shell git rev-parse --short HEAD)
+GIT_COMMIT = $(shell git rev-parse HEAD 2>/dev/null)
+GIT_SHA    = $(shell git rev-parse --short HEAD 2>/dev/null)
 GIT_TAG    = $(shell git describe --tags --abbrev=0 --exact-match 2>/dev/null)
 LDFLAGS   += -X github.com/browningluke/mangathr/v2/internal/version.sha=${GIT_SHA}
 
