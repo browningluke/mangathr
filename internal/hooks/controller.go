@@ -94,13 +94,17 @@ func (c *Controller) FinalizeAggregates() error {
 		if !h.IsAggregate() {
 			continue
 		}
-		buf, ok := c.buffers[h.Name()]
-		if !ok || len(buf) == 0 {
+
+		buf := c.buffers[h.Name()] // nil/empty if no events were collected
+
+		// If nothing was collected and fireIfEmpty is false, skip entirely.
+		if len(buf) == 0 && !h.FireIfEmpty() {
 			continue
 		}
 
 		aggCtx := buildAggregateContext(buf)
 
+		// If events were collected but total chapters is zero, apply the same gate.
 		if !h.FireIfEmpty() && aggCtx.ChapterCount == 0 {
 			delete(c.buffers, h.Name())
 			continue
