@@ -24,7 +24,7 @@ func (d sqliteDriver) Open(name string) (driver.Conn, error) {
 	})
 	if _, err := c.Exec("PRAGMA foreign_keys = on;", nil); err != nil {
 		conn.Close()
-		return nil, fmt.Errorf("%s%s", err, " failed to enable enable foreign keys")
+		return nil, fmt.Errorf("%s%s", err, " failed to enable foreign keys")
 	}
 	return conn, nil
 }

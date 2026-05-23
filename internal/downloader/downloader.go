@@ -147,7 +147,6 @@ func (d *Downloader) Download(chapter *manga.Chapter) error {
 		timeStart := time.Now().UnixMilli()
 		defer d.waitChapterDuration(timeStart)
 	} else {
-		// TODO: differentiate between Download & Update delay
 		dur, err := time.ParseDuration(config.Delay.Chapter)
 		if err != nil {
 			return err
@@ -178,7 +177,7 @@ func (d *Downloader) Download(chapter *manga.Chapter) error {
 
 	// Build task array
 	pool := workerpool.New(config.SimultaneousPages)
-	for i, _ := range chapter.Pages() {
+	for i := range chapter.Pages() {
 		p := &chapter.Pages()[i]
 		pool.AddTask(func() {
 			// Get image bytes to write
@@ -204,9 +203,10 @@ func (d *Downloader) Download(chapter *manga.Chapter) error {
 	// --- Run pool ---
 	var poolErr error
 
-	// Handle pool errors if an error occurred
-	defer func(err error) {
-		if err != nil {
+	// Defer cleanup/completion using a closure so it captures poolErr by
+	// reference and sees its final value, not the nil set at declaration.
+	defer func() {
+		if poolErr != nil {
 			// If there were errors, cleanup the writer (only if enabled in config)
 			if config.CleanupOnError {
 				if err := chapterWriter.Cleanup(); err != nil {
@@ -225,7 +225,7 @@ func (d *Downloader) Download(chapter *manga.Chapter) error {
 				logging.Errorln("Unable to mark file as complete. Reason: ", err)
 			}
 		}
-	}(poolErr)
+	}()
 
 	// Run tasks on worker pool (blocking call)
 	poolErr = pool.Run()

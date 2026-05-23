@@ -104,7 +104,10 @@ func filterGroups(chapters []manga.Chapter, groups []string, exclude bool) []man
 	var filteredChapters []manga.Chapter
 
 	for _, v := range chapters {
-		// Assuming chapters must have 1 and only 1 group (as Cubari does with GIST provider)
+		if len(v.Metadata.Groups) == 0 {
+			continue
+		}
+		// Cubari chapters always have exactly one group entry.
 		_, ok := utils.FindInSlice(groups, v.Metadata.Groups[0])
 
 		// If we're excluding, invert the answer

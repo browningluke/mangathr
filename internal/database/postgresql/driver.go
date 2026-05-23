@@ -2,9 +2,8 @@ package postgresql
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/browningluke/mangathr/v2/internal/logging"
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
 )
 
 func CreateDatabase(dbName, connInfo string) error {
@@ -13,28 +12,37 @@ func CreateDatabase(dbName, connInfo string) error {
 	if err != nil {
 		return err
 	}
+	defer db.Close()
 
-	logging.Debugln("Executing db search SQL command")
-	existsResult, err := db.Exec(
-		fmt.Sprintf("SELECT datname FROM pg_catalog.pg_database WHERE lower(datname) = lower('%s');", dbName))
+	// Check whether the database already exists.
+	// db.Exec on a SELECT returns 0 RowsAffected regardless of result count
+	// with the pq driver, so we use QueryRow with EXISTS instead.
+	var exists bool
+	logging.Debugln("Checking if database exists")
+	err = db.QueryRow(
+		"SELECT EXISTS(SELECT 1 FROM pg_catalog.pg_database WHERE lower(datname) = lower($1))",
+		dbName,
+	).Scan(&exists)
 	if err != nil {
 		return err
 	}
 
-	rowsAffected, err := existsResult.RowsAffected()
-	if err != nil {
-		return err
-	}
-
-	// If database doesn't exist, create it
-	if rowsAffected == 0 {
-		logging.Debugln("Executing db create SQL command")
-		_, err = db.Exec(fmt.Sprintf("create database %s", dbName))
-		if err != nil {
-			return err
-		}
-	} else {
+	if exists {
 		logging.Debugln("Skipping creation. Database already exists")
+		return nil
+	}
+
+	logging.Debugln("Executing db create SQL command")
+	// pq.QuoteIdentifier safely quotes the identifier to prevent injection.
+	_, err = db.Exec("CREATE DATABASE " + pq.QuoteIdentifier(dbName))
+	if err != nil {
+		// 42P04 = duplicate_database; harmless race where another process
+		// created the DB between our existence check and this CREATE.
+		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "42P04" {
+			logging.Debugln("Database created concurrently, ignoring duplicate error")
+			return nil
+		}
+		return err
 	}
 
 	return nil

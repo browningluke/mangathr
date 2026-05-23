@@ -63,8 +63,14 @@ func (m *Scraper) Download(dl *downloader.Downloader, directoryMapping string) [
 	}
 
 	// Configure downloader (downloadType is one of ["download", "update"])
+	dir, err := dl.CreateDirectory(directoryName)
+	if err != nil {
+		logging.Errorln("Failed to create directory: ", err)
+		fmt.Printf("Failed to create output directory: %s\n", err)
+		return nil
+	}
 	dl.SetChapterDuration(calculateDuration(len(m.selectedChapters))).
-		SetPath(dl.CreateDirectory(directoryName)).
+		SetPath(dir).
 		SetMaxRuneCount(m.selectedChapters)
 
 	// Execute download queue, potential to add workerpool here later

@@ -28,12 +28,15 @@ func (m *Scraper) searchBySlug(slug string) ([]string, *logging.ScraperError) {
 	return []string{m.MangaTitle()}, nil
 }
 
-// matchQuery against different provider regex patters.
+// matchQuery against different provider regex patterns.
+// Returns the slug (capture group 4) when the query matches, or "" otherwise.
 func (m *Scraper) matchQuery(query, reStr string, provider Provider) string {
 	re := regexp.MustCompile(reStr)
 	match := re.FindStringSubmatch(query)
 
-	if len(match) > 0 {
+	// All provider regexes have exactly 4 capture groups; require at least 5
+	// elements (full match + 4 groups) before accessing match[4].
+	if len(match) > 4 {
 		m.provider = provider
 		return match[4]
 	}
@@ -69,7 +72,15 @@ func (m *Scraper) Search(query string) ([]string, *logging.ScraperError) {
 			}
 		}
 
-		m.provider = PROVIDERBYSTR[cbMatch[4]]
+		provider, ok := PROVIDERBYSTR[cbMatch[4]]
+		if !ok {
+			return []string{}, &logging.ScraperError{
+				Error:   fmt.Errorf("unknown cubari provider: %s", cbMatch[4]),
+				Message: "Cubari source does not support the given provider.",
+				Code:    0,
+			}
+		}
+		m.provider = provider
 		slug = cbMatch[5]
 	}
 

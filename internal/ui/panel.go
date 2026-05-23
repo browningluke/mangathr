@@ -77,6 +77,7 @@ func (p *panel) Start() bool {
 		index, err := SingleCheckboxesIndex(p.prompt(), optionStrings)
 		if err != nil {
 			p.errorHandler(err)
+			continue
 		}
 
 		selectedOpt := p.options[index]

@@ -132,10 +132,6 @@ func (c *Config) useDefaults(inContainer bool) {
 	c.Sources.MangaPlus = mangaplusConf
 
 	c.LogLevel = ""
-
-	// Overwrite defaults if we are in a container
-	if inContainer {
-	}
 }
 
 func (c *Config) validate() error {

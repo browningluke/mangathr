@@ -6,6 +6,7 @@ import (
 	"github.com/browningluke/mangathr/v2/internal/logging"
 	"github.com/browningluke/mangathr/v2/internal/manga"
 	"github.com/browningluke/mangathr/v2/internal/rester"
+	"github.com/browningluke/mangathr/v2/internal/utils"
 	"strconv"
 	"strings"
 )
@@ -124,7 +125,7 @@ func (m *Scraper) parseGroups(data mangaFeedData) []string {
 
 	// Add groups to scraper
 	for _, group := range groups {
-		// Check if group already caught my scraper
+		// Check if group has already been captured by this scraper
 		skip := false
 		for _, a := range m.groups {
 			if a == group {
@@ -199,7 +200,7 @@ func (m *Scraper) scrapeChapters() ([]manga.Chapter, *logging.ScraperError) { //
 						Title:    metadataTitle,
 						Num:      numString,
 						Language: item.Attributes.TranslatedLanguage,
-						Date:     item.Attributes.CreatedAt[0:11],
+						Date:     utils.ExtractDate(item.Attributes.CreatedAt),
 						Link:     fmt.Sprintf("https://mangadex.org/chapter/%s", item.Id),
 						Groups:   groups,
 					},

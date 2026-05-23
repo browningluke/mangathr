@@ -17,7 +17,7 @@ func (d *Driver) queryManga(eager bool, ps ...predicate.Manga) (*ent.Manga, erro
 
 	u, err := mq.Only(d.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed querying user: %w", err)
+		return nil, fmt.Errorf("failed querying manga: %w", err)
 	}
 	logging.Debugln("manga returned: ", u)
 	return u, nil
@@ -53,7 +53,7 @@ func (d *Driver) QueryAllManga() ([]*ent.Manga, error) {
 		WithChapters().
 		All(d.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed querying user: %w", err)
+		return nil, fmt.Errorf("failed querying manga: %w", err)
 	}
 	logging.Debugln("manga returned: ", u)
 	return u, nil

@@ -35,9 +35,17 @@ var MANGASEE = Provider{
 	registrable: true,
 }
 
+var IMGCHEST = Provider{
+	name:        "imgchest",
+	sourceURL:   "https://imgchest.com",
+	regex:       ``,
+	registrable: true,
+}
+
 var PROVIDERBYSTR = map[string]Provider{
 	"imgur":    IMGUR,
 	"gist":     GIST,
 	"nhentai":  NHENTAI,
 	"mangasee": MANGASEE,
+	"imgchest": IMGCHEST,
 }
