@@ -59,13 +59,13 @@ func (a *comicInfoAgent) SetNum(num string) Agent {
 
 // SetDate in yyyy-mm-dd format
 func (a *comicInfoAgent) SetDate(date string) Agent {
-	date = utils.ExtractDate(date)
-	if date == "" {
+	extracted := utils.ExtractDate(date)
+	if extracted == "" {
 		logging.Warningf("Attempted to parse garbage date string: %s\n", date)
 		return a
 	}
 
-	dateSlice := strings.Split(date, "-")
+	dateSlice := strings.Split(extracted, "-")
 
 	a.template.Year = dateSlice[0]
 	a.template.Month = dateSlice[1]
@@ -84,7 +84,7 @@ func (a *comicInfoAgent) SetWebLink(link string) Agent {
 }
 
 func (a *comicInfoAgent) SetPageCount(count int) Agent {
-	a.template.PageCount += count
+	a.template.PageCount = count
 	return a
 }
 
