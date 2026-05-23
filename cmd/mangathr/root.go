@@ -52,9 +52,8 @@ func init() {
 	// Help func
 	rootCmd.SetUsageTemplate(usageTemplate)
 	rootCmd.SetHelpFunc(func(c *cobra.Command, s []string) {
-		err := c.Usage()
-		if err != nil {
-			panic(err)
+		if err := c.Usage(); err != nil {
+			ui.Fatalf("Failed to display usage: %s\n", err)
 		}
 	})
 	rootCmd.SetHelpCommand(&cobra.Command{Use: "h", Hidden: true})
@@ -118,9 +117,6 @@ func initConfig() {
 }
 
 func setLogLevel(logLevelArg, logLevelConf string) {
-	//fmt.Println("log level arg: ", logLevelArg)
-	//fmt.Println("log level cfg: ", logLevelConf)
-
 	// If neither value is set, do nothing (level has default: logging.loggingLevel)
 	if logLevelArg == "" && logLevelConf == "" {
 		return
