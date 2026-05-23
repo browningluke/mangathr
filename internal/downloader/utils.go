@@ -3,7 +3,6 @@ package downloader
 import (
 	"github.com/browningluke/mangathr/v2/internal/downloader/templater"
 	"github.com/browningluke/mangathr/v2/internal/manga"
-	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -19,7 +18,7 @@ func CleanPath(path string) string {
 	return re.ReplaceAllString(path, "")
 }
 
-func (d *Downloader) CreateDirectory(title string) string {
+func (d *Downloader) CreateDirectory(title string) (string, error) {
 	var dirname string
 
 	if d.downloadMode == DOWNLOAD {
@@ -31,13 +30,12 @@ func (d *Downloader) CreateDirectory(title string) string {
 	newPath := filepath.Join(dirname, CleanPath(title))
 
 	if !config.DryRun {
-		err := os.MkdirAll(newPath, os.ModePerm)
-		if err != nil {
-			log.Fatalln(err)
+		if err := os.MkdirAll(newPath, os.ModePerm); err != nil {
+			return "", err
 		}
 	}
 
-	return newPath
+	return newPath, nil
 }
 
 func (d *Downloader) GetNameFromTemplate(chapter *manga.Chapter, mangaTitle, source string) string {

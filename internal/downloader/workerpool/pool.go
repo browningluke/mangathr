@@ -1,6 +1,7 @@
 package workerpool
 
 import (
+	"fmt"
 	"github.com/alitto/pond"
 )
 
@@ -19,27 +20,38 @@ func (p *pool) AddTask(f func()) {
 	p.tasks = append(p.tasks, f)
 }
 
-// Run a blocking abstraction over Pond's WorkerPool to download all pages
+// Run submits all tasks to a worker pool and blocks until completion.
+// Returns the first worker panic as an error, if any.
 func (p *pool) Run() error {
-	wpErr := make(chan error)
-	panicHandler := func(p interface{}) {
-		wpErr <- p.(error)
+	// Buffered so the panic handler never blocks even if we return early.
+	wpErr := make(chan error, 1)
+
+	panicHandler := func(v interface{}) {
+		err, ok := v.(error)
+		if !ok {
+			err = fmt.Errorf("worker panic: %v", v)
+		}
+		// Non-blocking send: only the first panic is captured.
+		select {
+		case wpErr <- err:
+		default:
+		}
 	}
-	pool := pond.New(p.workers, 0, pond.PanicHandler(panicHandler))
+
+	wp := pond.New(p.workers, 0, pond.PanicHandler(panicHandler))
 
 	for _, task := range p.tasks {
-		pool.Submit(task)
+		wp.Submit(task)
 	}
 
-	for {
-		select {
-		case err := <-wpErr:
-			pool.Stop()
-			return err
-		default:
-			if pool.SubmittedTasks() == pool.CompletedTasks() {
-				return nil
-			}
-		}
+	// StopAndWait blocks until all submitted tasks have finished (or
+	// been dropped after a panic), eliminating the busy-wait spin loop.
+	wp.StopAndWait()
+
+	select {
+	case err := <-wpErr:
+		return err
+	default:
+		return nil
 	}
 }
