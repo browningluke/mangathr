@@ -80,10 +80,10 @@ func listSubcommand(cfg *config.Config) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			if o.List.Source != "" {
 				// Validate source flag input
-				if _, exists := sources.MatchScraperTitle(o.Delete.Source); !exists {
+				if _, exists := sources.MatchScraperTitle(o.List.Source); !exists {
 					logging.ExitIfError(&logging.ScraperError{
 						Error:   nil,
-						Message: fmt.Sprintf("%s is not a valid source", o.Delete.Source), Code: 0,
+						Message: fmt.Sprintf("%s is not a valid source", o.List.Source), Code: 0,
 					})
 				}
 			}
@@ -94,7 +94,7 @@ func listSubcommand(cfg *config.Config) *cobra.Command {
 		DisableFlagsInUseLine: true,
 	}
 
-	cmd.Flags().StringVarP(&o.Delete.Source, "source", "s",
+	cmd.Flags().StringVarP(&o.List.Source, "source", "s",
 		"", "Source for desired series")
 
 	return cmd
