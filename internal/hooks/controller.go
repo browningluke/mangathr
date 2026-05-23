@@ -125,6 +125,7 @@ func (c *Controller) FinalizeAggregates() error {
 
 func buildAggregateContext(items []HookContext) AggregateHookContext {
 	var chapterCount, errorCount int
+	var event string
 	seen := make(map[string]struct{})
 	for _, ctx := range items {
 		chapterCount += ctx.Chapter.Count
@@ -132,11 +133,15 @@ func buildAggregateContext(items []HookContext) AggregateHookContext {
 			errorCount++
 		}
 		seen[ctx.Manga.Title] = struct{}{}
+		if event == "" {
+			event = ctx.Event
+		}
 	}
 	return AggregateHookContext{
 		Items:        items,
 		ChapterCount: chapterCount,
 		ErrorCount:   errorCount,
 		MangaCount:   len(seen),
+		Event:        event,
 	}
 }
