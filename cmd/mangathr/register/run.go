@@ -232,7 +232,9 @@ func handleMenu(args *registerOpts, driver *database.Driver) {
 				for _, c := range chapters {
 					err := driver.CreateChapter(c.ID, c.Metadata.Num, c.Metadata.Title, manga)
 					if err != nil {
-						panic(err)
+						logging.ExitIfErrorWithFunc(&logging.ScraperError{
+							Error: err, Message: "An error occurred when saving chapter to database", Code: 0,
+						}, closeDatabase)
 					}
 				}
 			},

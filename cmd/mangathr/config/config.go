@@ -27,7 +27,7 @@ func NewCmd(getConfigPath func() string) *cobra.Command {
 			if o.Edit {
 				err := editConfig(configPath)
 				if err != nil {
-					panic(err)
+					ui.Fatalf("Failed to edit config: %s\n", err)
 				}
 			}
 
@@ -35,7 +35,7 @@ func NewCmd(getConfigPath func() string) *cobra.Command {
 			if o.Show {
 				err := showFile(configPath)
 				if err != nil {
-					panic(err)
+					ui.Fatalf("Failed to show config: %s\n", err)
 				}
 			}
 

@@ -33,6 +33,7 @@ func (o *option) ConfirmationHandler(prompt string, yes, no func(), error func(e
 
 		if err != nil {
 			error(err)
+			return !o.terminate
 		}
 
 		if confirm {
@@ -53,6 +54,7 @@ func (o *option) InputHandler(prompt string, input func(string), error func(erro
 
 		if err != nil {
 			error(err)
+			return !o.terminate
 		}
 
 		input(res)
@@ -70,6 +72,7 @@ func (o *option) CheckboxHandler(prompt string, genOpts func() []string, s func(
 
 		if err != nil {
 			e(err)
+			return !o.terminate
 		}
 
 		s(sel)
