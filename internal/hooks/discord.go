@@ -5,7 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 )
+
+// discordClient is a dedicated HTTP client for Discord webhook calls, isolated
+// from http.DefaultClient to avoid polluting the global transport state.
+var discordClient = &http.Client{Timeout: 10 * time.Second}
 
 // DiscordHookConfig is the config for a Discord webhook hook.
 type DiscordHookConfig struct {
@@ -115,7 +120,13 @@ func (h *DiscordHook) buildPayload(data any) ([]byte, error) {
 }
 
 func (h *DiscordHook) post(payload []byte) error {
-	resp, err := http.Post(h.cfg.WebhookURL, "application/json", bytes.NewReader(payload))
+	req, err := http.NewRequest(http.MethodPost, h.cfg.WebhookURL, bytes.NewReader(payload))
+	if err != nil {
+		return fmt.Errorf("hooks: discord %q: build request: %w", h.cfg.Name, err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := discordClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("hooks: discord %q: request failed: %w", h.cfg.Name, err)
 	}
