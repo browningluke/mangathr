@@ -80,9 +80,7 @@ func checkMangaForNewChapters(manga *ent.Manga) (seriesStats, *logging.ScraperEr
 	// Select new chapters in scraper, get array of them; and download if > 0
 	newChapters, err := scraper.SelectNewChapters(chapterIDs)
 	if err != nil {
-		// Log error, abandon search, and continue (no need to exit program)
-		logging.Errorln(err)
-		ui.Error("An error occurred while search for ", manga.Title)
+		return seriesStats{}, err
 	}
 
 	stats.found = len(newChapters)

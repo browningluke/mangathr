@@ -129,8 +129,8 @@ func (m *Scraper) SelectManga(name string) *logging.ScraperError {
 
 	if !found {
 		return &logging.ScraperError{
-			Error:   fmt.Errorf("selected manga `%s`not in searchResults", name),
-			Message: "An error occurred while selected Manga",
+			Error:   fmt.Errorf("selected manga `%s` not in searchResults", name),
+			Message: "An error occurred while selecting Manga",
 			Code:    0,
 		}
 	}
