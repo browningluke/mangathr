@@ -14,8 +14,8 @@ func (m *Scraper) addPagesToChapter(chapter *manga.Chapter) *logging.ScraperErro
 	pages := m.pages[chapter.ID]
 
 	// Get pages from proxy URL
-	// (if using GIST provider)
-	if m.provider == GIST {
+	// (if using GIST or IMGCHEST provider)
+	if m.provider == GIST || m.provider == IMGCHEST {
 		// Check if pages contain a valid URL
 		allValid := true
 
