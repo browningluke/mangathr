@@ -43,7 +43,7 @@ func GetDriver() (*Driver, error) {
 				config.Postgres.Host, config.Postgres.Port, config.Postgres.User, config.Postgres.Password,
 				config.Postgres.SSLMode, config.Postgres.Opts)
 
-			if err := postgresql.CreateDatabase("mangathr", psqlConnInfo); err != nil {
+			if err := postgresql.CreateDatabase(config.Postgres.DbName, psqlConnInfo); err != nil {
 				return nil, err
 			}
 		}
