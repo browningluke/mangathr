@@ -24,8 +24,8 @@ func (m *Scraper) addPagesToChapter(chapter *manga.Chapter) *logging.ScraperErro
 		m.headers(fmt.Sprintf("%s/viewer/%s", REFERERURL, chapter.ID)),
 		[]rester.QueryParam{
 			{Key: "chapter_id", Value: chapter.ID},
-			{Key: "split", Value: "yes"},
-			{Key: "img_quality", Value: "super_high"},
+			{Key: "split", Value: config.Split},
+			{Key: "img_quality", Value: config.ImageQuality},
 		},
 	).Do(4, "100ms")
 	data := respBytes.([]byte)

@@ -145,6 +145,9 @@ func (c *Config) validate() error {
 	if !validateMetadataLocation(c.Downloader.Metadata.Location) {
 		return errors.New("InvalidMetadataLocationError: " + c.Downloader.Metadata.Location + " is not a valid location.")
 	}
+	if err := c.Sources.MangaPlus.Validate(); err != nil {
+		return err
+	}
 	return nil
 }
 
