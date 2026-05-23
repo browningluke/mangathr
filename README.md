@@ -15,6 +15,7 @@ $ mangathr <COMMAND> -s SOURCE QUERY
 - [Options](#options)
 - [Configuration](#configuration)
 - [Sources](#sources)
+- [Hooks](#hooks)
 - [Databases](#databases)
 - [Metadata Agents](#metadata-agents)
 
@@ -245,9 +246,126 @@ mangaplus:
   split: "no"                # One of: (no|yes) — whether to split spreads
 ```
 
-## Databases
+## Hooks
 
-| Database   | Supported |
+Hooks execute at lifecycle events during `download` and `update` runs. They can call webhooks or run local commands. All hook fields that accept a string payload use Go's [`text/template`](https://pkg.go.dev/text/template).
+
+### Events
+
+| Event | Fires when |
+|---|---|
+| `download.chapter` | A chapter is successfully downloaded (both `download` and `update` commands) |
+| `update.success` | A manga is successfully checked/downloaded during an `update` run |
+| `update.error` | An error occurs while processing a manga during an `update` run |
+
+### Common options
+
+All hook types share these fields:
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `name` | string | — | Identifies the hook in logs (required) |
+| `on` | list | — | Events that trigger this hook (required) |
+| `aggregate` | bool | `false` | Collect all events and fire once at end of run instead of immediately |
+| `abortOnError` | bool | `false` | Propagate hook failure to abort the current operation |
+| `fireIfEmpty` | bool | `false` | Fire even when no chapters were downloaded |
+
+### Template context
+
+When `aggregate: false`, templates receive a `HookContext`:
+
+```
+.Manga.Title        # Manga title
+.Manga.Source       # Source name (e.g. "mangadex")
+.Chapter.Num        # Chapter number string
+.Chapter.Title      # Chapter title
+.Chapter.Path       # Filesystem path where the chapter was saved
+.Chapter.Lang       # Language code
+.Chapter.Groups     # Comma-separated scanlation group names
+.Chapter.Count      # Number of chapters downloaded in this invocation
+.Error.Message      # Error message (only set for error events; nil otherwise)
+.Event              # Event name that triggered this hook
+```
+
+When `aggregate: true`, templates receive an `AggregateHookContext`:
+
+```
+.Items[]            # Slice of HookContext, one per collected event
+.ChapterCount       # Total chapters across all items
+.ErrorCount         # Number of items with errors
+.MangaCount         # Number of distinct manga titles
+.Event              # Event name of the last collected item
+```
+
+### Discord
+
+Posts a message to a Discord webhook. Set `embed: true` for a rich embed, or `false` for a plain text message.
+
+```yaml
+hooks:
+  discord:
+    - name: "My Discord"
+      webhookURL: "https://discord.com/api/webhooks/..."
+      abortOnError: false
+      fireIfEmpty: false
+      on:
+        - update.success
+      aggregate: true           # fire once with a summary at end of update run
+      embed: true
+      template:
+        title: "mangathr update"
+        description: |
+          {{ range .Items }}• **{{ .Manga.Title }}**: {{ .Chapter.Count }} chapter(s)
+          {{ end }}
+        color: 5814783          # decimal colour value
+        footer: "mangathr"
+        # message: "..."        # used instead of title/description/color/footer when embed: false
+```
+
+### Webhook
+
+Fires a templated HTTP request. The `body` and `headers` fields are `text/template` strings; `headers` must render to a JSON object.
+
+```yaml
+hooks:
+  webhook:
+    - name: "My API"
+      webhookURL: "https://example.com/hook"
+      requestType: POST         # GET / POST / PUT / PATCH (default: POST)
+      successCode: 200
+      abortOnError: false
+      fireIfEmpty: false
+      on:
+        - download.chapter
+      aggregate: false
+      body: |
+        {"manga": "{{ .Manga.Title }}", "chapter": "{{ .Chapter.Num }}", "path": "{{ .Chapter.Path }}"}
+      headers: |
+        {"Authorization": "Bearer TOKEN"}
+```
+
+### Subcommand
+
+Runs a local command. Each entry in `args` and each value in `env` is a `text/template` string.
+
+```yaml
+hooks:
+  subcommand:
+    - name: "Post-process"
+      command: "/usr/local/bin/post-process.sh"
+      abortOnError: true        # abort download if script exits non-zero
+      fireIfEmpty: false
+      on:
+        - download.chapter
+      aggregate: false
+      args:
+        - "{{ .Chapter.Path }}"
+      env:
+        MANGA_TITLE: "{{ .Manga.Title }}"
+        CHAPTER_NUM: "{{ .Chapter.Num }}"
+```
+
+## Databases
 |------------|:---------:|
 | SQLite3    |     ✓     |
 | PostgreSQL |     ✓     |
