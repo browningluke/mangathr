@@ -6,6 +6,7 @@ import (
 	"github.com/browningluke/mangathr/v2/internal/manga"
 	"github.com/browningluke/mangathr/v2/internal/sources/cubari"
 	"github.com/browningluke/mangathr/v2/internal/sources/mangadex"
+	"github.com/browningluke/mangathr/v2/internal/sources/mangaplus"
 	"github.com/browningluke/mangathr/v2/internal/ui"
 	"strings"
 )
@@ -19,6 +20,10 @@ var scrapers = map[string]func() Scraper{
 	strings.ToLower(cubari.SCRAPERNAME): func() Scraper {
 		return cubari.NewScraper()
 	},
+	// MangaPlus
+	strings.ToLower(mangaplus.SCRAPERNAME): func() Scraper {
+		return mangaplus.NewScraper()
+	},
 }
 
 var scraperTitles = map[string]string{
@@ -26,6 +31,8 @@ var scraperTitles = map[string]string{
 	strings.ToLower(mangadex.SCRAPERNAME): mangadex.SCRAPERNAME,
 	// Cubari
 	strings.ToLower(cubari.SCRAPERNAME): cubari.SCRAPERNAME,
+	// MangaPlus
+	strings.ToLower(mangaplus.SCRAPERNAME): mangaplus.SCRAPERNAME,
 }
 
 type Scraper interface {

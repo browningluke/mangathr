@@ -20,6 +20,14 @@ func (c *Chapter) AddPage(url, name string) {
 	})
 }
 
+func (c *Chapter) AddPageWithTransform(url, name string, transform func([]byte) ([]byte, error)) {
+	c.pages = append(c.pages, Page{
+		Url:       url,
+		Name:      name,
+		Transform: transform,
+	})
+}
+
 func (c *Chapter) Pages() []Page {
 	return c.pages
 }
