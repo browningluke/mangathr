@@ -21,6 +21,12 @@ $ mangathr <COMMAND> -s SOURCE QUERY
 
 ## Installation
 
+### Homebrew
+
+```
+$ brew install browningluke/tap/mangathr
+```
+
 ### Go install
 
 If Go is installed, install it with:
@@ -366,11 +372,12 @@ hooks:
 ```
 
 ## Databases
+
+| Database   | Supported |
 |------------|:---------:|
 | SQLite3    |     ✓     |
 | PostgreSQL |     ✓     |
-| MySQL      |     ✗     |
-| MongoDB    |     ✗     |
+
 
 ### SQLite3
 
