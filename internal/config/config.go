@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/browningluke/mangathr/v2/internal/database"
 	"github.com/browningluke/mangathr/v2/internal/downloader"
+	"github.com/browningluke/mangathr/v2/internal/hooks"
 	"github.com/browningluke/mangathr/v2/internal/sources/cubari"
 	"github.com/browningluke/mangathr/v2/internal/sources/mangadex"
 	"github.com/browningluke/mangathr/v2/internal/sources/mangaplus"
@@ -21,7 +22,8 @@ type Config struct {
 		Cubari    cubari.Config
 		MangaPlus mangaplus.Config
 	}
-	LogLevel string `yaml:"logLevel"`
+	Hooks    hooks.HooksConfig `yaml:"hooks"`
+	LogLevel string            `yaml:"logLevel"`
 }
 
 func (c *Config) Propagate() {
@@ -32,6 +34,8 @@ func (c *Config) Propagate() {
 	mangadex.SetConfig(c.Sources.Mangadex)
 	cubari.SetConfig(c.Sources.Cubari)
 	mangaplus.SetConfig(c.Sources.MangaPlus)
+
+	hooks.SetConfig(c.Hooks)
 }
 
 func (c *Config) Load(path string, inContainer bool) (exists bool, err error) {
@@ -148,6 +152,9 @@ func (c *Config) validate() error {
 	if err := c.Sources.MangaPlus.Validate(); err != nil {
 		return err
 	}
+	if err := validateHooks(c.Hooks); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -159,4 +166,67 @@ func validateMetadataAgent(agent string) bool {
 func validateMetadataLocation(location string) bool {
 	_, exists := utils.FindInSliceFold([]string{"internal", "external", "both"}, location)
 	return exists
+}
+
+var validHookEvents = []string{
+	hooks.EventDownloadChapter,
+	hooks.EventUpdateSuccess,
+	hooks.EventUpdateError,
+}
+
+var validWebhookMethods = []string{"GET", "POST", "PUT", "PATCH"}
+
+func validateHooks(cfg hooks.HooksConfig) error {
+	for _, d := range cfg.Discord {
+		if d.Name == "" {
+			return errors.New("hooks.discord: each hook must have a name")
+		}
+		if d.WebhookURL == "" {
+			return errors.New("hooks.discord: hook " + d.Name + " is missing webhookURL")
+		}
+		if err := validateHookEvents(d.On, "hooks.discord."+d.Name); err != nil {
+			return err
+		}
+	}
+	for _, w := range cfg.Webhook {
+		if w.Name == "" {
+			return errors.New("hooks.webhook: each hook must have a name")
+		}
+		if w.WebhookURL == "" {
+			return errors.New("hooks.webhook: hook " + w.Name + " is missing webhookURL")
+		}
+		if w.RequestType != "" {
+			if _, ok := utils.FindInSliceFold(validWebhookMethods, w.RequestType); !ok {
+				return errors.New("hooks.webhook: hook " + w.Name + " has invalid requestType: " + w.RequestType)
+			}
+		}
+		if err := validateHookEvents(w.On, "hooks.webhook."+w.Name); err != nil {
+			return err
+		}
+	}
+	for _, s := range cfg.Subcommand {
+		if s.Name == "" {
+			return errors.New("hooks.subcommand: each hook must have a name")
+		}
+		if s.Command == "" {
+			return errors.New("hooks.subcommand: hook " + s.Name + " is missing command")
+		}
+		if err := validateHookEvents(s.On, "hooks.subcommand."+s.Name); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func validateHookEvents(on []string, hookPath string) error {
+	if len(on) == 0 {
+		return errors.New(hookPath + ": on must have at least one event")
+	}
+	for _, e := range on {
+		if _, ok := utils.FindInSliceFold(validHookEvents, e); !ok {
+			return errors.New(hookPath + ": unknown event: " + e +
+				" (valid: download.chapter, update.success, update.error)")
+		}
+	}
+	return nil
 }

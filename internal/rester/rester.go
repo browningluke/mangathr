@@ -1,12 +1,9 @@
 package rester
 
 import (
-	"context"
-	"crypto/tls"
 	"fmt"
 	"github.com/browningluke/mangathr/v2/internal/logging"
 	"io"
-	"net"
 	"net/http"
 	"net/url"
 	"time"
@@ -34,11 +31,6 @@ func New() *RESTer {
 			Transport: &http.Transport{
 				MaxConnsPerHost: 50,
 				MaxIdleConns:    50 * 3,
-				DialTLSContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
-					tlsConfig := http.DefaultTransport.(*http.Transport).TLSClientConfig
-					conn, err := tls.Dial(network, addr, tlsConfig)
-					return conn, err
-				},
 			},
 			Timeout: time.Second * 50,
 		},

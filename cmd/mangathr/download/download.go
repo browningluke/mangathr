@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/browningluke/mangathr/v2/internal/config"
 	"github.com/browningluke/mangathr/v2/internal/downloader"
+	"github.com/browningluke/mangathr/v2/internal/hooks"
 	"github.com/browningluke/mangathr/v2/internal/logging"
 	"github.com/browningluke/mangathr/v2/internal/sources"
 	"github.com/browningluke/mangathr/v2/internal/ui"
@@ -87,7 +88,14 @@ func (o *downloadOpts) run(cfg *config.Config) {
 	err = scraper.SelectChapters(chapterSelections)
 	logging.ExitIfError(err)
 
-	scraper.Download(downloader.NewDownloader(downloader.DOWNLOAD, scraper.EnforceChapterDuration()), "")
+	dl := downloader.NewDownloader(downloader.DOWNLOAD, scraper.EnforceChapterDuration()).
+		SetMangaInfo(scraper.MangaTitle(), scraper.ScraperName())
+
+	scraper.Download(dl, "")
+
+	if hookErr := hooks.FinalizeAggregates(); hookErr != nil {
+		logging.Warningln("aggregate hook failed:", hookErr)
+	}
 }
 
 func SelectChapters(titles []string, mangaTitle string, sourceName string) ([]string, error) {

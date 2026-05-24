@@ -5,6 +5,7 @@ import (
 	"github.com/browningluke/mangathr/v2/ent"
 	"github.com/browningluke/mangathr/v2/internal/database"
 	"github.com/browningluke/mangathr/v2/internal/downloader"
+	"github.com/browningluke/mangathr/v2/internal/hooks"
 	"github.com/browningluke/mangathr/v2/internal/logging"
 	"github.com/browningluke/mangathr/v2/internal/sources"
 	"github.com/browningluke/mangathr/v2/internal/ui"
@@ -31,9 +32,10 @@ func downloadNewChapters(manga *ent.Manga,
 			"\u001B[1mFound:  \u001B[0m%d chapter(s)\n",
 		scraper.MangaTitle(), scraper.ScraperName(), numChapters)
 
-	succeeded := scraper.Download(
-		downloader.NewDownloader(downloader.UPDATE, scraper.EnforceChapterDuration()), manga.Mapping,
-	)
+	dl := downloader.NewDownloader(downloader.UPDATE, scraper.EnforceChapterDuration()).
+		SetMangaInfo(scraper.MangaTitle(), scraper.ScraperName())
+
+	succeeded := scraper.Download(dl, manga.Mapping)
 
 	if !downloader.DryRun() {
 		// If it's not a dry run, add new chapters to db
@@ -51,7 +53,24 @@ func downloadNewChapters(manga *ent.Manga,
 		}
 	}
 
-	return len(succeeded), numChapters - len(succeeded)
+	downloaded = len(succeeded)
+	errors = numChapters - downloaded
+
+	// Fire update.success hook with a summary for this manga.
+	hookCtx := hooks.HookContext{
+		Manga: hooks.MangaContext{
+			Title:  scraper.MangaTitle(),
+			Source: scraper.ScraperName(),
+		},
+		Chapter: hooks.ChapterContext{
+			Count: downloaded,
+		},
+	}
+	if hookErr := hooks.Fire(hooks.EventUpdateSuccess, hookCtx); hookErr != nil {
+		logging.Warningln("update.success hook failed:", hookErr)
+	}
+
+	return
 }
 
 func checkMangaForNewChapters(manga *ent.Manga) (seriesStats, *logging.ScraperError) {
@@ -62,7 +81,14 @@ func checkMangaForNewChapters(manga *ent.Manga) (seriesStats, *logging.ScraperEr
 
 	// Directly search for chapter by ID
 	if err := scraper.SearchByID(manga.MangaID, manga.Title); err != nil {
-		// Abandon search
+		// Fire update.error hook before abandoning
+		hookCtx := hooks.HookContext{
+			Manga: hooks.MangaContext{Title: manga.Title, Source: manga.Source},
+			Error: &hooks.ErrorContext{Message: err.Message},
+		}
+		if hookErr := hooks.Fire(hooks.EventUpdateError, hookCtx); hookErr != nil {
+			logging.Warningln("update.error hook failed:", hookErr)
+		}
 		return seriesStats{}, err
 	}
 
@@ -80,6 +106,14 @@ func checkMangaForNewChapters(manga *ent.Manga) (seriesStats, *logging.ScraperEr
 	// Select new chapters in scraper, get array of them; and download if > 0
 	newChapters, err := scraper.SelectNewChapters(chapterIDs)
 	if err != nil {
+		// Fire update.error hook
+		hookCtx := hooks.HookContext{
+			Manga: hooks.MangaContext{Title: scraper.MangaTitle(), Source: scraper.ScraperName()},
+			Error: &hooks.ErrorContext{Message: err.Message},
+		}
+		if hookErr := hooks.Fire(hooks.EventUpdateError, hookCtx); hookErr != nil {
+			logging.Warningln("update.error hook failed:", hookErr)
+		}
 		return seriesStats{}, err
 	}
 

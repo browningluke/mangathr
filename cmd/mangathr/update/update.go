@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/browningluke/mangathr/v2/internal/config"
 	"github.com/browningluke/mangathr/v2/internal/database"
+	"github.com/browningluke/mangathr/v2/internal/hooks"
 	"github.com/browningluke/mangathr/v2/internal/logging"
 	"github.com/browningluke/mangathr/v2/internal/ui"
 	"github.com/browningluke/mangathr/v2/internal/utils"
@@ -111,4 +112,8 @@ func (o *updateOpts) run(cfg *config.Config) {
 	}
 
 	printStats(stats)
+
+	if err := hooks.FinalizeAggregates(); err != nil {
+		logging.Warningln("aggregate hook failed:", err)
+	}
 }

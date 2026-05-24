@@ -59,3 +59,52 @@ sources:
   mangaplus:
     filenameTemplate: "{num:3} - Chapter {num}{title: - <.>} (mangaplus)" # Set specific for source (overrides global)
     language: 0 # ENGLISH=0, SPANISH=1, FRENCH=2, INDONESIAN=3, PORTUGUESE_BR=4, RUSSIAN=5, THAI=6
+# hooks:
+#   # Discord webhook — fires once at end of update run, even if nothing was downloaded
+#   discord:
+#     - name: "My Discord"
+#       webhookURL: "https://discord.com/api/webhooks/..."
+#       abortOnError: false
+#       fireIfEmpty: true         # fire even when 0 chapters downloaded
+#       on:
+#         - update.success
+#       aggregate: true           # batch all manga into one message
+#       embed: true
+#       template:
+#         title: "mangathr update"
+#         description: |
+#           {{ range .Items }}• {{ .Manga.Title }}: {{ .Chapter.Count }} chapter(s)
+#           {{ end }}
+#         color: 5814783
+#         footer: "mangathr"
+#
+#   # Generic HTTP webhook — fires after each chapter download
+#   webhook:
+#     - name: "My API"
+#       webhookURL: "https://example.com/hook"
+#       requestType: POST
+#       successCode: 200
+#       abortOnError: false
+#       fireIfEmpty: false
+#       on:
+#         - download.chapter
+#       aggregate: false
+#       body: |
+#         {"manga": "{{ .Manga.Title }}", "chapter": "{{ .Chapter.Num }}", "path": "{{ .Chapter.Path }}"}
+#       headers: |
+#         {"Authorization": "Bearer TOKEN"}
+#
+#   # Subcommand — runs a script after each chapter, aborts on failure
+#   subcommand:
+#     - name: "Post-process"
+#       command: "/usr/local/bin/post-process.sh"
+#       abortOnError: true
+#       fireIfEmpty: false
+#       on:
+#         - download.chapter
+#       aggregate: false
+#       args:
+#         - "{{ .Chapter.Path }}"
+#       env:
+#         MANGA_TITLE: "{{ .Manga.Title }}"
+#         CHAPTER_NUM: "{{ .Chapter.Num }}"
