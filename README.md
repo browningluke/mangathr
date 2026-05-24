@@ -366,6 +366,8 @@ hooks:
 ```
 
 ## Databases
+
+| Database   | Supported |
 |------------|:---------:|
 | SQLite3    |     ✓     |
 | PostgreSQL |     ✓     |
