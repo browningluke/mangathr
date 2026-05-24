@@ -371,8 +371,7 @@ hooks:
 |------------|:---------:|
 | SQLite3    |     ✓     |
 | PostgreSQL |     ✓     |
-| MySQL      |     ✗     |
-| MongoDB    |     ✗     |
+
 
 ### SQLite3
 
