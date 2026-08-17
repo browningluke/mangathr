@@ -10,7 +10,7 @@ require (
 	github.com/lib/pq v1.11.1
 	github.com/schollz/progressbar/v3 v3.19.0
 	github.com/spf13/cobra v1.10.2
-	google.golang.org/protobuf v1.36.11
+	google.golang.org/protobuf v1.36.12
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/helm v2.17.0+incompatible
 	modernc.org/sqlite v1.44.3
